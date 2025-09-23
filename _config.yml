@@ -1,8 +1,8 @@
 # ---- Site basics ----
 title: "Games Lab — Events & Experiences"
 description: "Immersive events, party games, and social experiences."
-url: ""                # keep empty for GitHub Pages project sites
-baseurl: ""            # we will use {{ '/path' | relative_url }} everywhere
+url: https://gameslabbangalore-maker.github.io                # keep empty for GitHub Pages project sites
+baseurl: /website            # we will use {{ '/path' | relative_url }} everywhere
 
 # ---- Build & Markdown ----
 markdown: kramdown
