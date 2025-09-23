@@ -1,0 +1,61 @@
+{%- comment -%}
+Contact block
+- Uses site.data.settings for contact links (email/phone/instagram/whatsapp)
+- Mobile: all items align consistently in one list
+{%- endcomment -%}
+
+<section class="contact">
+  <div class="container">
+    <h2 class="contact__title">Reach out to us</h2>
+
+    <ul class="contact__list">
+      {%- if site.data.settings.brand_email -%}
+      <li>
+        <span class="contact__label">Email</span>
+        <a href="mailto:{{ site.data.settings.brand_email }}">{{ site.data.settings.brand_email }}</a>
+      </li>
+      {%- endif -%}
+
+      {%- if site.data.settings.brand_phone -%}
+      <li>
+        <span class="contact__label">Phone</span>
+        <a href="tel:{{ site.data.settings.brand_phone | replace: ' ', '' }}">{{ site.data.settings.brand_phone }}</a>
+      </li>
+      {%- endif -%}
+
+      {%- if site.data.settings.brand_instagram -%}
+      <li>
+        <span class="contact__label">Instagram</span>
+        <a href="{{ site.data.settings.brand_instagram }}" target="_blank" rel="noopener">@gameslab</a>
+      </li>
+      {%- endif -%}
+
+      {%- if site.data.settings.brand_whatsapp -%}
+      <li>
+        <span class="contact__label">WhatsApp</span>
+        <a href="{{ site.data.settings.brand_whatsapp }}" target="_blank" rel="noopener">Chat with us</a>
+      </li>
+      {%- endif -%}
+    </ul>
+
+    <address class="contact__address">{{ site.data.settings.brand_address }}</address>
+  </div>
+</section>
+
+<style>
+.contact{ padding:32px 0; border-top:1px solid rgba(0,0,0,.08); }
+@media (prefers-color-scheme: dark){ .contact{ border-top-color: rgba(255,255,255,.08);} }
+.contact__title{ margin:0 0 12px; font-size:1.25rem; text-align:center; }
+.contact__list{
+  list-style:none; margin:0; padding:0;
+  display:grid; gap:10px; max-width:640px; margin-inline:auto;
+}
+.contact__list li{
+  display:grid; grid-template-columns: 120px 1fr; gap:12px; align-items:center;
+}
+.contact__label{ opacity:.7; }
+.contact__address{ text-align:center; margin-top:12px; opacity:.8; }
+@media (max-width: 560px){
+  .contact__list li{ grid-template-columns: 100px 1fr; }
+}
+</style>
