@@ -391,314 +391,285 @@ Say goodbye to the bar scene and hello to laughter, camaraderie, and friendly co
 
   <!-- Gallery -->
   <script>
-  (function(){
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSs9vlFaLhdFNFXvWsBIXlAJu0J5Dj2deY_7SlwAGd9Jk1-djK6xP3rdXim7Co0BJ-pUJueDCYYugew/pub?gid=1078145247&single=true&output=csv";
-    const MAX_SKELETONS = 6;
+(function(){
+  const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSs9vlFaLhdFNFXvWsBIXlAJu0J5Dj2deY_7SlwAGd9Jk1-djK6xP3rdXim7Co0BJ-pUJueDCYYugew/pub?gid=1078145247&single=true&output=csv";
+  const MAX_SKELETONS = 6;
 
-    const wrap = document.getElementById('gallery');
-    const track = document.getElementById('gallery-track');
-    const skel  = document.getElementById('gallery-skeletons');
-    if (!wrap || !track || !skel) return;
+  const wrap  = document.getElementById('gallery');
+  const track = document.getElementById('gallery-track');
+  const skel  = document.getElementById('gallery-skeletons');
+  if (!wrap || !track || !skel) return;
 
-    const isMobile = () => window.innerWidth <= 768;
-    const slidesPerView = () => 1;
-    const stepPct = () => 100 / slidesPerView();
+  // --- helpers ---
+  const isMobile        = () => window.innerWidth <= 768;
+  const slidesPerView   = () => 1;
+  const stepPct         = () => 100 / slidesPerView();
+  const slideTransform  = () => (isMobile() ? 'w-720,q-80' : 'w-1200,q-80'); // not applied unless ImageKit
+  const lightboxTransform = 'w-1600,q-80';
+  const blurTransform     = 'w-40,q-10,bl-6';
 
-    const lightboxTransform = () => 'w-1600,q-80,f-auto';
-    const blurTransform     = 'w-40,q-10,bl-6,f-auto';
-    const slideTransform    = () => (isMobile() ? 'w-720,q-80,f-auto' : 'w-1200,q-80,f-auto');
-
-    function withIK(url, transform) {
-      function withIK(url, transform) {
-  // Only touch ik.imagekit.io links. Otherwise return original.
-  if (!/https?:\/\/[^/]*ik\.imagekit\.io\//i.test(url)) return url;
-
-  const t = transform.includes('f-auto') ? transform : (transform + ',f-auto');
-  try {
-    const u = new URL(url);
-    if (/\/tr:/.test(u.pathname)) {
-      // already has a transform; append f-auto if missing
-      u.pathname = u.pathname.replace(/\/tr:([^/]+)/, (m, g1) => {
-        return '/tr:' + (g1.includes('f-auto') ? g1 : g1 + ',f-auto');
-      });
-      return u.toString();
-    }
-    // insert /tr:<t> after the endpoint segment
-    const parts = u.pathname.split('/');
-    // ['', 'gameslab', '...']
-    if (parts.length >= 3) {
-      parts.splice(2, 0, 'tr:' + t);
-      u.pathname = parts.join('/');
-      return u.toString();
-    }
-    return url;
-  } catch (e) {
-    return url; // absolute fallback
+  // Only transform ik.imagekit.io URLs; otherwise return original unchanged
+  function withIK(url, transform) {
+    if (!/https?:\/\/[^/]*ik\.imagekit\.io\//i.test(url)) return url;
+    try {
+      const u = new URL(url);
+      if (/\/tr:/.test(u.pathname)) {
+        // append f-auto if missing
+        u.pathname = u.pathname.replace(/\/tr:([^/]+)/, (m, g1) => {
+          const t = g1.includes('f-auto') ? g1 : g1 + ',f-auto';
+          return '/tr:' + t;
+        });
+        return u.toString();
+      }
+      // insert /tr:<transform,f-auto> after endpoint segment
+      const parts = u.pathname.split('/'); // ["", "gameslab", ...]
+      if (parts.length >= 3) {
+        const t = (transform ? transform + ',' : '') + 'f-auto';
+        parts.splice(2, 0, 'tr:' + t);
+        u.pathname = parts.join('/');
+        return u.toString();
+      }
+      return url;
+    } catch(e) { return url; }
   }
-}
 
-
-    function createSlide(obj){
-      const slide = document.createElement('div');
-      slide.className = 'gal-slide';
-
-      const bg = document.createElement('div');
-      bg.className = 'gal-bg';
-      bg.style.backgroundImage = `url("${withIK(obj.Image, blurTransform)}")`;
-      slide.appendChild(bg);
-
-      const img = document.createElement('img');
-      img.className = 'gal-img';
-      img.alt = obj.Alt || '';
-      img.loading = 'lazy';
-      img.decoding = 'async';
-      img.src = withIK(obj.Image, slideTransform());
-      img.onerror = function () {
-        if (!img.dataset.retry) {
-          img.dataset.retry = '1';
-          img.src = withIK(obj.Image, slideTransform().replace('f-auto', 'f-jpg'));
-        }
-      };
-      img.addEventListener('load', ()=>{
-        if (img.naturalHeight > img.naturalWidth) slide.classList.add('portrait');
-      }, { once:true });
-
-      slide.addEventListener('click', () => openLightbox(realIndexFromSlide(slide)));
-      slide.appendChild(img);
-      return slide;
+  // case-insensitive CSV getter
+  function get(row, key){
+    const w = key.toLowerCase();
+    for (const k in row) {
+      if (Object.prototype.hasOwnProperty.call(row,k) && k.toLowerCase().trim() === w) {
+        return String(row[k] || '').trim();
+      }
     }
+    return '';
+  }
 
-    fetch(CSV_URL, { cache: 'no-cache' })
-      .then(r => r.text())
-      .then(text => Papa.parse(text, { header:true, skipEmptyLines:true }).data)
-      .then(rows => {
-        const items = rows
-          .map((r,i)=>({
-            _i:i,
-            Image:String(r['Image']||'').trim(),
-            Alt:String(r['Alt']||'').trim(),
-            Caption:String(r['Caption']||'').trim(),
-            Show:String(r['Show']||'').trim().toLowerCase(),
-            Order:(r['Order']!==undefined && r['Order']!=='') ? Number(r['Order']) : null
-          }))
-          .filter(r => r.Image && (r.Show==='yes' || r.Show==='y' || r.Show==='true'))
-          .sort((a,b)=>{
-            if (a.Order!=null && b.Order!=null) return a.Order - b.Order;
-            if (a.Order!=null) return -1;
-            if (b.Order!=null) return 1;
-            return a._i - b._i;
-          });
+  function createSlide(obj){
+    const slide = document.createElement('div');
+    slide.className = 'gal-slide';
 
-        if (!items.length) {
-          skel.innerHTML = '<div style="color:#bbb;text-align:center;padding:16px 0">No gallery images yet.</div>';
-          return;
+    const bg = document.createElement('div');
+    bg.className = 'gal-bg';
+    bg.style.backgroundImage = `url("${withIK(obj.image, blurTransform)}")`;
+    slide.appendChild(bg);
+
+    const img = document.createElement('img');
+    img.className = 'gal-img';
+    img.alt = obj.alt || '';
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    img.src = withIK(obj.image, slideTransform());
+    img.onerror = function(){
+      // retry once without f-auto (jpg) if ImageKit
+      if (!img.dataset.retry && /ik\.imagekit\.io/.test(obj.image)) {
+        img.dataset.retry = '1';
+        img.src = withIK(obj.image, slideTransform().replace('f-auto','f-jpg'));
+      }
+    };
+    img.addEventListener('load', ()=>{
+      if (img.naturalHeight > img.naturalWidth) slide.classList.add('portrait');
+    }, { once:true });
+
+    slide.addEventListener('click', () => openLightbox(obj.idx));
+    slide.appendChild(img);
+    return slide;
+  }
+
+  fetch(CSV_URL, { cache: 'no-cache' })
+    .then(r => r.text())
+    .then(t => Papa.parse(t, { header:true, skipEmptyLines:true }).data)
+    .then(rows => {
+      const items = rows
+        .map((r,i)=>({
+          idx: i,
+          image:   get(r,'Image'),
+          alt:     get(r,'Alt'),
+          caption: get(r,'Caption'),
+          show:    (get(r,'Show') || 'yes').toLowerCase(),
+          order:   (()=>{ const v = get(r,'Order'); return v!=='' ? Number(v) : null; })()
+        }))
+        // show any row that has an Image; if "Show" exists and is a clear "no", hide it
+        .filter(r => r.image && !['no','n','false','0'].includes(r.show))
+        .sort((a,b)=>{
+          if (a.order!=null && b.order!=null) return a.order - b.order;
+          if (a.order!=null) return -1;
+          if (b.order!=null) return 1;
+          return a.idx - b.idx;
+        });
+
+      if (!items.length) {
+        skel.innerHTML = '<div style="color:#bbb;text-align:center;padding:16px 0">No gallery images yet. Check CSV (Image / Show columns).</div>';
+        return;
+      }
+
+      // trim skeletons to count cap
+      while (skel.children.length > Math.min(items.length, MAX_SKELETONS)) {
+        skel.removeChild(skel.lastElementChild);
+      }
+
+      // build track with clones for infinite loop
+      let pos = 0, spv = slidesPerView(), sliding = false;
+
+      function buildTrack(){
+        spv = slidesPerView();
+        track.innerHTML = '';
+
+        const head = [], tail = [];
+        for (let i=0;i<spv;i++){
+          const hc = createSlide(items[i]); head.push(hc);
+          const idx = items.length - spv + i;
+          const tc = createSlide(items[idx]); tail.push(tc);
         }
+        track.append(...tail);
+        items.forEach(it => track.appendChild(createSlide(it)));
+        track.append(...head);
 
-        while (skel.children.length > Math.min(items.length, MAX_SKELETONS)) {
-          skel.removeChild(skel.lastElementChild);
-        }
+        pos = spv;
+        setTransform(false);
+        skel.style.display = 'none';
+      }
 
-        let slides = items.map(createSlide);
-        let pos = 0;
-        let spv = slidesPerView();
-
-        function buildTrack() {
-          spv = slidesPerView();
-          track.innerHTML = '';
-
-          const headClones = [];
-          const tailClones = [];
-          for (let i=0;i<spv;i++){
-            const hc = createSlide(items[i]); hc.dataset.clone='head'; headClones.push(hc);
-            const idx = items.length - spv + i;
-            const tc = createSlide(items[idx]); tc.dataset.clone='tail'; tailClones.push(tc);
-          }
-
-          track.append(...tailClones);
-          slides.forEach(s => track.appendChild(s));
-          track.append(...headClones);
-
-          pos = spv;
-          setTransform(false);
-          skel.style.display = 'none';
-          preloadAround(pos);
-        }
-
-        function setTransform(withAnim=true){
-          const step = stepPct();
-          const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-          track.style.transition = (withAnim && !reduce) ? 'transform .35s ease' : 'none';
-          track.style.transform = `translate3d(-${pos*step}%,0,0)`;
-        }
-
-        function realIndexFromPos(p){
-          const n = items.length;
-          return ((p - spv + n) % n);
-        }
-        function realIndexFromSlide(slide){
-          const idx = Array.from(track.children).indexOf(slide);
-          return realIndexFromPos(idx);
-        }
-
-        function go(delta){
-          if (sliding) return;
-          sliding = true;
-          pos += delta;
-          setTransform(true);
-          setTimeout(()=>{
-            const total = items.length;
-            if (pos < spv) {
-              pos += total;
-              setTransform(false);
-            } else if (pos > total + spv - 1) {
-              pos -= total;
-              setTransform(false);
-            }
-            sliding = false;
-          }, 380);
-        }
-
-        function preloadAround(p){
-          [p-1,p,p+1].forEach(k=>{
-            const el = track.children[k];
-            if(!el) return;
-            const img = el.querySelector('img.gal-img');
-            if (img && img.dataset.src){ img.src = img.dataset.src; delete img.dataset.src; }
-          });
-        }
-
-        buildTrack();
-
-        const prevBtn = wrap.querySelector('.gal-prev');
-        const nextBtn = wrap.querySelector('.gal-next');
-        prevBtn.addEventListener('click', ()=>go(-1));
-        nextBtn.addEventListener('click', ()=>go(1));
-
-        const viewport = wrap.querySelector('.gallery-viewport');
-        let startX=0, startPos=pos, dragging=false, sliding=false;
-
-        const W = () => viewport.clientWidth;
-        function onDown(e){
-          dragging = true;
-          track.style.transition = 'none';
-          startX = (e.touches ? e.touches[0].clientX : e.clientX);
-          startPos = pos;
-          pauseAuto();
-        }
-        function onMove(e){
-          if (!dragging) return;
-          const x = (e.touches ? e.touches[0].clientX : e.clientX);
-          const dx = x - startX;
-          const pct = dx / W() * 100;
-          const step = stepPct();
-          track.style.transform = `translate3d(-${startPos*step - pct}%,0,0)`;
-        }
-        function onUp(e){
-          if (!dragging) return;
-          dragging = false;
-          const x = (e.changedTouches ? e.changedTouches[0].clientX : e.clientX);
-          const dx = x - startX;
-          const threshold = Math.max(40, (W()/slidesPerView())*0.2);
-          if (dx > threshold) go(-1);
-          else if (dx < -threshold) go(1);
-          else setTransform(true);
-          resumeAutoSoon();
-        }
-
-        viewport.addEventListener('mousedown', onDown);
-        viewport.addEventListener('mousemove', onMove);
-        window.addEventListener('mouseup', onUp);
-        viewport.addEventListener('touchstart', onDown, { passive:true });
-        viewport.addEventListener('touchmove', onMove, { passive:true });
-        viewport.addEventListener('touchend', onUp);
-
+      function setTransform(animate=true){
         const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        let timer = null, paused = false;
-        function tick(){ if (!paused) go(1); }
-        function startAuto(){ if (!reduce && !timer) timer = setInterval(tick, 3500); }
-        function stopAuto(){ if (timer){ clearInterval(timer); timer = null; } }
-        function pauseAuto(){ paused = true; stopAuto(); }
-        function resumeAuto(){ paused = false; startAuto(); }
-        function resumeAutoSoon(){ setTimeout(()=>!dragging && resumeAuto(), 1200); }
+        track.style.transition = (animate && !reduce) ? 'transform .35s ease' : 'none';
+        track.style.transform  = `translate3d(-${pos*stepPct()}%,0,0)`;
+      }
 
-        if (!reduce) startAuto();
-        viewport.addEventListener('mouseenter', pauseAuto);
-        viewport.addEventListener('mouseleave', resumeAuto);
-        viewport.addEventListener('touchstart', pauseAuto, {passive:true});
-        viewport.addEventListener('touchend', resumeAutoSoon);
+      function go(delta){
+        if (sliding) return;
+        sliding = true;
+        pos += delta;
+        setTransform(true);
+        setTimeout(()=>{
+          const total = items.length;
+          if (pos < spv) { pos += total; setTransform(false); }
+          else if (pos > total + spv - 1) { pos -= total; setTransform(false); }
+          sliding = false;
+        }, 380);
+      }
 
-        let lastSPV = slidesPerView();
-        window.addEventListener('resize', ()=>{
-          const now = slidesPerView();
-          if (now !== lastSPV){
-            lastSPV = now;
-            buildTrack();
-            return;
-          }
-          [pos-1,pos,pos+1].forEach(k=>{
-            const el = track.children[k];
-            if(!el) return;
-            const img = el.querySelector('img.gal-img');
-            if(!img) return;
-            const raw = items[realIndexFromPos(k)].Image;
-            img.src = withIK(raw, slideTransform());
-          });
-        });
+      buildTrack();
 
-        const lb = document.getElementById('gal-lightbox');
-        const lbImg = document.getElementById('gal-lightbox-img');
-        const lbCap = document.getElementById('gal-lightbox-cap');
-        const lbClose = lb.querySelector('.gal-lightbox-close');
-        const lbPrev = lb.querySelector('.gal-lightbox-prev');
-        const lbNext = lb.querySelector('.gal-lightbox-next');
+      // arrows (hidden on mobile via CSS)
+      wrap.querySelector('.gal-prev').addEventListener('click', ()=>go(-1));
+      wrap.querySelector('.gal-next').addEventListener('click', ()=>go(1));
 
-        let currentReal = realIndexFromPos(pos);
-        function openLightbox(realIdx){
-          currentReal = realIdx;
-          updateLightbox();
-          lb.hidden = false;
-          pauseAuto();
-        }
-        function closeLightbox(){ lb.hidden = true; resumeAutoSoon(); }
-        function updateLightbox(){
-          const item = items[currentReal];
-          lbImg.src = withIK(item.Image, lightboxTransform());
-          lbImg.alt = item.Alt || '';
-          lbImg.onerror = function () {
-            if (!lbImg.dataset.retry) {
-              lbImg.dataset.retry = '1';
-              lbImg.src = withIK(item.Image, lightboxTransform().replace('f-auto','f-jpg'));
-            }
-          };
-          lbCap.textContent = item.Caption ? item.Caption : '';
-          lbCap.style.display = item.Caption ? 'block' : 'none';
-        }
-        function lbGo(delta){
-          currentReal = (currentReal + delta + items.length) % items.length;
-          updateLightbox();
-        }
+      // swipe / drag
+      const viewport = wrap.querySelector('.gallery-viewport');
+      let startX=0, startPos=pos, dragging=false;
 
-        lbClose.addEventListener('click', closeLightbox);
-        lbPrev.addEventListener('click', ()=>lbGo(-1));
-        lbNext.addEventListener('click', ()=>lbGo(1));
-        lb.addEventListener('click', (e)=>{ if (e.target === lb) closeLightbox(); });
+      const W = () => viewport.clientWidth;
+      function onDown(e){
+        dragging = true;
+        track.style.transition = 'none';
+        startX = (e.touches ? e.touches[0].clientX : e.clientX);
+        startPos = pos;
+        pauseAuto();
+      }
+      function onMove(e){
+        if (!dragging) return;
+        const x  = (e.touches ? e.touches[0].clientX : e.clientX);
+        const dx = x - startX;
+        const pct = dx / W() * 100;
+        track.style.transform = `translate3d(-${startPos*stepPct() - pct}%,0,0)`;
+      }
+      function onUp(e){
+        if (!dragging) return;
+        dragging = false;
+        const x  = (e.changedTouches ? e.changedTouches[0].clientX : e.clientX);
+        const dx = x - startX;
+        const threshold = Math.max(40, (W()/slidesPerView())*0.2);
+        if (dx > threshold) go(-1);
+        else if (dx < -threshold) go(1);
+        else setTransform(true);
+        resumeAutoSoon();
+      }
 
-        let lStart=0, lDrag=false;
-        lb.addEventListener('touchstart', e=>{ lDrag=true; lStart=e.touches[0].clientX; }, {passive:true});
-        lb.addEventListener('touchend', e=>{
-          if(!lDrag) return; lDrag=false;
-          const dx = e.changedTouches[0].clientX - lStart;
-          const thr = 50;
-          if (dx > thr) lbGo(-1);
-          else if (dx < -thr) lbGo(1);
-        });
-      })
-      .catch(err => {
-        console.error('Gallery load error:', err);
-        skel.innerHTML = '<div style="color:#f66;text-align:center;padding:16px 0">Could not load gallery.</div>';
+      viewport.addEventListener('mousedown', onDown);
+      viewport.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onUp);
+      viewport.addEventListener('touchstart', onDown, { passive:true });
+      viewport.addEventListener('touchmove', onMove, { passive:true });
+      viewport.addEventListener('touchend', onUp);
+
+      // autoplay
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let timer = null, paused = false;
+      function tick(){ if (!paused) go(1); }
+      function startAuto(){ if (!reduce && !timer) timer = setInterval(tick, 3500); }
+      function stopAuto(){ if (timer){ clearInterval(timer); timer = null; } }
+      function pauseAuto(){ paused = true; stopAuto(); }
+      function resumeAuto(){ paused = false; startAuto(); }
+      function resumeAutoSoon(){ setTimeout(()=>!dragging && resumeAuto(), 1200); }
+
+      startAuto();
+      viewport.addEventListener('mouseenter', pauseAuto);
+      viewport.addEventListener('mouseleave', resumeAuto);
+      viewport.addEventListener('touchstart', pauseAuto, {passive:true});
+      viewport.addEventListener('touchend', resumeAutoSoon);
+
+      // lightbox
+      const lb     = document.getElementById('gal-lightbox');
+      const lbImg  = document.getElementById('gal-lightbox-img');
+      const lbCap  = document.getElementById('gal-lightbox-cap');
+      const lbClose= lb.querySelector('.gal-lightbox-close');
+      const lbPrev = lb.querySelector('.gal-lightbox-prev');
+      const lbNext = lb.querySelector('.gal-lightbox-next');
+
+      let current = 0;
+      function openLightbox(realIdx){
+        current = realIdx % items.length;
+        updateLightbox();
+        lb.hidden = false;
+        pauseAuto();
+      }
+      function closeLightbox(){ lb.hidden = true; resumeAutoSoon(); }
+      function updateLightbox(){
+        const it = items[current];
+        // Only apply IK transform if host is ImageKit; otherwise load raw
+        const src = /ik\.imagekit\.io/.test(it.image)
+          ? withIK(it.image, lightboxTransform)
+          : it.image;
+        lbImg.src = src;
+        lbImg.alt = it.alt || '';
+        lbCap.textContent = it.caption || '';
+        lbCap.style.display = it.caption ? 'block' : 'none';
+      }
+      function lbGo(d){ current = (current + d + items.length) % items.length; updateLightbox(); }
+
+      lbClose.addEventListener('click', closeLightbox);
+      lbPrev .addEventListener('click', ()=>lbGo(-1));
+      lbNext .addEventListener('click', ()=>lbGo(1));
+      lb.addEventListener('click', (e)=>{ if (e.target === lb) closeLightbox(); });
+
+      // swipe in lightbox
+      let lStart=0, lDrag=false;
+      lb.addEventListener('touchstart', e=>{ lDrag=true; lStart=e.touches[0].clientX; }, {passive:true});
+      lb.addEventListener('touchend', e=>{
+        if(!lDrag) return; lDrag=false;
+        const dx = e.changedTouches[0].clientX - lStart;
+        const thr = 50;
+        if (dx > thr) lbGo(-1);
+        else if (dx < -thr) lbGo(1);
       });
-  })();
-  </script>
+
+      // handle resize
+      let lastSPV = slidesPerView();
+      window.addEventListener('resize', ()=>{
+        const now = slidesPerView();
+        if (now !== lastSPV){
+          lastSPV = now;
+          buildTrack();
+        }
+      });
+    })
+    .catch(err => {
+      console.error('Gallery load error:', err);
+      skel.innerHTML = '<div style="color:#f66;text-align:center;padding:16px 0">Could not load gallery.</div>';
+    });
+})();
+</script>
+
 
   <!-- Elfsight lazy loader -->
   <script>
