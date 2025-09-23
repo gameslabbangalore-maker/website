@@ -8,3 +8,11 @@ brand_phone: "+91-00000-00000"
 brand_instagram: "https://instagram.com/gameslab"
 brand_whatsapp: "https://wa.me/910000000000"
 brand_address: "Bengaluru, India"
+
+gallery_home:
+  - /assets/img/sample1.jpg
+  - /assets/img/sample2.jpg
+  - /assets/img/sample3.jpg
+  - /assets/img/sample4.jpg
+  - /assets/img/sample5.jpg
+  - /assets/img/sample6.jpg
