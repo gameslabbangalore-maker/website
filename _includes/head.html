@@ -1,0 +1,17 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
+<meta name="description" content="{{ page.seo_description | default: site.description }}">
+
+<!-- Favicon placeholders (swap when ready) -->
+<link rel="icon" href="{{ '/favicon.ico' | relative_url }}">
+
+<!-- Main stylesheet (Jekyll will compile SCSS to /assets/css/site.css) -->
+<link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+
+<!-- GitHub Pages–whitelisted SEO helper -->
+{% if site.plugins contains 'jekyll-seo-tag' %}
+  {% seo %}
+{% endif %}
+
+<meta name="theme-color" content="#181818">
