@@ -1,9 +1,9 @@
 ---
 layout: default
 ---
-<section class="home-intro">
-  <div class="container">
-    <h1>{{ page.title }}</h1>
-    <p style="opacity:.7">Homepage shell is wired up. We’ll drop real sections (microbar/highlights/gallery/contact) next.</p>
-  </div>
-</section>
+{%- assign sections = page.sections | default: "highlights,gallery,contact" | split: "," -%}
+
+{%- for section in sections -%}
+  {%- capture include_name -%}{{ section | strip }}.html{%- endcapture -%}
+  {%- include {{ include_name }} -%}
+{%- endfor -%}
