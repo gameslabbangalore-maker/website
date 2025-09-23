@@ -409,35 +409,34 @@ Say goodbye to the bar scene and hello to laughter, camaraderie, and friendly co
     const slideTransform    = () => (isMobile() ? 'w-720,q-80,f-auto' : 'w-1200,q-80,f-auto');
 
     function withIK(url, transform) {
-      function ensureFAuto(t){ return t.includes('f-auto') ? t : (t + (t.endsWith(',') ? '' : ',') + 'f-auto'); }
-      const needed = ensureFAuto(transform);
-      try {
-        const u = new URL(url);
-        const trMatch = u.pathname.match(/\\/tr:([^/]+)/);
-        if (trMatch) {
-          const current = trMatch[1];
-          if (!/(\\b|,)f-auto(\\b|,)/.test(current)) {
-            u.pathname = u.pathname.replace('/tr:' + current, '/tr:' + current + ',f-auto');
-          }
-          return u.toString();
-        }
-        const parts = u.pathname.split('/');
-        if (parts.length >= 3) {
-          parts.splice(2, 0, 'tr:' + needed);
-          u.pathname = parts.join('/');
-          return u.toString();
-        } else {
-          u.pathname = u.pathname.replace(/\\/?$/, '/') + 'tr:' + needed;
-          return u.toString();
-        }
-      } catch(e) {
-        if (url.includes('/tr:')) return url.replace(/(\\/tr:[^/]+)/, m => m.includes('f-auto') ? m : m + ',f-auto');
-        const m = url.match(/^(https?:\\/\\/[^/]+)\\/([^/]+)(\\/.*)?$/);
-        if (!m) return url;
-        const origin = m[1], endpoint = m[2], rest = m[3] || '';
-        return `${origin}/${endpoint}/tr:${needed}${rest}`;
-      }
+      function withIK(url, transform) {
+  // Only touch ik.imagekit.io links. Otherwise return original.
+  if (!/https?:\/\/[^/]*ik\.imagekit\.io\//i.test(url)) return url;
+
+  const t = transform.includes('f-auto') ? transform : (transform + ',f-auto');
+  try {
+    const u = new URL(url);
+    if (/\/tr:/.test(u.pathname)) {
+      // already has a transform; append f-auto if missing
+      u.pathname = u.pathname.replace(/\/tr:([^/]+)/, (m, g1) => {
+        return '/tr:' + (g1.includes('f-auto') ? g1 : g1 + ',f-auto');
+      });
+      return u.toString();
     }
+    // insert /tr:<t> after the endpoint segment
+    const parts = u.pathname.split('/');
+    // ['', 'gameslab', '...']
+    if (parts.length >= 3) {
+      parts.splice(2, 0, 'tr:' + t);
+      u.pathname = parts.join('/');
+      return u.toString();
+    }
+    return url;
+  } catch (e) {
+    return url; // absolute fallback
+  }
+}
+
 
     function createSlide(obj){
       const slide = document.createElement('div');
