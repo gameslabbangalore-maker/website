@@ -1,0 +1,134 @@
+{%- comment -%}
+Microbar (top strip) for event pages.
+Reads front matter fields from the event file:
+title, date_utc, duration_hours, scheduled (bool), price,
+location_name, location_maps_url, ticket_url
+{%- endcomment -%}
+
+<section class="microbar">
+  <div class="container microbar__grid">
+
+    <!-- Left side: Title, date/time OR price, location -->
+    <div class="microbar__left">
+      <h1 class="microbar__title">{{ page.title }}</h1>
+
+      {%- if page.scheduled == true and page.date_utc -%}
+        <div class="microbar__meta">
+          <span class="microbar__datetime">
+            {{ page.date_utc | date: "%a, %b %e, %Y" }}
+            &nbsp;•&nbsp;
+            {%- if page.date_utc -%}{{ page.date_utc | date: "%-I:%M %p" }} IST{%- endif -%}
+            {%- if page.duration_hours -%}&nbsp;•&nbsp;{{ page.duration_hours }} hrs{%- endif -%}
+          </span>
+          {%- if page.location_name -%}
+            <span class="microbar__location">{{ page.location_name }}</span>
+          {%- endif -%}
+        </div>
+      {%- else -%}
+        <div class="microbar__meta">
+          {%- if page.duration_hours -%}
+            <span class="microbar__duration">{{ page.duration_hours }} hrs</span>
+          {%- endif -%}
+          {%- if page.price -%}
+            <span class="microbar__price">{{ page.price }}</span>
+          {%- endif -%}
+          {%- if page.location_name -%}
+            <span class="microbar__location">{{ page.location_name }}</span>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <!-- Right side: Share, Add to Calendar, Get Directions -->
+    <div class="microbar__right">
+      <a href="#" class="btn btn--link microbar__share" id="shareBtn">Share</a>
+
+      {%- if page.scheduled == true and page.date_utc -%}
+        <a href="#" class="btn btn--link" id="addToCalendar"
+           data-date="{{ page.date_utc | date: "%Y%m%dT%H%M%S" }}"
+           data-duration="{{ page.duration_hours | default: 2 }}"
+           data-title="{{ page.title | xml_escape }}"
+           data-location="{{ page.location_name | default: '' | xml_escape }}"
+           data-url="{{ page.url | absolute_url | xml_escape }}">
+          Add to Calendar
+        </a>
+      {%- endif -%}
+
+      {%- if page.location_maps_url -%}
+        <a class="btn btn--link" href="{{ page.location_maps_url }}" target="_blank" rel="noopener">
+          Get Directions
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<style>
+/* minimal styles so it looks sane; we’ll migrate to SCSS later */
+.microbar { padding: 16px 0; border-bottom: 1px solid rgba(0,0,0,.08); }
+@media (prefers-color-scheme: dark){ .microbar { border-bottom-color: rgba(255,255,255,.08);} }
+.microbar__grid { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
+.microbar__title { margin: 0 0 6px; line-height: 1.2; }
+.microbar__meta { display: flex; flex-wrap: wrap; gap: 8px 12px; opacity: .85; }
+.microbar__right { display: flex; gap: 12px; align-items: center; justify-content: flex-end; }
+.btn--link { text-decoration: none; opacity:.9; }
+.btn--link:hover { text-decoration: underline; }
+.microbar__price { font-weight: 600; }
+</style>
+
+<script>
+/* Share button (uses Web Share API when available, falls back to copying link) */
+(function(){
+  var shareBtn = document.getElementById('shareBtn');
+  if(!shareBtn) return;
+  shareBtn.addEventListener('click', function(e){
+    e.preventDefault();
+    var shareData = {
+      title: document.title,
+      text: "{{ page.title | escape }}",
+      url: "{{ page.url | absolute_url | escape }}"
+    };
+    if (navigator.share) {
+      navigator.share(shareData).catch(function(){});
+    } else {
+      navigator.clipboard && navigator.clipboard.writeText(shareData.url);
+      alert('Link copied!');
+    }
+  });
+})();
+
+/* Build a Google Calendar URL from front matter (no plugins needed) */
+(function(){
+  var link = document.getElementById('addToCalendar');
+  if(!link) return;
+  var start = link.dataset.date; // YYYYMMDDTHHMMSS (UTC per Jekyll filter)
+  var durHrs = parseFloat(link.dataset.duration || "2");
+  // Compute end time by adding hours (rough; fine for typical events)
+  function addHours(yyyymmddThhmmss, hours){
+    var y = yyyymmddThhmmss.slice(0,4);
+    var m = yyyymmddThhmmss.slice(4,6);
+    var d = yyyymmddThhmmss.slice(6,8);
+    var H = yyyymmddThhmmss.slice(9,11);
+    var M = yyyymmddThhmmss.slice(11,13);
+    var S = yyyymmddThhmmss.slice(13,15);
+    var dt = new Date(Date.UTC(+y, +m-1, +d, +H, +M, +S));
+    dt = new Date(dt.getTime() + hours*60*60*1000);
+    var pad = n => String(n).padStart(2,'0');
+    return dt.getUTCFullYear()
+      + pad(dt.getUTCMonth()+1)
+      + pad(dt.getUTCDate())
+      + "T" + pad(dt.getUTCHours()) + pad(dt.getUTCMinutes()) + pad(dt.getUTCSeconds());
+  }
+  var end = addHours(start, durHrs);
+  var params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: link.dataset.title || document.title,
+    dates: start + "/" + end,    // treated as UTC (Z implied)
+    details: (link.dataset.url || ""),
+    location: link.dataset.location || ""
+  });
+  link.href = "https://www.google.com/calendar/render?" + params.toString();
+  link.target = "_blank";
+  link.rel = "noopener";
+})();
+</script>
