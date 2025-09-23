@@ -1,3 +1,716 @@
+---
+---
+<!doctype html>
+<html lang="en">
 <head>
   {% include head.html %}
 </head>
+<body>
+  {% include header.html %}
+
+  <main class="wrap" role="main">
+    <h1 class="sr-only">Games Lab — Events & Experiences</h1>
+
+    <!-- Animated headline -->
+    <div class="animated-wrapper" aria-live="polite">
+      <div class="animated-text"></div>
+    </div>
+
+    {% include divider.html %}
+    <div class="title"><h2>Upcoming Events</h2></div>
+
+    <div id="events" class="cards-row" aria-live="polite"></div>
+
+    {% include divider.html mt:"40px" %}
+    <div class="title" style="margin-top:40px;"><h2>Explore Our Other Events</h2></div>
+    <div id="explore-cards" class="cards-row"></div>
+
+    <!-- ===== Gallery ===== -->
+    {% include divider.html mt:"40px" %}
+    <div class="title" style="margin-top:40px;"><h2>Gallery</h2></div>
+
+    <div id="gallery" class="gallery-wrap">
+      <!-- Desktop arrows (hidden on mobile) -->
+      <button class="gal-nav gal-prev" aria-label="Previous image">&lsaquo;</button>
+      <button class="gal-nav gal-next" aria-label="Next image">&rsaquo;</button>
+
+      <!-- Skeletons while CSV loads -->
+      <div id="gallery-skeletons" class="gallery-skeletons">
+        <div class="gal-skel"><div class="gal-skel-bg"></div></div>
+        <div class="gal-skel"><div class="gal-skel-bg"></div></div>
+        <div class="gal-skel"><div class="gal-skel-bg"></div></div>
+        <div class="gal-skel"><div class="gal-skel-bg"></div></div>
+        <div class="gal-skel"><div class="gal-skel-bg"></div></div>
+        <div class="gal-skel"><div class="gal-skel-bg"></div></div>
+      </div>
+
+      <!-- Slider -->
+      <div class="gallery-viewport">
+        <div class="gallery-track" id="gallery-track" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div id="gal-lightbox" class="gal-lightbox" hidden>
+      <div class="gal-lightbox-inner">
+        <button class="gal-lightbox-close" aria-label="Close">&times;</button>
+        <button class="gal-lightbox-prev" aria-label="Previous">&lsaquo;</button>
+        <button class="gal-lightbox-next" aria-label="Next">&rsaquo;</button>
+        <div class="gal-lightbox-stage">
+          <img id="gal-lightbox-img" alt="">
+          <div id="gal-lightbox-cap" class="gal-lightbox-cap"></div>
+        </div>
+      </div>
+    </div>
+    <!-- ===== /Gallery ===== -->
+
+    {% include divider.html mt:"40px" %}
+    <div class="title" style="margin-top:40px;"><h2>About Us</h2></div>
+    <div style="max-width:800px;margin:0 auto;text-align:justify;white-space:pre-line;line-height:1.6;font-size:1rem;padding:0 10px;">
+Games Lab is a group of fun loving people organizing fun events throughout the year. We aim to make life happier and lighter for all who join us. We strive for unique experiences, memorable time, and widest smiles.
+
+Games Lab uses innovative ideas and curates the best social experiences for people. We give unique twists to world renowned games and help people stay happening.
+
+Instead of the typical alcohol-focused gatherings, we bring people together through the joy of fun events and workshops. Whether it’s Mafia, Game Night, Interactive Challenges or Workshops, this community creates a fun and inclusive environment where everyone can relax and connect.
+
+Say goodbye to the bar scene and hello to laughter, camaraderie, and friendly competition. At our events discover a refreshing alternative to traditional socializing, where friendships take center stage and lasting memories are made.
+    </div>
+
+    <!-- Reviews -->
+    {% include divider.html mt:"40px" %}
+    <div class="title" style="margin-top:40px;"><h2>What Our Attendees Say</h2></div>
+
+    <section id="reviews" class="reviews-wrap">
+      <div id="reviews-placeholder" style="text-align:center;padding:14px 0;color:var(--muted)">
+        Loading reviews…
+      </div>
+      <div class="elfsight-app-3c382168-0e66-4f66-b811-109f6deef90d" data-elfsight-app-lazy></div>
+    </section>
+
+    {% include divider.html mt:"40px" %}
+    <div class="title" style="margin-top:40px;"><h2>Contact Us</h2></div>
+    {% include contact.html %}
+
+  </main>
+
+  <!-- One-time typing animation -->
+  <script>
+    (function(){
+      const lines = [
+        'IF "HOW TO HAVE A GOOD TIME ?"','IS THE QUESTION,','WE ARE THE ANSWER'
+      ];
+      const msg = lines.join('\\n');
+      const el = document.querySelector('.animated-text');
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      el.textContent = msg;
+      if (reduceMotion) return;
+
+      let i = 0;
+      const delay = 55;
+      el.textContent = '';
+      (function typeOnce(){
+        if (i <= msg.length) {
+          el.textContent = msg.substring(0, i);
+          i++;
+          setTimeout(typeOnce, delay);
+        }
+      })();
+    })();
+  </script>
+
+  {% include scripts-skeletons.html %}
+
+  <!-- Upcoming Events -->
+  <script>
+    (async function(){
+      const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSs9vlFaLhdFNFXvWsBIXlAJu0J5Dj2deY_7SlwAGd9Jk1-djK6xP3rdXim7Co0BJ-pUJueDCYYugew/pub?gid=1356004046&single=true&output=csv";
+      const fallbackImage = "https://via.placeholder.com/800x450?text=Event+Image";
+      const container = document.getElementById("events");
+
+      setSkeletons(container, 3);
+
+      function clean(v){ if (v === undefined || v === null) return ""; return String(v).trim().replace(/^\"|\"$/g, ''); }
+      function parseEventDate(str) {
+        if (!str) return null;
+        str = str.trim().replace(/^[A-Za-z]{3},?\\s*/, '').replace(/’/g,"'").replace(/`/g,"'");
+        const parts = str.match(/^(\\d{1,2})\\s+([A-Za-z]{3})\\s+'(\\d{2})$/);
+        if (!parts) return null;
+        const [_, day, monthStr, yearStr] = parts;
+        const month = { Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11 }[monthStr];
+        if (month === undefined) return null;
+        const year = 2000 + parseInt(yearStr, 10);
+        return new Date(year, month, parseInt(day, 10));
+      }
+
+      try{
+        const res = await fetch(csvUrl + '&cb=' + Date.now(), { cache: "no-store" });
+        if(!res.ok) throw new Error("CSV fetch failed: " + res.status);
+        const csvText = await res.text();
+
+        const parsed = Papa.parse(csvText, {skipEmptyLines:true});
+        const rows = parsed.data || [];
+        if (rows.length < 2) {
+          container.innerHTML = '<p style="color:#bbb">No events found in the sheet.</p>';
+          return;
+        }
+
+        const dataRows = rows.slice(1).filter(r => r && r[0] && String(r[0]).trim() !== "");
+        const today = new Date(); today.setHours(0,0,0,0);
+
+        const items = [];
+        dataRows.sort((a,b)=>{
+          const da = parseEventDate(clean(a[1]));
+          const db = parseEventDate(clean(b[1]));
+          if(!da) return 1; if(!db) return -1; return da - db;
+        }).forEach(cols=>{
+          const dateObj = parseEventDate(clean(cols[1]));
+          if(!dateObj) return;
+          dateObj.setHours(0,0,0,0);
+          if(dateObj < today) return;
+          items.push(cols);
+        });
+
+        if (items.length > 0) setSkeletons(container, items.length);
+
+        items.forEach((cols, idx)=>{
+          const name = clean(cols[0]);
+          const date = clean(cols[1]);
+          const time = clean(cols[2]);
+          const locText = clean(cols[3]);
+          const pageLink = clean(cols[4]);
+          const scheduled = clean(cols[5]);
+          const locLink = clean(cols[6]);
+          const ticket = clean(cols[7]) || "#";
+          const image = clean(cols[8]) || fallbackImage;
+          const eventDateObj = parseEventDate(date);
+
+          const card = document.createElement("article");
+          card.className = "card";
+
+          const media = document.createElement("div");
+          media.className = "media";
+          const img = document.createElement("img");
+          img.loading = "lazy"; img.src = image; img.alt = name || "Event image";
+          img.width = 800; img.height = 450;
+          img.onerror = function(){ this.onerror=null; this.src = fallbackImage; };
+          media.appendChild(img);
+          card.appendChild(media);
+
+          const body = document.createElement("div");
+          body.className = "card-body";
+
+          const h = document.createElement("h3");
+          h.className = "event-title";
+          h.textContent = name || "Untitled Event";
+          body.appendChild(h);
+
+          const meta = document.createElement("p");
+          meta.className = "meta";
+          meta.textContent = (date ? date : "") + ((date && time) ? " | " : "") + (time ? time : "");
+          body.appendChild(meta);
+
+          if (locText) {
+            const locP = document.createElement("p");
+            locP.className = "location";
+            locP.textContent = locText;
+            body.appendChild(locP);
+          }
+
+          const mobileInfo = document.createElement("p");
+          mobileInfo.className = "mobile-info";
+          if (locText) mobileInfo.appendChild(document.createTextNode(locText));
+          if (locText && time) mobileInfo.appendChild(document.createTextNode(" | "));
+          if (time) mobileInfo.appendChild(document.createTextNode(time));
+          body.appendChild(mobileInfo);
+
+          card.appendChild(body);
+
+          if (eventDateObj) {
+            const dayNum = eventDateObj.getDate();
+            const monthShort = eventDateObj.toLocaleString('en-US', { month: 'short' });
+            const dateBox = document.createElement("div");
+            dateBox.className = "card-date";
+            dateBox.innerHTML =
+              `<div class="day">${String(dayNum).padStart(2,'0')}</div>` +
+              `<div class="month">${monthShort}</div>` +
+              `<div class="time"></div>`;
+            card.appendChild(dateBox);
+          }
+
+          const footer = document.createElement("div");
+          footer.className = "card-footer";
+          if (pageLink) {
+            const btn = document.createElement("a");
+            btn.className = "book-btn";
+            btn.href = pageLink;
+            btn.textContent = "Details";
+            btn.target = "_self";
+            btn.removeAttribute('rel');
+            footer.appendChild(btn);
+          }
+          card.appendChild(footer);
+
+          card.addEventListener('click', function(e) {
+            if (e.target.closest('a,button')) return;
+            if (window.innerWidth <= 768) {
+              if (pageLink) window.location.href = pageLink;
+            }
+          });
+
+          replaceSkeletonWithCard(container, idx, card);
+        });
+
+        if (items.length === 0) {
+          container.innerHTML = '<p style="color:#bbb">No upcoming events.</p>';
+        }
+      } catch (err) {
+        console.error('Upcoming events error:', err);
+        container.innerHTML = '<p style="color:#f66">Could not load events — check the CSV publish link and CSP settings.</p>';
+      }
+    })();
+  </script>
+
+  <!-- Explore -->
+  <script>
+    (async function() {
+      const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSs9vlFaLhdFNFXvWsBIXlAJu0J5Dj2deY_7SlwAGd9Jk1-djK6xP3rdXim7Co0BJ-pUJueDCYYugew/pub?gid=583837785&single=true&output=csv";
+      const container = document.getElementById('explore-cards');
+      const fallbackImage = "https://via.placeholder.com/800x450?text=Event+Image";
+
+      setSkeletons(container, 3);
+
+      try {
+        const res = await fetch(csvUrl + '&cb=' + Date.now(), { cache: "no-store" });
+        if (!res.ok) throw new Error("Failed to fetch explore events");
+        const csvText = await res.text();
+        const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+
+        const items = parsed.data.filter(event =>
+          event && (event['Scheduled'] || '').trim().toLowerCase() === 'no'
+        );
+
+        if (items.length > 0) setSkeletons(container, items.length);
+
+        items.forEach((event, idx) => {
+          const card = document.createElement('div');
+          card.className = 'card';
+
+          const media = document.createElement('div');
+          media.className = 'media';
+          const img = document.createElement('img');
+          img.src = (event['Image Links'] || '').trim() || fallbackImage;
+          img.alt = (event['Event'] || '').trim();
+          img.loading = "lazy"; img.width = 800; img.height = 450;
+          img.onerror = function(){ this.onerror=null; this.src = fallbackImage; };
+          media.appendChild(img);
+          card.appendChild(media);
+
+          const body = document.createElement('div');
+          body.className = 'card-body';
+
+          const title = document.createElement('div');
+          title.className = 'event-title';
+          title.textContent = (event['Event'] || '').trim();
+          body.appendChild(title);
+
+          if (event['Tagline'] && String(event['Tagline']).trim() !== '') {
+            const tagline = document.createElement('div');
+            tagline.className = 'event-tagline';
+            tagline.textContent = String(event['Tagline']).trim();
+            body.appendChild(tagline);
+          }
+
+          card.appendChild(body);
+
+          const footer = document.createElement('div');
+          footer.className = 'card-footer';
+
+          const learn = document.createElement('a');
+          learn.className = 'book-btn';
+          const pageUrl = (event['Page Link'] || '#').trim();
+          learn.href = pageUrl;
+          learn.textContent = 'Learn More';
+          learn.target = '_self';
+          learn.removeAttribute('rel');
+
+          footer.appendChild(learn);
+          card.appendChild(footer);
+
+          card.addEventListener('click', function(e) {
+            if (e.target.closest('a')) return;
+            if (window.innerWidth <= 768) {
+              const url = (event['Page Link'] || '').trim();
+              if (url) window.location.href = url;
+            }
+          });
+
+          replaceSkeletonWithCard(container, idx, card);
+        });
+
+        if (!items.length) {
+          container.innerHTML = '<div style="color:#bbb;text-align:center;">No other events to explore at this time.</div>';
+        }
+      } catch (err) {
+        console.error('Error loading explore events:', err);
+        container.innerHTML = '<div style="color:#f66;text-align:center;">Could not load other events.</div>';
+      }
+    })();
+  </script>
+
+  <!-- Gallery -->
+  <script>
+  (function(){
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSs9vlFaLhdFNFXvWsBIXlAJu0J5Dj2deY_7SlwAGd9Jk1-djK6xP3rdXim7Co0BJ-pUJueDCYYugew/pub?gid=1078145247&single=true&output=csv";
+    const MAX_SKELETONS = 6;
+
+    const wrap = document.getElementById('gallery');
+    const track = document.getElementById('gallery-track');
+    const skel  = document.getElementById('gallery-skeletons');
+    if (!wrap || !track || !skel) return;
+
+    const isMobile = () => window.innerWidth <= 768;
+    const slidesPerView = () => 1;
+    const stepPct = () => 100 / slidesPerView();
+
+    const lightboxTransform = () => 'w-1600,q-80,f-auto';
+    const blurTransform     = 'w-40,q-10,bl-6,f-auto';
+    const slideTransform    = () => (isMobile() ? 'w-720,q-80,f-auto' : 'w-1200,q-80,f-auto');
+
+    function withIK(url, transform) {
+      function ensureFAuto(t){ return t.includes('f-auto') ? t : (t + (t.endsWith(',') ? '' : ',') + 'f-auto'); }
+      const needed = ensureFAuto(transform);
+      try {
+        const u = new URL(url);
+        const trMatch = u.pathname.match(/\\/tr:([^/]+)/);
+        if (trMatch) {
+          const current = trMatch[1];
+          if (!/(\\b|,)f-auto(\\b|,)/.test(current)) {
+            u.pathname = u.pathname.replace('/tr:' + current, '/tr:' + current + ',f-auto');
+          }
+          return u.toString();
+        }
+        const parts = u.pathname.split('/');
+        if (parts.length >= 3) {
+          parts.splice(2, 0, 'tr:' + needed);
+          u.pathname = parts.join('/');
+          return u.toString();
+        } else {
+          u.pathname = u.pathname.replace(/\\/?$/, '/') + 'tr:' + needed;
+          return u.toString();
+        }
+      } catch(e) {
+        if (url.includes('/tr:')) return url.replace(/(\\/tr:[^/]+)/, m => m.includes('f-auto') ? m : m + ',f-auto');
+        const m = url.match(/^(https?:\\/\\/[^/]+)\\/([^/]+)(\\/.*)?$/);
+        if (!m) return url;
+        const origin = m[1], endpoint = m[2], rest = m[3] || '';
+        return `${origin}/${endpoint}/tr:${needed}${rest}`;
+      }
+    }
+
+    function createSlide(obj){
+      const slide = document.createElement('div');
+      slide.className = 'gal-slide';
+
+      const bg = document.createElement('div');
+      bg.className = 'gal-bg';
+      bg.style.backgroundImage = `url("${withIK(obj.Image, blurTransform)}")`;
+      slide.appendChild(bg);
+
+      const img = document.createElement('img');
+      img.className = 'gal-img';
+      img.alt = obj.Alt || '';
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.src = withIK(obj.Image, slideTransform());
+      img.onerror = function () {
+        if (!img.dataset.retry) {
+          img.dataset.retry = '1';
+          img.src = withIK(obj.Image, slideTransform().replace('f-auto', 'f-jpg'));
+        }
+      };
+      img.addEventListener('load', ()=>{
+        if (img.naturalHeight > img.naturalWidth) slide.classList.add('portrait');
+      }, { once:true });
+
+      slide.addEventListener('click', () => openLightbox(realIndexFromSlide(slide)));
+      slide.appendChild(img);
+      return slide;
+    }
+
+    fetch(CSV_URL, { cache: 'no-cache' })
+      .then(r => r.text())
+      .then(text => Papa.parse(text, { header:true, skipEmptyLines:true }).data)
+      .then(rows => {
+        const items = rows
+          .map((r,i)=>({
+            _i:i,
+            Image:String(r['Image']||'').trim(),
+            Alt:String(r['Alt']||'').trim(),
+            Caption:String(r['Caption']||'').trim(),
+            Show:String(r['Show']||'').trim().toLowerCase(),
+            Order:(r['Order']!==undefined && r['Order']!=='') ? Number(r['Order']) : null
+          }))
+          .filter(r => r.Image && (r.Show==='yes' || r.Show==='y' || r.Show==='true'))
+          .sort((a,b)=>{
+            if (a.Order!=null && b.Order!=null) return a.Order - b.Order;
+            if (a.Order!=null) return -1;
+            if (b.Order!=null) return 1;
+            return a._i - b._i;
+          });
+
+        if (!items.length) {
+          skel.innerHTML = '<div style="color:#bbb;text-align:center;padding:16px 0">No gallery images yet.</div>';
+          return;
+        }
+
+        while (skel.children.length > Math.min(items.length, MAX_SKELETONS)) {
+          skel.removeChild(skel.lastElementChild);
+        }
+
+        let slides = items.map(createSlide);
+        let pos = 0;
+        let spv = slidesPerView();
+
+        function buildTrack() {
+          spv = slidesPerView();
+          track.innerHTML = '';
+
+          const headClones = [];
+          const tailClones = [];
+          for (let i=0;i<spv;i++){
+            const hc = createSlide(items[i]); hc.dataset.clone='head'; headClones.push(hc);
+            const idx = items.length - spv + i;
+            const tc = createSlide(items[idx]); tc.dataset.clone='tail'; tailClones.push(tc);
+          }
+
+          track.append(...tailClones);
+          slides.forEach(s => track.appendChild(s));
+          track.append(...headClones);
+
+          pos = spv;
+          setTransform(false);
+          skel.style.display = 'none';
+          preloadAround(pos);
+        }
+
+        function setTransform(withAnim=true){
+          const step = stepPct();
+          const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          track.style.transition = (withAnim && !reduce) ? 'transform .35s ease' : 'none';
+          track.style.transform = `translate3d(-${pos*step}%,0,0)`;
+        }
+
+        function realIndexFromPos(p){
+          const n = items.length;
+          return ((p - spv + n) % n);
+        }
+        function realIndexFromSlide(slide){
+          const idx = Array.from(track.children).indexOf(slide);
+          return realIndexFromPos(idx);
+        }
+
+        function go(delta){
+          if (sliding) return;
+          sliding = true;
+          pos += delta;
+          setTransform(true);
+          setTimeout(()=>{
+            const total = items.length;
+            if (pos < spv) {
+              pos += total;
+              setTransform(false);
+            } else if (pos > total + spv - 1) {
+              pos -= total;
+              setTransform(false);
+            }
+            sliding = false;
+          }, 380);
+        }
+
+        function preloadAround(p){
+          [p-1,p,p+1].forEach(k=>{
+            const el = track.children[k];
+            if(!el) return;
+            const img = el.querySelector('img.gal-img');
+            if (img && img.dataset.src){ img.src = img.dataset.src; delete img.dataset.src; }
+          });
+        }
+
+        buildTrack();
+
+        const prevBtn = wrap.querySelector('.gal-prev');
+        const nextBtn = wrap.querySelector('.gal-next');
+        prevBtn.addEventListener('click', ()=>go(-1));
+        nextBtn.addEventListener('click', ()=>go(1));
+
+        const viewport = wrap.querySelector('.gallery-viewport');
+        let startX=0, startPos=pos, dragging=false, sliding=false;
+
+        const W = () => viewport.clientWidth;
+        function onDown(e){
+          dragging = true;
+          track.style.transition = 'none';
+          startX = (e.touches ? e.touches[0].clientX : e.clientX);
+          startPos = pos;
+          pauseAuto();
+        }
+        function onMove(e){
+          if (!dragging) return;
+          const x = (e.touches ? e.touches[0].clientX : e.clientX);
+          const dx = x - startX;
+          const pct = dx / W() * 100;
+          const step = stepPct();
+          track.style.transform = `translate3d(-${startPos*step - pct}%,0,0)`;
+        }
+        function onUp(e){
+          if (!dragging) return;
+          dragging = false;
+          const x = (e.changedTouches ? e.changedTouches[0].clientX : e.clientX);
+          const dx = x - startX;
+          const threshold = Math.max(40, (W()/slidesPerView())*0.2);
+          if (dx > threshold) go(-1);
+          else if (dx < -threshold) go(1);
+          else setTransform(true);
+          resumeAutoSoon();
+        }
+
+        viewport.addEventListener('mousedown', onDown);
+        viewport.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onUp);
+        viewport.addEventListener('touchstart', onDown, { passive:true });
+        viewport.addEventListener('touchmove', onMove, { passive:true });
+        viewport.addEventListener('touchend', onUp);
+
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let timer = null, paused = false;
+        function tick(){ if (!paused) go(1); }
+        function startAuto(){ if (!reduce && !timer) timer = setInterval(tick, 3500); }
+        function stopAuto(){ if (timer){ clearInterval(timer); timer = null; } }
+        function pauseAuto(){ paused = true; stopAuto(); }
+        function resumeAuto(){ paused = false; startAuto(); }
+        function resumeAutoSoon(){ setTimeout(()=>!dragging && resumeAuto(), 1200); }
+
+        if (!reduce) startAuto();
+        viewport.addEventListener('mouseenter', pauseAuto);
+        viewport.addEventListener('mouseleave', resumeAuto);
+        viewport.addEventListener('touchstart', pauseAuto, {passive:true});
+        viewport.addEventListener('touchend', resumeAutoSoon);
+
+        let lastSPV = slidesPerView();
+        window.addEventListener('resize', ()=>{
+          const now = slidesPerView();
+          if (now !== lastSPV){
+            lastSPV = now;
+            buildTrack();
+            return;
+          }
+          [pos-1,pos,pos+1].forEach(k=>{
+            const el = track.children[k];
+            if(!el) return;
+            const img = el.querySelector('img.gal-img');
+            if(!img) return;
+            const raw = items[realIndexFromPos(k)].Image;
+            img.src = withIK(raw, slideTransform());
+          });
+        });
+
+        const lb = document.getElementById('gal-lightbox');
+        const lbImg = document.getElementById('gal-lightbox-img');
+        const lbCap = document.getElementById('gal-lightbox-cap');
+        const lbClose = lb.querySelector('.gal-lightbox-close');
+        const lbPrev = lb.querySelector('.gal-lightbox-prev');
+        const lbNext = lb.querySelector('.gal-lightbox-next');
+
+        let currentReal = realIndexFromPos(pos);
+        function openLightbox(realIdx){
+          currentReal = realIdx;
+          updateLightbox();
+          lb.hidden = false;
+          pauseAuto();
+        }
+        function closeLightbox(){ lb.hidden = true; resumeAutoSoon(); }
+        function updateLightbox(){
+          const item = items[currentReal];
+          lbImg.src = withIK(item.Image, lightboxTransform());
+          lbImg.alt = item.Alt || '';
+          lbImg.onerror = function () {
+            if (!lbImg.dataset.retry) {
+              lbImg.dataset.retry = '1';
+              lbImg.src = withIK(item.Image, lightboxTransform().replace('f-auto','f-jpg'));
+            }
+          };
+          lbCap.textContent = item.Caption ? item.Caption : '';
+          lbCap.style.display = item.Caption ? 'block' : 'none';
+        }
+        function lbGo(delta){
+          currentReal = (currentReal + delta + items.length) % items.length;
+          updateLightbox();
+        }
+
+        lbClose.addEventListener('click', closeLightbox);
+        lbPrev.addEventListener('click', ()=>lbGo(-1));
+        lbNext.addEventListener('click', ()=>lbGo(1));
+        lb.addEventListener('click', (e)=>{ if (e.target === lb) closeLightbox(); });
+
+        let lStart=0, lDrag=false;
+        lb.addEventListener('touchstart', e=>{ lDrag=true; lStart=e.touches[0].clientX; }, {passive:true});
+        lb.addEventListener('touchend', e=>{
+          if(!lDrag) return; lDrag=false;
+          const dx = e.changedTouches[0].clientX - lStart;
+          const thr = 50;
+          if (dx > thr) lbGo(-1);
+          else if (dx < -thr) lbGo(1);
+        });
+      })
+      .catch(err => {
+        console.error('Gallery load error:', err);
+        skel.innerHTML = '<div style="color:#f66;text-align:center;padding:16px 0">Could not load gallery.</div>';
+      });
+  })();
+  </script>
+
+  <!-- Elfsight lazy loader -->
+  <script>
+  (function(){
+    const sec = document.getElementById('reviews');
+    if (!sec) return;
+
+    const SESSION_KEY = 'elfsightLoaded';
+    function markLoaded(){ try{ sessionStorage.setItem(SESSION_KEY, '1'); }catch(e){} }
+    function alreadyLoaded(){ try{ return sessionStorage.getItem(SESSION_KEY) === '1'; }catch(e){ return false; } }
+
+    function loadElfsight(){
+      if (window.__ELFSIGHT_LOADING__) return;
+      window.__ELFSIGHT_LOADING__ = true;
+
+      const ph = document.getElementById('reviews-placeholder');
+      if (ph) ph.textContent = 'Loading…';
+
+      const s = document.createElement('script');
+      s.src = "https://static.elfsight.com/platform/platform.js";
+      s.defer = true;
+      s.setAttribute('data-use-service-core','');
+      s.onload = function(){ markLoaded(); if (ph) ph.remove(); };
+      document.head.appendChild(s);
+    }
+
+    if (alreadyLoaded()){ loadElfsight(); return; }
+
+    if ('IntersectionObserver' in window){
+      const io = new IntersectionObserver((entries)=>{
+        if (entries.some(e => e.isIntersecting)){
+          loadElfsight();
+          io.disconnect();
+        }
+      }, { rootMargin: '250px' });
+      io.observe(sec);
+    } else {
+      loadElfsight();
+    }
+  })();
+  </script>
+
+  {% include scripts-shared.html %}
+
+</body>
+</html>
