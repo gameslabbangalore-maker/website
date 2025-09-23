@@ -131,16 +131,48 @@ Say goodbye to the bar scene and hello to laughter, camaraderie, and friendly co
 
       function clean(v){ if (v === undefined || v === null) return ""; return String(v).trim().replace(/^\"|\"$/g, ''); }
       function parseEventDate(str) {
-        if (!str) return null;
-        str = str.trim().replace(/^[A-Za-z]{3},?\\s*/, '').replace(/’/g,"'").replace(/`/g,"'");
-        const parts = str.match(/^(\\d{1,2})\\s+([A-Za-z]{3})\\s+'(\\d{2})$/);
-        if (!parts) return null;
-        const [_, day, monthStr, yearStr] = parts;
-        const month = { Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11 }[monthStr];
-        if (month === undefined) return null;
-        const year = 2000 + parseInt(yearStr, 10);
-        return new Date(year, month, parseInt(day, 10));
-      }
+  if (!str) return null;
+  str = String(str).trim()
+    .replace(/^[A-Za-z]{3},?\s*/, '')  // drop leading "Fri," etc
+    .replace(/’/g, "'")
+    .replace(/`/g, "'");
+
+  // 1) 26 Sep '24
+  let m = str.match(/^(\d{1,2})\s+([A-Za-z]{3})\s+'(\d{2})$/);
+  if (m) {
+    const day = +m[1];
+    const mon = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11}[m[2]];
+    const year = 2000 + +m[3];
+    if (mon != null) return new Date(year, mon, day);
+  }
+
+  // 2) 26 Sep 2024
+  m = str.match(/^(\d{1,2})\s+([A-Za-z]{3})\s+(\d{4})$/);
+  if (m) {
+    const day = +m[1];
+    const mon = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11}[m[2]];
+    const year = +m[3];
+    if (mon != null) return new Date(year, mon, day);
+  }
+
+  // 3) Sep 26, 2024
+  m = str.match(/^([A-Za-z]{3})\s+(\d{1,2}),\s*(\d{4})$/);
+  if (m) {
+    const mon = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11}[m[1]];
+    const day = +m[2];
+    const year = +m[3];
+    if (mon != null) return new Date(year, mon, day);
+  }
+
+  // 4) ISO-ish 2024-09-26
+  m = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (m) return new Date(+m[1], +m[2]-1, +m[3]);
+
+  // 5) Let Date try (last resort)
+  const d = new Date(str);
+  return isNaN(d.getTime()) ? null : d;
+}
+
 
       try{
         const res = await fetch(csvUrl + '&cb=' + Date.now(), { cache: "no-store" });
