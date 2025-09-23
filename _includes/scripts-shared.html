@@ -1,0 +1,13 @@
+<script>
+  // Force same-tab for any link to /events/ (incl. links added later)
+  (function(){
+    const sel = 'a[href^="/events/"], a[href*="://gameslab.co.in/events/"]';
+    const fix = (root=document) => root.querySelectorAll(sel).forEach(a => a.removeAttribute('target'));
+    fix(); // initial pass
+    new MutationObserver(muts => {
+      muts.forEach(m => m.addedNodes.forEach(n => {
+        if (n.nodeType === 1) fix(n);
+      }));
+    }).observe(document.body, { childList:true, subtree:true });
+  })();
+</script>
