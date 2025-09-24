@@ -3,6 +3,11 @@ title: "Games Lab — Events & Experiences"
 description: "Immersive events, party games, and social experiences."
 url: https://gameslabbangalore-maker.github.io                # keep empty for GitHub Pages project sites
 baseurl: /website            # we will use {{ '/path' | relative_url }} everywhere
+theme: null
+
+# SEO: auto-generate /sitemap.xml on each build (GitHub Pages supports this plugin)
+plugins:
+  - jekyll-sitemap
 
 # ---- Build & Markdown ----
 markdown: kramdown
