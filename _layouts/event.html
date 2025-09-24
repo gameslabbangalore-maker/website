@@ -15,16 +15,22 @@ layout: null
   {% include header.html %}
 
   <!-- Mobile microbar (filled by scripts) -->
-  <div class="mobile-info-bar" id="mobileInfoBar" aria-hidden="true">
-    <div class="mobile-info-inner">
-      <div class="microbar-left">
-        <span class="micro-title" id="microTitle">{{ page.title }}</span>
-        <span class="micro-meta-line" id="microDateTime">—</span>
-        <span class="micro-meta-line" id="microLocation">—</span>
-      </div>
-      <div class="microbar-right" id="microRight"></div>
+ <div class="mobile-info-bar" id="mobileInfoBar" aria-hidden="true">
+  <div class="mobile-info-inner">
+    <div class="microbar-left">
+      <span class="micro-title" id="microTitle"></span>
+      <span class="micro-meta-line"><span id="microLeft1"></span></span>
+      <span class="micro-meta-line"><span id="microLeft2"></span></span>
+      <span class="micro-meta-line"><span id="microLeft3"></span></span>
+    </div>
+    <div class="microbar-right">
+      <span class="microbar-link" id="microRight1"></span>
+      <span class="microbar-link" id="microRight2"></span>
+      <span class="microbar-link" id="microRight3"></span>
     </div>
   </div>
+</div>
+
 
   <!-- Floating Book Now (mobile; shown only if ticket) -->
   <a id="fabBook" class="fab-book" href="#" target="_blank" rel="noopener" hidden>Book Now</a>
