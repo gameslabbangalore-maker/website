@@ -62,5 +62,30 @@ layout: null
   </div>
 
   {% include scripts-event-core.html %}
+
+  <script id="event-data" type="application/json">
+{
+  "title": {{ page.title | jsonify }},
+  "tagline": {{ page.tagline | jsonify }},
+  "scheduled": {{ page.scheduled | default:false | jsonify }},
+  "date": {{ page.date | jsonify }},
+  "time": {{ page.time | jsonify }},
+  "location_text": {{ page.location_text | jsonify }},
+  "location_link": {{ page.location_link | jsonify }},
+  "ticket_link": {{ page.ticket_link | jsonify }},
+  "about_video": {{ page.about_video | jsonify }},
+  "recap_videos": {{ page.recap_videos | jsonify }},
+  "highlights": {
+    "format": {{ page.format | jsonify }},
+    "duration": {{ page.duration | jsonify }},
+    "group_size": {{ page.group_size | jsonify }},
+    "difficulty": {{ page.difficulty | jsonify }},
+    "age": {{ page.age | jsonify }},
+    "price": {{ page.price | jsonify }}
+  }
+}
+</script>
+
+  
 </body>
 </html>
