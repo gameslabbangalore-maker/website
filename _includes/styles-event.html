@@ -245,3 +245,16 @@
   max-width:clamp(240px,48vw,360px);  /* match recaps */
 }
 </style>
+<style>
+/* Unify portrait video sizes */
+.video-portrait{
+  aspect-ratio: 9/16;
+  width: 100%;
+  max-width: clamp(240px, 48vw, 360px); /* recap size */
+}
+
+/* Slightly smaller for the ABOUT video to match the recaps visually */
+#about-video .video-portrait{
+  max-width: clamp(220px, 42vw, 300px);
+}
+</style>
