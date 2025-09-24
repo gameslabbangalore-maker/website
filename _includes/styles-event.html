@@ -171,3 +171,42 @@
 .vid-close{position:absolute;top:10px;right:10px;border:0;border-radius:10px;background:rgba(0,0,0,.4);color:#fff;padding:6px 10px;cursor:pointer}
 .vid-close:hover{background:rgba(0,0,0,.6)}
 </style>
+
+<style>
+/* 1) Kill the full-width divider under the side card on desktop */
+@media (min-width:960px){
+  .page-grid > .divider{ display:none; }
+}
+
+/* 2) Share button in highlights: theme + pill */
+.share-row .btn{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:8px 14px;
+  border-radius:9999px;        /* pill */
+  background:var(--accent);    /* theme */
+  color:#000;                  /* readable on yellow / blue */
+  border:0;
+  font-weight:900;
+}
+.share-row .btn:hover{ filter:brightness(1.05); }
+
+/* 4) Make the “About Night of Mafias” video same size as others */
+#about-video .video-portrait{
+  max-width:clamp(240px,48vw,360px);   /* same as default */
+}
+
+/* MOBILE */
+
+/* 4) Share FAB pill + dynamic bottom (with or without Book FAB) */
+.fab-share{
+  border-radius:9999px; /* pill */
+  bottom:12px;          /* default when NO Book FAB */
+}
+.fab-share.with-book{   /* when Book FAB is visible, lift it */
+  bottom:68px;
+}
+
+/* 5) Only add bottom padding when Book FAB is visible */
+.wrap{ padding-bottom:14px; }          /* default small */
+.wrap.pad-for-fab{ padding-bottom:80px; } /* when Book FAB shown */
+</style>
