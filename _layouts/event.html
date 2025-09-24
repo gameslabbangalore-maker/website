@@ -1,12 +1,47 @@
 ---
-layout: default
+layout: null
 ---
-<article class="event-page">
-  {% include microbar.html %}
 
-  {% include schedule.html %}
+<!doctype html>
+<html lang="en">
+<head>
+  {% include head.html %}
+  <title>{{ page.title }} — Games Lab</title>
+  {% if page.description %}<meta name="description" content="{{ page.description }}">{% endif %}
+  {% if page.og_image %}<meta property="og:image" content="{{ page.og_image }}">{% endif %}
+</head>
+<body>
+  {% include topbar-bleed.html %}
+  {% include header.html %}
 
-  <section class="event-body container">
-    {{ content }}
-  </section>
-</article>
+  <main class="wrap" role="main">
+    <div class="page-grid">
+      {% include event-hero.html %}
+
+      {% include divider.html %}
+
+      {% include event-sections.html %}
+    </div>
+
+    <!-- Divider used to hide floating Book button near footer -->
+    <div class="divider" id="contactTopDivider" style="margin-top:40px;"></div>
+
+    <div class="title" style="text-align:center;margin-bottom:18px;">
+      <h3 class="heading" style="margin:0;">Contact Us</h3>
+    </div>
+    {% include contact.html %}
+
+    <div class="divider" style="margin-top:40px;"></div>
+  </main>
+
+  <!-- Video Lightbox Modal -->
+  <div id="vidModal" class="vid-modal" hidden>
+    <div class="vid-stage" id="vidStage">
+      <button class="vid-close" id="vidClose" aria-label="Close video">Close ✕</button>
+      <iframe id="vidFrame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  {% include scripts-event-core.html %}
+</body>
+</html>
