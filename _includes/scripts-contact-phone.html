@@ -1,0 +1,84 @@
+<script>
+(function(){
+  function initOne(root){
+    const phone = root.querySelector('#phone-link');
+    const menu  = root.querySelector('#phone-menu');
+    const waBtn = root.querySelector('#wa-now');
+    if (!phone || !menu || !waBtn) return;
+
+    // prevent double-binding
+    if (phone.dataset.bound === '1') return;
+    phone.dataset.bound = '1';
+
+    function setWhatsAppHref(){
+      const tel = (phone.getAttribute('data-tel') || '').replace(/[^\d]/g,'');
+      const msg = encodeURIComponent("Hi! I'd like to know more about Games Lab events.");
+      waBtn.href = tel ? `https://wa.me/${tel}?text=${msg}` : 'https://wa.me/';
+    }
+    setWhatsAppHref();
+
+    function openMenu(){
+      const opening = menu.hidden;
+      menu.hidden = !opening;
+      phone.setAttribute('aria-expanded', String(opening));
+      if (!opening) return;
+
+      const onAway = (e)=>{
+        if (!menu.contains(e.target) && e.target !== phone){
+          menu.hidden = true;
+          phone.setAttribute('aria-expanded','false');
+          cleanup();
+        }
+      };
+      const onEsc = (e)=>{
+        if (e.key === 'Escape'){
+          menu.hidden = true;
+          phone.setAttribute('aria-expanded','false');
+          cleanup();
+        }
+      };
+      function cleanup(){
+        document.removeEventListener('click', onAway, true);
+        document.removeEventListener('keydown', onEsc, true);
+      }
+      document.addEventListener('click', onAway, true);
+      document.addEventListener('keydown', onEsc, true);
+    }
+
+    phone.addEventListener('click', (e)=>{
+      e.preventDefault();
+      setWhatsAppHref();
+      openMenu();
+    });
+
+    // iOS-friendly: avoid accidental tel: after tap
+    phone.addEventListener('touchend', (e)=>{ e.preventDefault(); }, {passive:false});
+  }
+
+  function bindAll(){
+    document.querySelectorAll('.contact-wrap').forEach(initOne);
+  }
+
+  // Run at DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindAll);
+  } else {
+    bindAll();
+  }
+
+  // Also re-bind if Contact is added later (other pages/modules)
+  new MutationObserver((muts)=>{
+    for (const m of muts){
+      for (const n of m.addedNodes){
+        if (n.nodeType === 1){
+          if (n.classList && n.classList.contains('contact-wrap')) initOne(n);
+          else if (n.querySelector) {
+            const wrap = n.querySelector('.contact-wrap');
+            if (wrap) initOne(wrap);
+          }
+        }
+      }
+    }
+  }).observe(document.documentElement, { childList:true, subtree:true });
+})();
+</script>
