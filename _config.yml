@@ -67,3 +67,14 @@ exclude:
 kramdown:
   input: GFM
   hard_wrap: false
+
+collections:
+  events:
+    output: true
+    permalink: /events/:slug/
+
+defaults:
+  - scope: { path: "", type: events }
+    values:
+      layout: event        # use our event layout for all event files
+      sitemap: true
