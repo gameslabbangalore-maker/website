@@ -125,16 +125,24 @@
         shareFab.classList.remove('with-book');
       }
       // Microbar text (3 lines, right column stats)
-      const t  = document.getElementById('microTitle');
-      const l2 = document.getElementById('microDateTime');
-      const l3 = document.getElementById('microLocation');
-      const r  = document.getElementById('microRight');
-      if (t)  t.textContent  = eventTitle || 'Event';
+     const t  = document.getElementById('microTitle');      // line 1 (left)
+      const l2 = document.getElementById('microDateTime');   // line 2 (left)
+      const l3 = document.getElementById('microLocation');   // line 3 (left)
+      const r  = document.getElementById('microRight');      // right column (3 lines)
+    
+      if (t)  t.textContent  = (title || 'Night of Mafias !');
       if (l2) l2.textContent = 'Social deduction';
       if (l3) l3.textContent = 'Beginner friendly';
-      if (r)  r.innerHTML    = `<span class="microbar-link">8–25 players</span><span class="microbar-link">3–4 hours</span><span class="microbar-link">₹ 350/-</span>`;
-      window.__updateMicrobarVis && window.__updateMicrobarVis();
-      return;
+    
+      if (r){
+        r.innerHTML =
+          `<span class="microbar-link">8–25 players</span>` +
+          `<span class="microbar-link">3–4 hours</span>` +
+          `<span class="microbar-link">₹ 350/-</span>`;
+  }
+
+  // Re-evaluate visibility after filling content
+  window.__updateMicrobarVis && window.__updateMicrobarVis();
     }
 
     // Extract
@@ -230,17 +238,24 @@
       }
 
       // Microbar: 3 lines
-      const t  = document.getElementById('microTitle');
-      const l2 = document.getElementById('microDateTime');
-      const l3 = document.getElementById('microLocation');
-      const r  = document.getElementById('microRight');
-      if (t)  t.textContent  = title;
-      if (l2) l2.textContent = 'Social deduction';
-      if (l3) l3.textContent = 'Beginner friendly';
-      if (r)  r.innerHTML    = `<span class="microbar-link">8–25 players</span><span class="microbar-link">3–4 hours</span><span class="microbar-link">₹ 350/-</span>`;
-    }
+      const t  = document.getElementById('microTitle');      // line 1 (left)
+  const l2 = document.getElementById('microDateTime');   // line 2 (left)
+  const l3 = document.getElementById('microLocation');   // line 3 (left)
+  const r  = document.getElementById('microRight');      // right column (3 lines)
 
-    window.__updateMicrobarVis && window.__updateMicrobarVis();
+  if (t)  t.textContent  = (title || 'Night of Mafias !');
+  if (l2) l2.textContent = 'Social deduction';
+  if (l3) l3.textContent = 'Beginner friendly';
+
+  if (r){
+    r.innerHTML =
+      `<span class="microbar-link">8–25 players</span>` +
+      `<span class="microbar-link">3–4 hours</span>` +
+      `<span class="microbar-link">₹ 350/-</span>`;
+  }
+
+  // Re-evaluate visibility after filling content
+  window.__updateMicrobarVis && window.__updateMicrobarVis();
   }catch(e){
     console.error('Sheet load failed', e);
   }
