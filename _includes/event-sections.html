@@ -1,58 +1,31 @@
+<!-- About the Event (text block) -->
 <article class="content">
-  <section id="details" aria-labelledby="about">
-    <h3 id="about" class="section-title">About the Event</h3>
-    <div class="prose">
-      {{ page.about | markdownify }}
-
-      <div class="divider" aria-hidden="true"></div>
-
-      {% if page.what_makes_it_different %}
-      <h3 class="section-title">🌙 What Makes It Different?</h3>
-      {{ page.what_makes_it_different | markdownify }}
-      <div class="divider" aria-hidden="true"></div>
-      {% endif %}
-
-      {% if page.how_it_works %}
-      <h3 class="section-title">🕹 How It Works</h3>
-      {{ page.how_it_works | markdownify }}
-      <div class="divider" aria-hidden="true"></div>
-      {% endif %}
-
-      {% if page.why_join %}
-      <h3 class="section-title">✨ Why Join?</h3>
-      {{ page.why_join | markdownify }}
-      <div class="divider" aria-hidden="true"></div>
-      {% endif %}
-
-      {% if page.closing %}
-      {{ page.closing | markdownify }}
-      {% endif %}
-    </div>
-  </section>
-
-  <div class="divider" aria-hidden="true"></div>
+  {% include event-copy.html %}
 </article>
 
+<div class="divider-left" aria-hidden="true"></div>
+
+<!-- About <Event> (video) -->
 {% if page.about_video %}
 <section id="about-video" aria-labelledby="about-nom">
   <h3 id="about-nom" class="section-title">About {{ page.title }}</h3>
-  <div class="video-portrait" data-embed="{{ page.about_video | escape }}">
-    <iframe loading="lazy" title="About {{ page.title }}" src="{{ page.about_video | escape }}"></iframe>
+  <div class="video-portrait video-unified" data-embed="{{ page.about_video }}">
+    <iframe loading="lazy" title="About {{ page.title }}" src="{{ page.about_video }}"></iframe>
   </div>
 </section>
 {% endif %}
 
 <div class="divider-left" aria-hidden="true"></div>
 
-{% assign recaps = page.recap_videos | default: empty %}
-{% if recaps and recaps.size > 0 %}
+<!-- Event recaps -->
+{% if page.recap_videos %}
 <section id="recaps" aria-labelledby="recaps-title">
   <h3 id="recaps-title" class="section-title">Event recaps</h3>
   <p class="contact-sub" style="margin:0 0 18px; text-align:left;">CATCH THE VIBE OF THE EVENT WITH THESE VIDEOS</p>
   <div class="recap-grid-portrait">
-    {% for v in recaps %}
-    <div class="video-portrait" data-embed="{{ v | escape }}">
-      <iframe loading="lazy" title="Recap {{ forloop.index }}" src="{{ v | escape }}"></iframe>
+    {% for url in page.recap_videos %}
+    <div class="video-portrait video-unified" data-embed="{{ url }}">
+      <iframe loading="lazy" title="Recap {{ forloop.index }}" src="{{ url }}"></iframe>
     </div>
     {% endfor %}
   </div>
