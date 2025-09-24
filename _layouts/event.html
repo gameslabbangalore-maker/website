@@ -14,16 +14,39 @@ layout: null
   {% include topbar-bleed.html %}
   {% include header.html %}
 
+  <!-- Mobile microbar (filled by scripts) -->
+  <div class="mobile-info-bar" id="mobileInfoBar" aria-hidden="true">
+    <div class="mobile-info-inner">
+      <div class="microbar-left">
+        <span class="micro-title" id="microTitle">{{ page.title }}</span>
+        <span class="micro-meta-line" id="microDateTime">—</span>
+        <span class="micro-meta-line" id="microLocation">—</span>
+      </div>
+      <div class="microbar-right" id="microRight"></div>
+    </div>
+  </div>
+
+  <!-- Floating Book Now (mobile; shown only if ticket) -->
+  <a id="fabBook" class="fab-book" href="#" target="_blank" rel="noopener" hidden>Book Now</a>
+
+  <!-- Floating Share FAB (mobile) -->
+  <button id="shareFab" class="fab-share" aria-label="Share this event" title="Share">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+      <path fill="currentColor" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7a3.27 3.27 0 000-1.39l7.02-4.11A2.99 2.99 0 0018 7.91a3 3 0 10-2.82-4H15a3 3 0 00.04 1.5l-7.02 4.11a3 3 0 10.01 4.96l7.02 4.11A3 3 0 1018 16.09z"/>
+    </svg>
+    <span class="fab-share-label">Share</span>
+  </button>
+
   <main class="wrap" role="main">
     <div class="page-grid">
       {% include event-hero.html %}
 
-      {% include divider-left.html %}
+      {% include divider.html %}
 
       {% include event-sections.html %}
     </div>
 
-    <!-- Divider used to hide floating Book button near footer -->
+    <!-- Divider to keep FABs off contact area (hidden by script when not needed) -->
     <div class="divider" id="contactTopDivider" style="margin-top:40px;"></div>
     {% include contact.html %}
 
