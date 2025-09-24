@@ -210,3 +210,27 @@
 .wrap{ padding-bottom:14px; }          /* default small */
 .wrap.pad-for-fab{ padding-bottom:80px; } /* when Book FAB shown */
 </style>
+<style>
+/* Highlights -> Share button: mimic FAB style (not floating) */
+.share-row .btn{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:8px 14px;
+  border-radius:9999px;                             /* pill */
+  background:rgba(24,24,24,.35);                    /* like FAB */
+  color:var(--text-main);
+  border:1px solid rgba(255,255,255,.25);
+  -webkit-backdrop-filter:blur(10px);
+  backdrop-filter:blur(10px);
+  box-shadow:0 6px 18px rgba(0,0,0,.35);
+  font-weight:900;
+}
+@media (prefers-color-scheme: light){
+  .share-row .btn{
+    background:rgba(255,255,255,.65);
+    border-color:rgba(0,0,0,.15);
+    color:#000;
+  }
+}
+.share-row .btn:hover{ filter:brightness(1.05); }
+.share-row .btn .icon{ width:18px; height:18px; color:currentColor; }
+</style>
