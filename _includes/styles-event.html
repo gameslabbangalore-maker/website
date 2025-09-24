@@ -234,3 +234,14 @@
 .share-row .btn:hover{ filter:brightness(1.05); }
 .share-row .btn .icon{ width:18px; height:18px; color:currentColor; }
 </style>
+<style>
+/* Unify portrait video frame sizes */
+.video-portrait{
+  aspect-ratio:9/16;
+  width:100%;
+  max-width:clamp(240px,48vw,360px);
+}
+#about-video .video-portrait{
+  max-width:clamp(240px,48vw,360px);  /* match recaps */
+}
+</style>
