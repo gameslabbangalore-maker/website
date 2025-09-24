@@ -314,6 +314,16 @@ content="
 }
 </style>
 
+<style>
+/* same size across About + Recaps */
+.video-unified { max-width: clamp(240px, 48vw, 360px); }
+@media (min-width: 960px){
+  /* keep About video same size as recap tiles on desktop */
+  #about-video .video-unified { max-width: 360px; }
+}
+</style>
+
+
 {% include scripts-contact-phone.html %}
 {% include scripts-same-tab.html %}
 {% include styles-event.html %}
