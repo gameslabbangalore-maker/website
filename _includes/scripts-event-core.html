@@ -1,256 +1,192 @@
 <script>
-/* ============= 1) Share (desktop card + mobile FAB) ============= */
 (function(){
-  async function sharePage(){
-    const data = { title: document.title, text: 'Check this Games Lab event', url: location.href };
-    try{
-      if (navigator.share) await navigator.share(data);
-      else { await navigator.clipboard.writeText(data.url); alert('Link copied to clipboard'); }
-    }catch(e){}
-  }
-  document.getElementById('shareBtnSide')?.addEventListener('click', sharePage);
-  document.getElementById('shareFab')?.addEventListener('click', sharePage);
-})();
+  const dataEl = document.getElementById('event-data');
+  let ev = {};
+  try { ev = JSON.parse(dataEl?.textContent || '{}'); } catch(e){ ev = {}; }
 
-/* ============= 2) Video lightbox (portrait/landscape aware) ============= */
-(function(){
-  const modal  = document.getElementById('vidModal');
-  const stage  = document.getElementById('vidStage');
-  const frame  = document.getElementById('vidFrame');
-  const close  = document.getElementById('vidClose');
-  if (!modal || !frame || !stage) return;
+  // ---------- helpers ----------
+  const $ = s => document.querySelector(s);
+  const esc = s => (s||'').replace(/[&<>"]/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+  const pad = n => String(n).padStart(2,'0');
 
-  function openFrom(el){
-    const url = el.getAttribute('data-embed') || el.querySelector('iframe')?.src || '';
-    if (!url) return;
-    const hasQ = url.includes('?');
-    const withAuto = url + (hasQ ? '&' : '?') + 'autoplay=1';
-    stage.classList.toggle('portrait', el.classList.contains('video-portrait'));
-    frame.src = withAuto;
-    modal.hidden = false;
-  }
-  function shut(){
-    frame.src = 'about:blank';
-    modal.hidden = true;
-  }
-
-  document.querySelectorAll('[data-embed], .video-portrait').forEach(v => {
-    v.addEventListener('click', () => openFrom(v));
-  });
-  close.addEventListener('click', shut);
-  modal.addEventListener('click', (e)=>{ if (e.target === modal) shut(); });
-  window.addEventListener('keydown', (e)=>{ if (e.key === 'Escape' && !modal.hidden) shut(); });
-})();
-
-/* ============= 3) Microbar show/hide on scroll (mobile) ============= */
-(function(){
-  const microbar    = document.getElementById('mobileInfoBar');
-  const highlights  = document.getElementById('highlightsMobile');
-  const banner      = document.querySelector('.banner');
-  if (!microbar) return;
-  function isDesktop(){ return window.innerWidth >= 960; }
-  function triggerEl(){
-    if (highlights && !highlights.hasAttribute('hidden')) return highlights;
-    return banner || document.body;
-  }
-  function update(){
-    if (isDesktop()){ microbar.classList.remove('show'); microbar.setAttribute('aria-hidden','true'); return; }
-    const topbarH = (document.querySelector('.topbar')?.offsetHeight || 56);
-    const el = triggerEl(); const rect = el.getBoundingClientRect();
-    const bottomY = rect.bottom + window.scrollY;
-    const shouldShow = window.scrollY >= (bottomY - topbarH);
-    microbar.classList.toggle('show', shouldShow);
-    microbar.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
-  }
-  window.addEventListener('load', update, { passive:true });
-  window.addEventListener('scroll', update, { passive:true });
-  window.addEventListener('resize', update);
-  window.__updateMicrobarVis = update; // expose for later refresh
-})();
-
-/* ============= 4) Schedule + CTA + Microbar content ============= */
-/* Priority of data:
-   A) page.* front matter from the event file
-   B) If this event exists in the Upcoming sheet, override dynamic bits (date/time/location/ticket)
-*/
-(async function(){
-  // ---- helpers ----
-  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSs9vlFaLhdFNFXvWsBIXlAJu0J5Dj2deY_7SlwAGd9Jk1-djK6xP3rdXim7Co0BJ-pUJueDCYYugew/pub?gid=1356004046&single=true&output=csv";
-  function clean(v){ if (v===undefined || v===null) return ""; return String(v).trim().replace(/^\"|\"$/g, ''); }
-  function pad(n){ return String(n).padStart(2,'0'); }
-  function parseEventDate(str) {
-    if (!str) return null;
-    str = str.trim().replace(/^[A-Za-z]{3},?\s*/, '').replace(/’/g,"'").replace(/`/g,"'");
-    const m = str.match(/^(\d{1,2})\s+([A-Za-z]{3})\s+'(\d{2})$/);
-    if (!m) return null;
-    const day = parseInt(m[1],10);
-    const month = { Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11 }[m[2]];
-    const year = 2000 + parseInt(m[3],10);
-    return new Date(year, month, day);
-  }
-  function parseTime12h(t){
-    if(!t) return {h:19,m:0};
-    const m = t.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-    if(!m) return {h:19,m:0};
-    let h = parseInt(m[1],10), min=parseInt(m[2],10);
-    const ampm = m[3].toUpperCase();
-    if (ampm==='PM' && h<12) h+=12;
-    if (ampm==='AM' && h===12) h=0;
-    return {h, m:min};
+  function parseDate(d, t){
+    if(!d) return null;
+    const base = new Date(d);
+    if (t){
+      const m = String(t).match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+      if (m){
+        let h = +m[1], mi = +m[2]; const ap = m[3].toUpperCase();
+        if (ap==='PM' && h<12) h+=12; if (ap==='AM' && h===12) h=0;
+        base.setHours(h, mi, 0, 0);
+      }
+    }
+    return base;
   }
   function fmtDateOnly(d){
     const dt = new Date(d);
     const wk = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()];
-    const day = String(dt.getDate()).padStart(2,'0');
     const mon = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()];
-    const yr2 = String(dt.getFullYear()).slice(-2);
-    return `${wk}, ${day} ${mon} '${yr2}`;
+    return `${wk}, ${pad(dt.getDate())} ${mon} '${String(dt.getFullYear()).slice(-2)}`;
   }
-  function makeICS({title, start, durationHours=3, locationText='', locationUrl='', description:''}){
+  function makeICS({title, start, durationHours=3, locationText='', locationUrl='', description=''}){
     const dt = new Date(start);
     const end = new Date(dt.getTime() + durationHours*60*60*1000);
-    const stamp = (x)=> x.getFullYear()+pad(x.getMonth()+1)+pad(x.getDate())+'T'+pad(x.getHours())+pad(x.getMinutes())+pad(x.getSeconds());
+    const stamp = x => x.getFullYear()+pad(x.getMonth()+1)+pad(x.getDate())+'T'+pad(x.getHours())+pad(x.getMinutes())+pad(x.getSeconds());
     const loc = locationUrl ? `${locationText} (${locationUrl})` : locationText;
     const lines = [
       'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Games Lab//Events//EN','BEGIN:VEVENT',
       `DTSTAMP:${stamp(new Date())}`,`DTSTART:${stamp(dt)}`,`DTEND:${stamp(end)}`,
-      `SUMMARY:${title}`,`LOCATION:${(loc||'').replace(/,/g,'\\,')}`,`DESCRIPTION:${description}`,
+      `SUMMARY:${title}`,`LOCATION:${loc.replace(/,/g,'\\,')}`,`DESCRIPTION:${description}`,
       'END:VEVENT','END:VCALENDAR'
     ];
     return 'data:text/calendar;charset=utf8,' + encodeURIComponent(lines.join('\r\n'));
   }
 
-  // ---- DOM refs ----
-  const scHeading = document.getElementById('scheduleHeading');
-  const scBlock   = document.getElementById('scheduleBlock');
-  const scWhen    = document.getElementById('scWhen');
-  const scWhere   = document.getElementById('scWhere');
-  const scAdd     = document.getElementById('scAddCal');
-  const scDir     = document.getElementById('scDir');
-  const scBook    = document.getElementById('scBook');
-  const hlMobile  = document.getElementById('highlightsMobile');
-  const fabBook   = document.getElementById('fabBook');
+  // ---------- SCHEDULE / RIGHT CARD ----------
+  (function scheduleCard(){
+    const scheduled = !!ev.scheduled;
+    const start = parseDate(ev.date, ev.time);
+    const scBlock = $('#scheduleBlock');
+    const scHead  = $('#scheduleHeading');
+    const scWhen  = $('#scWhen');
+    const scWhere = $('#scWhere');
+    const scAdd   = $('#scAddCal');
+    const scDir   = $('#scDir');
+    const scBook  = $('#scBook');
+    const fabBook = $('#fabBook');
+    const shareFab = $('#shareFab');
 
-  // Microbar elements (3-line unscheduled OR calendar/dir when scheduled)
-  const microTitle = document.getElementById('microTitle');
-  const microDate  = document.getElementById('microDateTime');  // we'll reuse as line2
-  const microLoc   = document.getElementById('microLocation');  // we'll reuse as line3
-  const microRight = document.getElementById('microRight');
-
-  // ---- Static data from the event file (exposed by Liquid) ----
-  const ev = {
-    title: {{ page.title | jsonify }},
-    highlights: {{ page.highlights | jsonify }},
-    ticket: {{ page.ticket_link | jsonify }},
-  };
-
-  // Fill title immediately (safety)
-  if (microTitle) microTitle.textContent = ev.title || document.getElementById('eventTitle')?.textContent || '';
-
-  // Defaults (unscheduled view) using event file values
-  function setUnscheduledView(){
-    // Desktop: hide schedule section, mobile highlights hidden by default
-    scHeading?.setAttribute('hidden','');
-    if (scBlock) scBlock.hidden = true;
-    if (hlMobile) hlMobile.setAttribute('hidden','');
-
-    // Book FAB hidden (no schedule)
-    if (fabBook) fabBook.setAttribute('hidden','');
-
-    // Share FAB shows text on mobile when not scheduled
-    document.getElementById('shareFab')?.classList.add('with-text');
-
-    // Microbar 3 lines
-    const h = ev.highlights || {};
-    if (microDate) microDate.textContent = h.format || '';
-    if (microLoc)  microLoc.textContent  = h.difficulty || 'Beginner-friendly';
-    if (microRight){
-      const r1 = h.group_size || '';
-      const r2 = h.duration   || '';
-      const r3 = h.price      || '';
-      microRight.innerHTML =
-        `<span class="microbar-link">${r1}</span>` +
-        `<span class="microbar-link">${r2}</span>` +
-        `<span class="microbar-link">${r3}</span>`;
-    }
-  }
-
-  // Scheduled view (override with sheet data)
-  function setScheduledView({dateObj, timeStr, locText, locLink, ticket}){
-    // Desktop schedule
-    if (scHeading) scHeading.removeAttribute('hidden');
-    if (scBlock) scBlock.hidden = false;
-    if (scWhen)  scWhen.textContent  = fmtDateOnly(dateObj);
-    if (scWhere) scWhere.textContent = locText || '';
-    if (scAdd)   scAdd.href = makeICS({ title: ev.title, start: dateObj, durationHours: 3, locationText: locText, locationUrl: locLink, description: location.href });
-    if (scDir && locLink){ scDir.href = locLink; }
-
-    // Book FAB only if ticket present
-    if (fabBook){
-      if (ticket){ fabBook.href = ticket; fabBook.removeAttribute('hidden'); }
-      else fabBook.setAttribute('hidden','');
-    }
-
-    // Mobile highlights visible (if you use them)
-    if (hlMobile) hlMobile.removeAttribute('hidden');
-
-    // Share FAB icon-only when scheduled
-    document.getElementById('shareFab')?.classList.remove('with-text');
-
-    // Microbar scheduled: left shows date|time + location; right shows "Add to Calendar" + "Get Directions"
-    const timePart = timeStr && timeStr.trim() ? ` | ${timeStr.trim()}` : '';
-    if (microDate) microDate.textContent = `${fmtDateOnly(dateObj)}${timePart}`;
-    if (microLoc)  microLoc.textContent  = locText || '';
-
-    const icsForBar = makeICS({ title: ev.title, start: dateObj, durationHours: 3, locationText: locText, locationUrl: locLink, description: location.href });
-    const esc = s => (s||'').replace(/[&<>"]/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[m]));
-    if (microRight){
-      microRight.innerHTML =
-        `<a class="microbar-link" href="${esc(icsForBar)}" download>Add to Calendar</a>` +
-        (locLink
-          ? `<a class="microbar-link" href="${esc(locLink)}" target="_blank" rel="noopener">Get Directions</a>`
-          : `<span class="microbar-link" aria-disabled="true" style="opacity:.6">Get Directions</span>`);
-    }
-  }
-
-  // First, render unscheduled using the event file (so page looks good instantly)
-  setUnscheduledView();
-
-  // Then try to fetch the sheet and override if there is a matching scheduled event
-  try{
-    const res = await fetch(SHEET_URL + '&cb=' + Date.now(), { cache:'no-store' });
-    if (!res.ok) throw new Error('CSV fetch failed');
-    const text = await res.text();
-    const rows = Papa.parse(text, { header:true, skipEmptyLines:true }).data;
-
-    const pathNoSlash = location.pathname.replace(/\/+$/,'');
-    const match = rows.find(r=>{
-      const pageLink = clean(r['Page Link']).replace(/\/+$/,'');
-      const name = clean(r['EventName']);
-      return (pageLink && pathNoSlash.endsWith(pageLink)) || (name && name.toLowerCase() === (ev.title||'').toLowerCase());
-    });
-
-    if (match){
-      const scheduled = clean(match['Scheduled']).toLowerCase()==='yes';
-      const dateStr   = clean(match['Date']);
-      const timeStr   = clean(match['Time']);
-      const locText   = clean(match['Location']);
-      const locLink   = clean(match['Location Link']);
-      const ticket    = clean(match['Ticket Link']) || (ev.ticket || '');
-
-      const d = parseEventDate(dateStr);
-      if (scheduled && d){
-        const t = parseTime12h(timeStr);
-        d.setHours(t.h, t.m, 0, 0);
-        setScheduledView({dateObj:d, timeStr, locText, locLink, ticket});
+    if (scheduled && start){
+      scWhen && (scWhen.textContent = fmtDateOnly(start));
+      scWhere && (scWhere.textContent = ev.location_text || '');
+      if (scAdd){
+        scAdd.href = makeICS({
+          title: ev.title, start, durationHours: 3,
+          locationText: ev.location_text||'', locationUrl: ev.location_link||'',
+          description: location.href
+        });
+        scAdd.textContent = 'Add to Calendar';
       }
-    }
-  } catch(e){
-    // Silent: we already rendered the unscheduled view
-    console.warn('Sheet override skipped:', e);
-  }
+      if (scDir){
+        scDir.textContent = 'Get directions';
+        if (ev.location_link){ scDir.href = ev.location_link; scDir.target = '_blank'; scDir.rel='noopener'; }
+        else { scDir.removeAttribute('href'); }
+      }
+      if (scBook && ev.ticket_link){ scBook.href = ev.ticket_link; }
+      scHead && scHead.removeAttribute('hidden');
+      scBlock && (scBlock.hidden = false);
 
-  // Recompute microbar visibility after content changes
-  window.__updateMicrobarVis && window.__updateMicrobarVis();
+      // Book Now FAB (mobile)
+      if (fabBook && ev.ticket_link){ fabBook.href = ev.ticket_link; fabBook.removeAttribute('hidden'); }
+
+      // Share FAB = icon-only when scheduled
+      shareFab && shareFab.classList.remove('with-text');
+
+    } else {
+      scHead && scHead.setAttribute('hidden','');
+      scBlock && (scBlock.hidden = true);
+
+      // Hide Book FAB when not scheduled
+      fabBook && fabBook.setAttribute('hidden','');
+
+      // Share FAB = show text when not scheduled
+      shareFab && shareFab.classList.add('with-text');
+    }
+  })();
+
+  // ---------- MICROBAR (2 modes) ----------
+  (function microbar(){
+    const bar = $('#mobileInfoBar');
+    const titleEl = $('#microTitle');
+    const left1 = $('#microLeft1'); const right1 = $('#microRight1');
+    const left2 = $('#microLeft2'); const right2 = $('#microRight2');
+    const left3 = $('#microLeft3'); const right3 = $('#microRight3');
+
+    if (!bar) return;
+    // fill content
+    titleEl && (titleEl.textContent = ev.title || '');
+    if (ev.scheduled){
+      // scheduled mode: keep the Add to Calendar / Directions on the RIGHT (you already have that in side card),
+      // we keep microbar in simple 2-line mode for scheduled pages (title + date/time + location)
+      // If you *do* want 3-line even when scheduled, uncomment below and set values.
+      left1 && (left1.textContent = ev.title || '');
+      right1 && (right1.textContent = (ev.group_size || '')); // optional
+      left2 && (left2.textContent = (ev.location_text || ''));
+      right2 && (right2.textContent = (ev.time || ''));
+      left3 && (left3.textContent = '');
+      right3 && (right3.textContent = '');
+
+      bar.dataset.mode = 'scheduled';
+    } else {
+      // NOT scheduled → your requested 3-line text layout
+      left1 && (left1.textContent = ev.title || '');
+      right1 && (right1.textContent = ev.group_size || '8–25 players');
+
+      left2 && (left2.textContent = ev.format || 'Social deduction');
+      right2 && (right2.textContent = ev.duration || '3–4 hours');
+
+      left3 && (left3.textContent = ev.difficulty || 'Beginner friendly');
+      right3 && (right3.textContent = ev.price || '₹ 350/-');
+
+      bar.dataset.mode = 'three';
+    }
+
+    function isDesktop(){ return window.innerWidth >= 960; }
+    function triggerEl(){
+      const highlights = document.getElementById('highlightsMobile');
+      const banner = document.querySelector('.banner');
+      return (highlights && !highlights.hasAttribute('hidden')) ? highlights : (banner || document.body);
+    }
+    function update(){
+      if (isDesktop()){ bar.classList.remove('show'); bar.setAttribute('aria-hidden','true'); return; }
+      const topbarH = (document.querySelector('.topbar')?.offsetHeight || 56);
+      const rect = triggerEl().getBoundingClientRect();
+      const bottomY = rect.bottom + window.scrollY;
+      const shouldShow = window.scrollY >= (bottomY - topbarH);
+      bar.classList.toggle('show', shouldShow);
+      bar.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
+    }
+    window.addEventListener('load', update, { passive:true });
+    window.addEventListener('scroll', update, { passive:true });
+    window.addEventListener('resize', update);
+    window.__updateMicrobarVis = update;
+  })();
+
+  // ---------- Video lightbox + click-to-play ----------
+  (function videos(){
+    const modal  = $('#vidModal'), stage  = $('#vidStage'), frame  = $('#vidFrame'), close  = $('#vidClose');
+    if (!modal || !frame || !stage) return;
+    function openFrom(el){
+      const url = el.getAttribute('data-embed') || el.querySelector('iframe')?.src || '';
+      const withAuto = url + (url.includes('?') ? '&' : '?') + 'autoplay=1';
+      stage.classList.toggle('portrait', el.classList.contains('video-portrait'));
+      frame.src = withAuto; modal.hidden = false;
+    }
+    function shut(){ frame.src = 'about:blank'; modal.hidden = true; }
+    document.querySelectorAll('[data-embed], .video-portrait').forEach(v => v.addEventListener('click', () => openFrom(v)));
+    close.addEventListener('click', shut);
+    modal.addEventListener('click', e=>{ if (e.target === modal) shut(); });
+    window.addEventListener('keydown', e=>{ if (e.key === 'Escape' && !modal.hidden) shut(); });
+  })();
+
+  // ---------- Share (side card + FAB) ----------
+  (function share(){
+    async function sharePage(){
+      const data = { title: document.title, text: `Check out ${ev.title} at Games Lab`, url: location.href };
+      try{
+        if (navigator.share) await navigator.share(data);
+        else { await navigator.clipboard.writeText(data.url); alert('Link copied to clipboard'); }
+      }catch(e){}
+    }
+    document.getElementById('shareBtnSide')?.addEventListener('click', sharePage);
+    document.getElementById('shareFab')?.addEventListener('click', sharePage);
+  })();
+
+  // ---------- Same-tab rule (site-wide, keep exceptions if needed) ----------
+  (function sameTab(){
+    const sel = 'a[href^="/events/"], a[href*="://gameslab.co.in/events/"]';
+    const fix = (root=document) => root.querySelectorAll(sel).forEach(a => a.removeAttribute('target'));
+    fix(); new MutationObserver(muts => muts.forEach(m => m.addedNodes.forEach(n => n.nodeType===1 && fix(n)))).observe(document.body, { childList:true, subtree:true });
+  })();
 })();
 </script>
