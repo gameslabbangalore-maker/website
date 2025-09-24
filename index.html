@@ -3,6 +3,7 @@ layout: null
 title: Games Lab — Events & Experiences
 permalink: /
 ---
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -15,708 +16,138 @@ permalink: /
   <main class="wrap" role="main">
     <h1 class="sr-only">Games Lab — Events & Experiences</h1>
 
-    <!-- Animated headline -->
-    <div class="animated-wrapper" aria-live="polite">
-      <div class="animated-text"></div>
-    </div>
-
+    {% include hero-animated.html %}
     {% include divider.html %}
-    <div class="title"><h2>Upcoming Events</h2></div>
 
-    <div id="events" class="cards-row" aria-live="polite"></div>
-
-    {% include divider.html mt='40px' %}
-    <div class="title" style="margin-top:40px;"><h2>Explore Our Other Events</h2></div>
-    <div id="explore-cards" class="cards-row"></div>
-
-    <!-- ===== Gallery ===== -->
-    {% include divider.html mt='40px' %}
-    <div class="title" style="margin-top:40px;"><h2>Gallery</h2></div>
-
-    <div id="gallery" class="gallery-wrap">
-      <!-- Desktop arrows (hidden on mobile) -->
-      <button class="gal-nav gal-prev" aria-label="Previous image">&lsaquo;</button>
-      <button class="gal-nav gal-next" aria-label="Next image">&rsaquo;</button>
-
-      <!-- Skeletons while CSV loads -->
-      <div id="gallery-skeletons" class="gallery-skeletons">
-        <div class="gal-skel"><div class="gal-skel-bg"></div></div>
-        <div class="gal-skel"><div class="gal-skel-bg"></div></div>
-        <div class="gal-skel"><div class="gal-skel-bg"></div></div>
-        <div class="gal-skel"><div class="gal-skel-bg"></div></div>
-        <div class="gal-skel"><div class="gal-skel-bg"></div></div>
-        <div class="gal-skel"><div class="gal-skel-bg"></div></div>
-      </div>
-
-      <!-- Slider -->
-      <div class="gallery-viewport">
-        <div class="gallery-track" id="gallery-track" aria-live="polite"></div>
-      </div>
-    </div>
-
-    <!-- Lightbox -->
-    <div id="gal-lightbox" class="gal-lightbox" hidden>
-      <div class="gal-lightbox-inner">
-        <button class="gal-lightbox-close" aria-label="Close">&times;</button>
-        <button class="gal-lightbox-prev" aria-label="Previous">&lsaquo;</button>
-        <button class="gal-lightbox-next" aria-label="Next">&rsaquo;</button>
-        <div class="gal-lightbox-stage">
-          <img id="gal-lightbox-img" alt="">
-          <div id="gal-lightbox-cap" class="gal-lightbox-cap"></div>
-        </div>
-      </div>
-    </div>
-    <!-- ===== /Gallery ===== -->
+    {% include cards-upcoming.html %}
 
     {% include divider.html mt='40px' %}
-    <div class="title" style="margin-top:40px;"><h2>About Us</h2></div>
-    <div style="max-width:800px;margin:0 auto;text-align:justify;white-space:pre-line;line-height:1.6;font-size:1rem;padding:0 10px;">
-Games Lab is a group of fun loving people organizing fun events throughout the year. We aim to make life happier and lighter for all who join us. We strive for unique experiences, memorable time, and widest smiles.
-
-Games Lab uses innovative ideas and curates the best social experiences for people. We give unique twists to world renowned games and help people stay happening.
-
-Instead of the typical alcohol-focused gatherings, we bring people together through the joy of fun events and workshops. Whether it’s Mafia, Game Night, Interactive Challenges or Workshops, this community creates a fun and inclusive environment where everyone can relax and connect.
-
-Say goodbye to the bar scene and hello to laughter, camaraderie, and friendly competition. At our events discover a refreshing alternative to traditional socializing, where friendships take center stage and lasting memories are made.
-    </div>
-
-    <!-- Reviews -->
-    {% include divider.html mt='40px' %}
-    <div class="title" style="margin-top:40px;"><h2>What Our Attendees Say</h2></div>
-
-    <section id="reviews" class="reviews-wrap">
-      <div id="reviews-placeholder" style="text-align:center;padding:14px 0;color:var(--muted)">
-        Loading reviews…
-      </div>
-      <div class="elfsight-app-3c382168-0e66-4f66-b811-109f6deef90d" data-elfsight-app-lazy></div>
-    </section>
+    {% include cards-explore.html %}
 
     {% include divider.html mt='40px' %}
+    {% include gallery.html %}
+
+    {% include divider.html mt='40px' %}
+    {% include about.html %}
+
+    {% include divider.html mt='40px' %}
+    {% include reviews.html %}
+
+    {% include divider.html mt='40px' %}
+
+    <!-- Contact (kept inline so this page builds even if you haven’t created contact.html yet) -->
     <div class="title" style="margin-top:40px;"><h2>Contact Us</h2></div>
-    {% include contact.html %}
+    <section class="contact-wrap" aria-labelledby="contact-title">
+      <div class="contact-head">
+        <img class="logo-lg"
+             src="https://ik.imagekit.io/gameslab/tr:w-88,q-100,f-auto/Games_Lab_Logo.png"
+             width="44" height="44" alt="Games Lab logo" />
+        <p id="contact-title" class="contact-sub">REACH OUT TO US!</p>
+      </div>
+
+      <ul class="contact-list">
+        <!-- Phone (with chooser) -->
+        <li class="row phone-wrap">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.62 10.79a15.053 15.053 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.07 21 3 13.93 3 5a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.24 1.02l-2.21 2.2Z"/></svg>
+          <a id="phone-link" class="link" href="tel:+917676099857" data-tel="+917676099857">+91&nbsp;76760&nbsp;99857</a>
+          <div id="phone-menu" class="phone-menu" hidden>
+            <a id="call-now" href="tel:+917676099857">Call</a>
+            <a id="wa-now"   href="https://wa.me/917676099857" target="_blank" rel="noopener">WhatsApp</a>
+          </div>
+        </li>
+
+        <!-- Email -->
+        <li class="row">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 13 2 6.76V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6.76L12 13Zm0-2.47L22 4H2l10 6.53Z"/></svg>
+          <a class="link email-text" href="mailto:info@gameslab.co.in">info@gameslab.co.in</a>
+        </li>
+
+        <!-- Instagram -->
+        <li class="row">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 3.5A5.5 5.5 0 1 1 6.5 13 5.5 5.5 0 0 1 12 7.5Zm0 2A3.5 3.5 0 1 0 15.5 13 3.5 3.5 0 0 0 12 9.5Zm5.25-2.75a.75.75 0 1 1-.75.75.75.75 0 0 1 .75-.75Z"/></svg>
+          <a class="link" href="https://www.instagram.com/games._.lab/" target="_blank" rel="noopener">Follow Us</a>
+        </li>
+
+        <!-- WhatsApp Community -->
+        <li class="row">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.52 3.48A11.8 11.8 0 0 0 12.01.2C5.55.2.3 5.43.3 11.9c0 2.08.55 4.11 1.6 5.9L.2 24l6.36-1.65a11.7 11.7 0 0 0 5.45 1.38h.01c6.47 0 11.7-5.23 11.7-11.7 0-3.12-1.22-6.06-3.2-8.04ZM12.02 21.2h-.01c-1.74 0-3.45-.46-4.95-1.32l-.35-.2-3.77.98 1.01-3.67-.23-.38a9.79 9.79 0 0 1-1.5-5.12c0-5.42 4.42-9.83 9.85-9.83 2.63 0 5.1 1.03 6.96 2.9a9.76 9.76 0 0 1 2.89 6.95c0 5.42-4.42 9.83-9.85 9.83Zm5.6-7.33c-.3-.15-1.78-.88-2.06-.98-.28-.1-.48-.15-.68.15-.2.3-.78.98-.95 1.18-.17.2-.35.22-.65.07-.3-.15-1.28-.47-2.44-1.5-.9-.77-1.5-1.72-1.67-2.01-.17-.3-.02-.46.13-.61.14-.14.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.38-.02-.53-.07-.15-.68-1.62-.93-2.22-.24-.58-.49-.5-.68-.5l-.58-.01c-.2 0-.52.07-.8.38s-1.05 1.03-1.05 2.5 1.08 2.9 1.23 3.11c.15.2 2.12 3.24 5.14 4.55.72.31 1.29.5 1.74.64.73.23 1.4.2 1.93.12.59-.09 1.78-.73 2.03-1.44.25-.71.25-1.3.17-1.43-.07-.13-.27-.2-.57-.35Z"/></svg>
+          <a class="link" href="https://chat.whatsapp.com/BDglWOECbIiGLaCRVmzAaj" target="_blank" rel="noopener">Join our Community</a>
+        </li>
+      </ul>
+    </section>
 
   </main>
 
-  <!-- One-time typing animation -->
+  <!-- Skeleton helpers (needed by the cards includes) -->
   <script>
-    (function(){
-      const lines = [
-        'IF "HOW TO HAVE A GOOD TIME ?"','IS THE QUESTION,','WE ARE THE ANSWER'
-      ];
-      const msg = lines.join('\n');
-      const el = document.querySelector('.animated-text');
-      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      el.textContent = msg;
-      if (reduceMotion) return;
-
-      let i = 0;
-      const delay = 55;
-      el.textContent = '';
-      (function typeOnce(){
-        if (i <= msg.length) {
-          el.textContent = msg.substring(0, i);
-          i++;
-          setTimeout(typeOnce, delay);
-        }
-      })();
-    })();
-  </script>
-
-  {% include scripts-skeletons.html %}
-
-  <!-- Upcoming Events -->
-  <script>
-    (async function(){
-      const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSs9vlFaLhdFNFXvWsBIXlAJu0J5Dj2deY_7SlwAGd9Jk1-djK6xP3rdXim7Co0BJ-pUJueDCYYugew/pub?gid=1356004046&single=true&output=csv";
-      const fallbackImage = "https://via.placeholder.com/800x450?text=Event+Image";
-      const container = document.getElementById("events");
-
-      setSkeletons(container, 3);
-
-      function clean(v){ if (v === undefined || v === null) return ""; return String(v).trim().replace(/^\"|\"$/g, ''); }
-      function parseEventDate(str) {
-  if (!str) return null;
-  str = String(str).trim()
-    .replace(/^[A-Za-z]{3},?\s*/, '')  // drop leading "Fri," etc
-    .replace(/’/g, "'")
-    .replace(/`/g, "'");
-
-  // 1) 26 Sep '24
-  let m = str.match(/^(\d{1,2})\s+([A-Za-z]{3})\s+'(\d{2})$/);
-  if (m) {
-    const day = +m[1];
-    const mon = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11}[m[2]];
-    const year = 2000 + +m[3];
-    if (mon != null) return new Date(year, mon, day);
-  }
-
-  // 2) 26 Sep 2024
-  m = str.match(/^(\d{1,2})\s+([A-Za-z]{3})\s+(\d{4})$/);
-  if (m) {
-    const day = +m[1];
-    const mon = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11}[m[2]];
-    const year = +m[3];
-    if (mon != null) return new Date(year, mon, day);
-  }
-
-  // 3) Sep 26, 2024
-  m = str.match(/^([A-Za-z]{3})\s+(\d{1,2}),\s*(\d{4})$/);
-  if (m) {
-    const mon = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11}[m[1]];
-    const day = +m[2];
-    const year = +m[3];
-    if (mon != null) return new Date(year, mon, day);
-  }
-
-  // 4) ISO-ish 2024-09-26
-  m = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-  if (m) return new Date(+m[1], +m[2]-1, +m[3]);
-
-  // 5) Let Date try (last resort)
-  const d = new Date(str);
-  return isNaN(d.getTime()) ? null : d;
-}
-
-
-      try{
-        const res = await fetch(csvUrl + '&cb=' + Date.now(), { cache: "no-store" });
-        if(!res.ok) throw new Error("CSV fetch failed: " + res.status);
-        const csvText = await res.text();
-
-        const parsed = Papa.parse(csvText, {skipEmptyLines:true});
-        const rows = parsed.data || [];
-        if (rows.length < 2) {
-          container.innerHTML = '<p style="color:#bbb">No events found in the sheet.</p>';
-          return;
-        }
-
-        const dataRows = rows.slice(1).filter(r => r && r[0] && String(r[0]).trim() !== "");
-        const today = new Date(); today.setHours(0,0,0,0);
-
-        const items = [];
-        dataRows.sort((a,b)=>{
-          const da = parseEventDate(clean(a[1]));
-          const db = parseEventDate(clean(b[1]));
-          if(!da) return 1; if(!db) return -1; return da - db;
-        }).forEach(cols=>{
-          const dateObj = parseEventDate(clean(cols[1]));
-          if(!dateObj) return;
-          dateObj.setHours(0,0,0,0);
-          if(dateObj < today) return;
-          items.push(cols);
-        });
-
-        if (items.length > 0) setSkeletons(container, items.length);
-
-        items.forEach((cols, idx)=>{
-          const name = clean(cols[0]);
-          const date = clean(cols[1]);
-          const time = clean(cols[2]);
-          const locText = clean(cols[3]);
-          const pageLink = clean(cols[4]);
-          const scheduled = clean(cols[5]);
-          const locLink = clean(cols[6]);
-          const ticket = clean(cols[7]) || "#";
-          const image = clean(cols[8]) || fallbackImage;
-          const eventDateObj = parseEventDate(date);
-
-          const card = document.createElement("article");
-          card.className = "card";
-
-          const media = document.createElement("div");
-          media.className = "media";
-          const img = document.createElement("img");
-          img.loading = "lazy"; img.src = image; img.alt = name || "Event image";
-          img.width = 800; img.height = 450;
-          img.onerror = function(){ this.onerror=null; this.src = fallbackImage; };
-          media.appendChild(img);
-          card.appendChild(media);
-
-          const body = document.createElement("div");
-          body.className = "card-body";
-
-          const h = document.createElement("h3");
-          h.className = "event-title";
-          h.textContent = name || "Untitled Event";
-          body.appendChild(h);
-
-          const meta = document.createElement("p");
-          meta.className = "meta";
-          meta.textContent = (date ? date : "") + ((date && time) ? " | " : "") + (time ? time : "");
-          body.appendChild(meta);
-
-          if (locText) {
-            const locP = document.createElement("p");
-            locP.className = "location";
-            locP.textContent = locText;
-            body.appendChild(locP);
-          }
-
-          const mobileInfo = document.createElement("p");
-          mobileInfo.className = "mobile-info";
-          if (locText) mobileInfo.appendChild(document.createTextNode(locText));
-          if (locText && time) mobileInfo.appendChild(document.createTextNode(" | "));
-          if (time) mobileInfo.appendChild(document.createTextNode(time));
-          body.appendChild(mobileInfo);
-
-          card.appendChild(body);
-
-          if (eventDateObj) {
-            const dayNum = eventDateObj.getDate();
-            const monthShort = eventDateObj.toLocaleString('en-US', { month: 'short' });
-            const dateBox = document.createElement("div");
-            dateBox.className = "card-date";
-            dateBox.innerHTML =
-              `<div class="day">${String(dayNum).padStart(2,'0')}</div>` +
-              `<div class="month">${monthShort}</div>` +
-              `<div class="time"></div>`;
-            card.appendChild(dateBox);
-          }
-
-          const footer = document.createElement("div");
-          footer.className = "card-footer";
-          if (pageLink) {
-            const btn = document.createElement("a");
-            btn.className = "book-btn";
-            btn.href = pageLink;
-            btn.textContent = "Details";
-            btn.target = "_self";
-            btn.removeAttribute('rel');
-            footer.appendChild(btn);
-          }
-          card.appendChild(footer);
-
-          card.addEventListener('click', function(e) {
-            if (e.target.closest('a,button')) return;
-            if (window.innerWidth <= 768) {
-              if (pageLink) window.location.href = pageLink;
-            }
-          });
-
-          replaceSkeletonWithCard(container, idx, card);
-        });
-
-        if (items.length === 0) {
-          container.innerHTML = '<p style="color:#bbb">No upcoming events.</p>';
-        }
-      } catch (err) {
-        console.error('Upcoming events error:', err);
-        container.innerHTML = '<p style="color:#f66">Could not load events — check the CSV publish link and CSP settings.</p>';
-      }
-    })();
-  </script>
-
-  <!-- Explore -->
-  <script>
-    (async function() {
-      const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSs9vlFaLhdFNFXvWsBIXlAJu0J5Dj2deY_7SlwAGd9Jk1-djK6xP3rdXim7Co0BJ-pUJueDCYYugew/pub?gid=583837785&single=true&output=csv";
-      const container = document.getElementById('explore-cards');
-      const fallbackImage = "https://via.placeholder.com/800x450?text=Event+Image";
-
-      setSkeletons(container, 3);
-
-      try {
-        const res = await fetch(csvUrl + '&cb=' + Date.now(), { cache: "no-store" });
-        if (!res.ok) throw new Error("Failed to fetch explore events");
-        const csvText = await res.text();
-        const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
-
-        const items = parsed.data.filter(event =>
-          event && (event['Scheduled'] || '').trim().toLowerCase() === 'no'
-        );
-
-        if (items.length > 0) setSkeletons(container, items.length);
-
-        items.forEach((event, idx) => {
-          const card = document.createElement('div');
-          card.className = 'card';
-
-          const media = document.createElement('div');
-          media.className = 'media';
-          const img = document.createElement('img');
-          img.src = (event['Image Links'] || '').trim() || fallbackImage;
-          img.alt = (event['Event'] || '').trim();
-          img.loading = "lazy"; img.width = 800; img.height = 450;
-          img.onerror = function(){ this.onerror=null; this.src = fallbackImage; };
-          media.appendChild(img);
-          card.appendChild(media);
-
-          const body = document.createElement('div');
-          body.className = 'card-body';
-
-          const title = document.createElement('div');
-          title.className = 'event-title';
-          title.textContent = (event['Event'] || '').trim();
-          body.appendChild(title);
-
-          if (event['Tagline'] && String(event['Tagline']).trim() !== '') {
-            const tagline = document.createElement('div');
-            tagline.className = 'event-tagline';
-            tagline.textContent = String(event['Tagline']).trim();
-            body.appendChild(tagline);
-          }
-
-          card.appendChild(body);
-
-          const footer = document.createElement('div');
-          footer.className = 'card-footer';
-
-          const learn = document.createElement('a');
-          learn.className = 'book-btn';
-          const pageUrl = (event['Page Link'] || '#').trim();
-          learn.href = pageUrl;
-          learn.textContent = 'Learn More';
-          learn.target = '_self';
-          learn.removeAttribute('rel');
-
-          footer.appendChild(learn);
-          card.appendChild(footer);
-
-          card.addEventListener('click', function(e) {
-            if (e.target.closest('a')) return;
-            if (window.innerWidth <= 768) {
-              const url = (event['Page Link'] || '').trim();
-              if (url) window.location.href = url;
-            }
-          });
-
-          replaceSkeletonWithCard(container, idx, card);
-        });
-
-        if (!items.length) {
-          container.innerHTML = '<div style="color:#bbb;text-align:center;">No other events to explore at this time.</div>';
-        }
-      } catch (err) {
-        console.error('Error loading explore events:', err);
-        container.innerHTML = '<div style="color:#f66;text-align:center;">Could not load other events.</div>';
-      }
-    })();
-  </script>
-
-  <!-- Gallery -->
-  <script>
-(function(){
-  const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSs9vlFaLhdFNFXvWsBIXlAJu0J5Dj2deY_7SlwAGd9Jk1-djK6xP3rdXim7Co0BJ-pUJueDCYYugew/pub?gid=1078145247&single=true&output=csv";
-  const MAX_SKELETONS = 6;
-
-  const wrap  = document.getElementById('gallery');
-  const track = document.getElementById('gallery-track');
-  const skel  = document.getElementById('gallery-skeletons');
-  if (!wrap || !track || !skel) return;
-
-  // --- helpers ---
-  const isMobile        = () => window.innerWidth <= 768;
-  const slidesPerView   = () => 1;
-  const stepPct         = () => 100 / slidesPerView();
-  const slideTransform  = () => (isMobile() ? 'w-720,q-80' : 'w-1200,q-80'); // not applied unless ImageKit
-  const lightboxTransform = 'w-1600,q-80';
-  const blurTransform     = 'w-40,q-10,bl-6';
-
-  // Only transform ik.imagekit.io URLs; otherwise return original unchanged
-  function withIK(url, transform) {
-    if (!/https?:\/\/[^/]*ik\.imagekit\.io\//i.test(url)) return url;
-    try {
-      const u = new URL(url);
-      if (/\/tr:/.test(u.pathname)) {
-        // append f-auto if missing
-        u.pathname = u.pathname.replace(/\/tr:([^/]+)/, (m, g1) => {
-          const t = g1.includes('f-auto') ? g1 : g1 + ',f-auto';
-          return '/tr:' + t;
-        });
-        return u.toString();
-      }
-      // insert /tr:<transform,f-auto> after endpoint segment
-      const parts = u.pathname.split('/'); // ["", "gameslab", ...]
-      if (parts.length >= 3) {
-        const t = (transform ? transform + ',' : '') + 'f-auto';
-        parts.splice(2, 0, 'tr:' + t);
-        u.pathname = parts.join('/');
-        return u.toString();
-      }
-      return url;
-    } catch(e) { return url; }
-  }
-
-  // case-insensitive CSV getter
-  function get(row, key){
-    const w = key.toLowerCase();
-    for (const k in row) {
-      if (Object.prototype.hasOwnProperty.call(row,k) && k.toLowerCase().trim() === w) {
-        return String(row[k] || '').trim();
-      }
+    function createSkeletonCard(){
+      const sk = document.createElement('div');
+      sk.className = 'sk-card';
+      sk.innerHTML = `
+        <div class="sk-media"></div>
+        <div class="sk-body">
+          <div class="sk-line w-80"></div>
+          <div class="sk-line w-60"></div>
+          <div class="sk-line w-40"></div>
+        </div>
+        <div class="sk-footer">
+          <div class="sk-box sk-btn"></div>
+        </div>
+      `;
+      return sk;
     }
-    return '';
-  }
+    function setSkeletons(container, count){
+      container.innerHTML = '';
+      for(let i=0;i<count;i++) container.appendChild(createSkeletonCard());
+    }
+    function replaceSkeletonWithCard(container, index, cardEl){
+      const sk = container.children[index];
+      if (sk) container.replaceChild(cardEl, sk);
+      else container.appendChild(cardEl);
+    }
+  </script>
 
-  function createSlide(obj){
-    const slide = document.createElement('div');
-    slide.className = 'gal-slide';
-
-    const bg = document.createElement('div');
-    bg.className = 'gal-bg';
-    bg.style.backgroundImage = `url("${withIK(obj.image, blurTransform)}")`;
-    slide.appendChild(bg);
-
-    const img = document.createElement('img');
-    img.className = 'gal-img';
-    img.alt = obj.alt || '';
-    img.loading = 'lazy';
-    img.decoding = 'async';
-    img.src = withIK(obj.image, slideTransform());
-    img.onerror = function(){
-      // retry once without f-auto (jpg) if ImageKit
-      if (!img.dataset.retry && /ik\.imagekit\.io/.test(obj.image)) {
-        img.dataset.retry = '1';
-        img.src = withIK(obj.image, slideTransform().replace('f-auto','f-jpg'));
-      }
-    };
-    img.addEventListener('load', ()=>{
-      if (img.naturalHeight > img.naturalWidth) slide.classList.add('portrait');
-    }, { once:true });
-
-    slide.addEventListener('click', () => openLightbox(obj.idx));
-    slide.appendChild(img);
-    return slide;
-  }
-
-  fetch(CSV_URL, { cache: 'no-cache' })
-    .then(r => r.text())
-    .then(t => Papa.parse(t, { header:true, skipEmptyLines:true }).data)
-    .then(rows => {
-      const items = rows
-        .map((r,i)=>({
-          idx: i,
-          image:   get(r,'Image'),
-          alt:     get(r,'Alt'),
-          caption: get(r,'Caption'),
-          show:    (get(r,'Show') || 'yes').toLowerCase(),
-          order:   (()=>{ const v = get(r,'Order'); return v!=='' ? Number(v) : null; })()
-        }))
-        // show any row that has an Image; if "Show" exists and is a clear "no", hide it
-        .filter(r => r.image && !['no','n','false','0'].includes(r.show))
-        .sort((a,b)=>{
-          if (a.order!=null && b.order!=null) return a.order - b.order;
-          if (a.order!=null) return -1;
-          if (b.order!=null) return 1;
-          return a.idx - b.idx;
-        });
-
-      if (!items.length) {
-        skel.innerHTML = '<div style="color:#bbb;text-align:center;padding:16px 0">No gallery images yet. Check CSV (Image / Show columns).</div>';
-        return;
-      }
-
-      // trim skeletons to count cap
-      while (skel.children.length > Math.min(items.length, MAX_SKELETONS)) {
-        skel.removeChild(skel.lastElementChild);
-      }
-
-      // build track with clones for infinite loop
-      let pos = 0, spv = slidesPerView(), sliding = false;
-
-      function buildTrack(){
-        spv = slidesPerView();
-        track.innerHTML = '';
-
-        const head = [], tail = [];
-        for (let i=0;i<spv;i++){
-          const hc = createSlide(items[i]); head.push(hc);
-          const idx = items.length - spv + i;
-          const tc = createSlide(items[idx]); tail.push(tc);
-        }
-        track.append(...tail);
-        items.forEach(it => track.appendChild(createSlide(it)));
-        track.append(...head);
-
-        pos = spv;
-        setTransform(false);
-        skel.style.display = 'none';
-      }
-
-      function setTransform(animate=true){
-        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        track.style.transition = (animate && !reduce) ? 'transform .35s ease' : 'none';
-        track.style.transform  = `translate3d(-${pos*stepPct()}%,0,0)`;
-      }
-
-      function go(delta){
-        if (sliding) return;
-        sliding = true;
-        pos += delta;
-        setTransform(true);
-        setTimeout(()=>{
-          const total = items.length;
-          if (pos < spv) { pos += total; setTransform(false); }
-          else if (pos > total + spv - 1) { pos -= total; setTransform(false); }
-          sliding = false;
-        }, 380);
-      }
-
-      buildTrack();
-
-      // arrows (hidden on mobile via CSS)
-      wrap.querySelector('.gal-prev').addEventListener('click', ()=>go(-1));
-      wrap.querySelector('.gal-next').addEventListener('click', ()=>go(1));
-
-      // swipe / drag
-      const viewport = wrap.querySelector('.gallery-viewport');
-      let startX=0, startPos=pos, dragging=false;
-
-      const W = () => viewport.clientWidth;
-      function onDown(e){
-        dragging = true;
-        track.style.transition = 'none';
-        startX = (e.touches ? e.touches[0].clientX : e.clientX);
-        startPos = pos;
-        pauseAuto();
-      }
-      function onMove(e){
-        if (!dragging) return;
-        const x  = (e.touches ? e.touches[0].clientX : e.clientX);
-        const dx = x - startX;
-        const pct = dx / W() * 100;
-        track.style.transform = `translate3d(-${startPos*stepPct() - pct}%,0,0)`;
-      }
-      function onUp(e){
-        if (!dragging) return;
-        dragging = false;
-        const x  = (e.changedTouches ? e.changedTouches[0].clientX : e.clientX);
-        const dx = x - startX;
-        const threshold = Math.max(40, (W()/slidesPerView())*0.2);
-        if (dx > threshold) go(-1);
-        else if (dx < -threshold) go(1);
-        else setTransform(true);
-        resumeAutoSoon();
-      }
-
-      viewport.addEventListener('mousedown', onDown);
-      viewport.addEventListener('mousemove', onMove);
-      window.addEventListener('mouseup', onUp);
-      viewport.addEventListener('touchstart', onDown, { passive:true });
-      viewport.addEventListener('touchmove', onMove, { passive:true });
-      viewport.addEventListener('touchend', onUp);
-
-      // autoplay
-      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      let timer = null, paused = false;
-      function tick(){ if (!paused) go(1); }
-      function startAuto(){ if (!reduce && !timer) timer = setInterval(tick, 3500); }
-      function stopAuto(){ if (timer){ clearInterval(timer); timer = null; } }
-      function pauseAuto(){ paused = true; stopAuto(); }
-      function resumeAuto(){ paused = false; startAuto(); }
-      function resumeAutoSoon(){ setTimeout(()=>!dragging && resumeAuto(), 1200); }
-
-      startAuto();
-      viewport.addEventListener('mouseenter', pauseAuto);
-      viewport.addEventListener('mouseleave', resumeAuto);
-      viewport.addEventListener('touchstart', pauseAuto, {passive:true});
-      viewport.addEventListener('touchend', resumeAutoSoon);
-
-      // lightbox
-      const lb     = document.getElementById('gal-lightbox');
-      const lbImg  = document.getElementById('gal-lightbox-img');
-      const lbCap  = document.getElementById('gal-lightbox-cap');
-      const lbClose= lb.querySelector('.gal-lightbox-close');
-      const lbPrev = lb.querySelector('.gal-lightbox-prev');
-      const lbNext = lb.querySelector('.gal-lightbox-next');
-
-      let current = 0;
-      function openLightbox(realIdx){
-        current = realIdx % items.length;
-        updateLightbox();
-        lb.hidden = false;
-        pauseAuto();
-      }
-      function closeLightbox(){ lb.hidden = true; resumeAutoSoon(); }
-      function updateLightbox(){
-        const it = items[current];
-        // Only apply IK transform if host is ImageKit; otherwise load raw
-        const src = /ik\.imagekit\.io/.test(it.image)
-          ? withIK(it.image, lightboxTransform)
-          : it.image;
-        lbImg.src = src;
-        lbImg.alt = it.alt || '';
-        lbCap.textContent = it.caption || '';
-        lbCap.style.display = it.caption ? 'block' : 'none';
-      }
-      function lbGo(d){ current = (current + d + items.length) % items.length; updateLightbox(); }
-
-      lbClose.addEventListener('click', closeLightbox);
-      lbPrev .addEventListener('click', ()=>lbGo(-1));
-      lbNext .addEventListener('click', ()=>lbGo(1));
-      lb.addEventListener('click', (e)=>{ if (e.target === lb) closeLightbox(); });
-
-      // swipe in lightbox
-      let lStart=0, lDrag=false;
-      lb.addEventListener('touchstart', e=>{ lDrag=true; lStart=e.touches[0].clientX; }, {passive:true});
-      lb.addEventListener('touchend', e=>{
-        if(!lDrag) return; lDrag=false;
-        const dx = e.changedTouches[0].clientX - lStart;
-        const thr = 50;
-        if (dx > thr) lbGo(-1);
-        else if (dx < -thr) lbGo(1);
-      });
-
-      // handle resize
-      let lastSPV = slidesPerView();
-      window.addEventListener('resize', ()=>{
-        const now = slidesPerView();
-        if (now !== lastSPV){
-          lastSPV = now;
-          buildTrack();
-        }
-      });
-    })
-    .catch(err => {
-      console.error('Gallery load error:', err);
-      skel.innerHTML = '<div style="color:#f66;text-align:center;padding:16px 0">Could not load gallery.</div>';
-    });
-})();
-</script>
-
-
-  <!-- Elfsight lazy loader -->
+  <!-- Phone menu logic for Contact -->
   <script>
   (function(){
-    const sec = document.getElementById('reviews');
-    if (!sec) return;
+    const phone = document.getElementById('phone-link');
+    const menu  = document.getElementById('phone-menu');
+    const waBtn = document.getElementById('wa-now');
+    if (!phone || !menu || !waBtn) return;
 
-    const SESSION_KEY = 'elfsightLoaded';
-    function markLoaded(){ try{ sessionStorage.setItem(SESSION_KEY, '1'); }catch(e){} }
-    function alreadyLoaded(){ try{ return sessionStorage.getItem(SESSION_KEY) === '1'; }catch(e){ return false; } }
+    const tel = (phone.dataset.tel || '').replace(/[^\d]/g,'');
+    const msg = encodeURIComponent("Hi! I'd like to know more about Games Lab events.");
+    waBtn.href = `https://wa.me/${tel}?text=${msg}`;
 
-    function loadElfsight(){
-      if (window.__ELFSIGHT_LOADING__) return;
-      window.__ELFSIGHT_LOADING__ = true;
-
-      const ph = document.getElementById('reviews-placeholder');
-      if (ph) ph.textContent = 'Loading…';
-
-      const s = document.createElement('script');
-      s.src = "https://static.elfsight.com/platform/platform.js";
-      s.defer = true;
-      s.setAttribute('data-use-service-core','');
-      s.onload = function(){ markLoaded(); if (ph) ph.remove(); };
-      document.head.appendChild(s);
+    function openMenu(){
+      if (!menu.hidden){ menu.hidden = true; return; }
+      menu.hidden = false;
+      const onAway = (e)=>{ if (!menu.contains(e.target) && e.target !== phone){ menu.hidden = true; cleanup(); } };
+      const onEsc  = (e)=>{ if (e.key === 'Escape'){ menu.hidden = true; cleanup(); } };
+      function cleanup(){
+        document.removeEventListener('click', onAway, true);
+        document.removeEventListener('keydown', onEsc, true);
+      }
+      document.addEventListener('click', onAway, true);
+      document.addEventListener('keydown', onEsc, true);
     }
 
-    if (alreadyLoaded()){ loadElfsight(); return; }
-
-    if ('IntersectionObserver' in window){
-      const io = new IntersectionObserver((entries)=>{
-        if (entries.some(e => e.isIntersecting)){
-          loadElfsight();
-          io.disconnect();
-        }
-      }, { rootMargin: '250px' });
-      io.observe(sec);
-    } else {
-      loadElfsight();
-    }
+    phone.addEventListener('click', (e)=>{ e.preventDefault(); openMenu(); });
   })();
   </script>
 
-  {% include scripts-shared.html %}
-
+  <!-- Force same-tab for any /events/ link added later -->
+  <script>
+  (function(){
+    const sel = 'a[href^="{{ site.baseurl }}/events/"], a[href^="/events/"], a[href*="://gameslab.co.in/events/"]';
+    const fix = (root=document) => root.querySelectorAll(sel).forEach(a => a.removeAttribute('target'));
+    fix();
+    new MutationObserver(muts => {
+      muts.forEach(m => m.addedNodes.forEach(n => {
+        if (n.nodeType === 1) fix(n);
+      }));
+    }).observe(document.body, { childList:true, subtree:true });
+  })();
+  </script>
 </body>
 </html>
