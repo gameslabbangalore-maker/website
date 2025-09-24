@@ -8,39 +8,19 @@ permalink: /
 <html lang="en">
 <head>
   {% include head.html %}
+  <!-- head.html should load:
+       - fonts/CSS
+       - PapaParse
+       - scripts-contact-phone.html (global Call/WhatsApp chooser)
+       - scripts-same-tab.html (force same-tab; respects data-newtab="true")
+  -->
 </head>
 <body>
   {% include topbar-bleed.html %}
   {% include header.html %}
 
-  <!-- Skeleton helpers: load BEFORE any cards scripts -->
-  <script>
-    function createSkeletonCard(){
-      const sk = document.createElement('div');
-      sk.className = 'sk-card';
-      sk.innerHTML = `
-        <div class="sk-media"></div>
-        <div class="sk-body">
-          <div class="sk-line w-80"></div>
-          <div class="sk-line w-60"></div>
-          <div class="sk-line w-40"></div>
-        </div>
-        <div class="sk-footer">
-          <div class="sk-box sk-btn"></div>
-        </div>
-      `;
-      return sk;
-    }
-    function setSkeletons(container, count){
-      container.innerHTML = '';
-      for(let i=0;i<count;i++) container.appendChild(createSkeletonCard());
-    }
-    function replaceSkeletonWithCard(container, index, cardEl){
-      const sk = container.children[index];
-      if (sk) container.replaceChild(cardEl, sk);
-      else container.appendChild(cardEl);
-    }
-  </script>
+  {# Make skeleton helpers available BEFORE any cards scripts #}
+  {% include scripts-skeletons.html %}
 
   <main id="main" class="wrap" role="main">
     <h1 class="sr-only">Games Lab — Events & Experiences</h1>
@@ -65,49 +45,5 @@ permalink: /
     {% include divider.html mt='40px' %}
     {% include contact.html %}
   </main>
-
-  <!-- Phone menu logic for Contact -->
-  <script>
-  (function(){
-    const phone = document.getElementById('phone-link');
-    const menu  = document.getElementById('phone-menu');
-    const waBtn = document.getElementById('wa-now');
-    if (!phone || !menu || !waBtn) return;
-
-    const tel = (phone.dataset.tel || '').replace(/[^\d]/g,'');
-    const msg = encodeURIComponent("Hi! I'd like to know more about Games Lab events.");
-    waBtn.href = `https://wa.me/${tel}?text=${msg}`;
-
-    function openMenu(){
-      if (!menu.hidden){ menu.hidden = true; return; }
-      menu.hidden = false;
-      const onAway = (e)=>{ if (!menu.contains(e.target) && e.target !== phone){ menu.hidden = true; cleanup(); } };
-      const onEsc  = (e)=>{ if (e.key === 'Escape'){ menu.hidden = true; cleanup(); } };
-      function cleanup(){
-        document.removeEventListener('click', onAway, true);
-        document.removeEventListener('keydown', onEsc, true);
-      }
-      document.addEventListener('click', onAway, true);
-      document.addEventListener('keydown', onEsc, true);
-    }
-
-    phone.addEventListener('click', (e)=>{ e.preventDefault(); openMenu(); });
-  })();
-  </script>
-
-  <!-- Force same-tab for any /events/ link added later -->
-  <script>
-  (function(){
-    const base = "{{ site.baseurl }}";
-    const sel = `a[href^="${base}/events/"], a[href^="/events/"], a[href*="://gameslab.co.in/events/"]`;
-    const fix = (root=document) => root.querySelectorAll(sel).forEach(a => a.removeAttribute('target'));
-    fix();
-    new MutationObserver(muts => {
-      muts.forEach(m => m.addedNodes.forEach(n => {
-        if (n.nodeType === 1) fix(n);
-      }));
-    }).observe(document.body, { childList:true, subtree:true });
-  })();
-  </script>
 </body>
 </html>
