@@ -80,7 +80,7 @@
       if (fabBook && ev.ticket_link){ fabBook.href = ev.ticket_link; fabBook.removeAttribute('hidden'); }
 
       // Share FAB = icon-only when scheduled
-      shareFab && shareFab.classList.remove('with-text');
+      shareFab && shareFab.classList.add('with-text');
 
     } else {
       scHead && scHead.setAttribute('hidden','');
