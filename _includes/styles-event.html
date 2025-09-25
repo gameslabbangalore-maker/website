@@ -98,14 +98,14 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
 }
 
 /* Microbar (mobile only) */
-.mobile-info-bar{position:fixed;left:0;right:0;top:calc(var(--topbar-height-mobile) + env(safe-area-inset-top,0px));z-index:10001;padding:8px 12px;background:rgba(24,24,24,.07);border-bottom:1px solid rgba(255,255,255,.3);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);transform:translate3d(0,-100%,0);opacity:0;pointer-events:none;transition:transform .2s ease, opacity .15s ease;will-change:transform,opacity}
+.mobile-info-bar{position:fixed;left:0;right:0;top:calc(var(--topbar-height-mobile) + env(safe-area-inset-top,0px));z-index:10001;padding:6px 12px;background:rgba(24,24,24,.07);border-bottom:1px solid rgba(255,255,255,.3);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);transform:translate3d(0,-100%,0);opacity:0;pointer-events:none;transition:transform .2s ease, opacity .15s ease;will-change:transform,opacity}
 @media (prefers-color-scheme: light){.mobile-info-bar{background:rgba(255,255,255,.55);border-bottom:1px solid rgba(0,0,0,.08)}}
 .mobile-info-bar.show{transform:translate3d(0,0,0);opacity:1;pointer-events:auto}
-.mobile-info-inner{display:flex;flex-direction:column;align-items:flex-start;gap:6px;max-width:1200px;margin:0 auto}
-.micro-title{font-size:1.08rem;font-weight:900;line-height:1.2}
-.micro-line{display:flex;align-items:baseline;gap:12px;width:100%;flex-wrap:nowrap}
-.micro-meta{font-size:.88rem;color:var(--muted);font-weight:800;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.micro-action{font-size:.84rem;color:var(--muted);font-weight:800;text-decoration:underline;text-underline-offset:3px;margin-left:auto;white-space:nowrap}
+.mobile-info-inner{display:flex;flex-direction:column;align-items:flex-start;gap:4px;max-width:1200px;margin:0 auto}
+.micro-title{font-size:1.02rem;font-weight:900;line-height:1.15}
+.micro-line{display:flex;align-items:center;gap:10px;width:100%;flex-wrap:nowrap}
+.micro-meta{font-size:.84rem;color:var(--muted);font-weight:800;line-height:1.2;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.micro-action{font-size:.82rem;color:var(--muted);font-weight:800;text-decoration:underline;text-underline-offset:2px;margin-left:auto;white-space:nowrap}
 .micro-action[hidden]{display:none}
 .micro-line:empty{display:none}
 .micro-line span:empty{display:none}
