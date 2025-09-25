@@ -1,20 +1,20 @@
 {%- comment -%}
   _includes/event-sections.html
-  Purpose: Render structured copy from the matching collection item at the TOP,
-  then (optionally) the "About the event" video and "Event recaps" grid.
+  Renders:
+  1) Structured copy (About / What makes it different / How it works / Why join? / Closing)
+     pulled from the matching collection item (by slug) — shown at the TOP.
+  2) Optional "About the event" video (opens in modal).
+  3) Optional Event recaps grid (opens in modal).
 
-  Assumptions:
-  - Collection: site.events with items having front matter fields:
-      about, what_makes_it_different, how_it_works, why_join, closing
-  - Current page has `slug` matching the collection item's `slug`.
-  - Optional page fields:
-      page.about_video              → string URL OR object { url, thumb }
-      page.about_video_thumb        → string URL (fallback thumbnail)
-      page.recap_videos             → array of strings OR objects { url, title, thumb }
+  Notes:
+  - Uses a wrapper .structured-sections so desktop stays single-column here only.
+  - Uses a data-URI placeholder as a guaranteed thumbnail to avoid visible link text if a thumb is missing.
 {%- endcomment -%}
 
-{%- comment -%} 1) Structured sections (TOP) {%- endcomment -%}
-{% assign ev = site.events | where: "slug", page.slug | first %}
+{%- assign ev = site.events | where: "slug", page.slug | first -%}
+
+{%- comment -%} 1) Structured sections — TOP {%- endcomment -%}
+<div class="structured-sections">
 {% if ev %}
 
   {% if ev.about %}
@@ -52,12 +52,18 @@
   {% endif %}
 
 {% endif %}
+</div>
 
-{%- comment -%} 2) Optional "About the event" video (guarded; heading clarified) {%- endcomment -%}
+{%- comment -%}
+  Helper: safe 1x1 placeholder (prevents anchor rendering as blue text when thumb is missing).
+{%- endcomment -%}
+{% assign placeholder_thumb = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" %}
+
+{%- comment -%} 2) Optional "About the event" video (guarded) {%- endcomment -%}
 {% if page.about_video %}
   {%- assign about_url = page.about_video -%}
   {%- if page.about_video.url -%}{% assign about_url = page.about_video.url %}{%- endif -%}
-  {%- assign about_thumb = page.about_video_thumb | default: page.about_video.thumb | default: '/assets/fallback-video-thumb.jpg' -%}
+  {%- assign about_thumb = page.about_video_thumb | default: page.about_video.thumb | default: placeholder_thumb -%}
 
   <section class="section" id="about-event">
     <h2>About the event</h2>
@@ -78,7 +84,7 @@
       {% for v in page.recap_videos %}
         {%- assign v_url = v -%}
         {%- assign v_title = "Recap video" -%}
-        {%- assign v_thumb = '/assets/fallback-video-thumb.jpg' -%}
+        {%- assign v_thumb = placeholder_thumb -%}
 
         {%- if v.url -%}{% assign v_url = v.url %}{%- endif -%}
         {%- if v.title -%}{% assign v_title = v.title %}{%- endif -%}
