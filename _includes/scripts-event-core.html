@@ -261,28 +261,10 @@
     shareFab?.addEventListener('click', sharePage);
   })();
 
-  // Contact phone chooser (same across site; kept here for event pages)
-  (function(){
-    const phone = document.getElementById('phone-link');
-    const menu  = document.getElementById('phone-menu');
-    const waBtn = document.getElementById('wa-now');
-    if (!phone || !menu || !waBtn) return;
-    const tel = (phone.dataset.tel || '').replace(/[^\d]/g,'');
-    const msg = encodeURIComponent("Hi! I'd like to know more about Games Lab events.");
-    waBtn.href = `https://wa.me/${tel}?text=${msg}`;
-    function openMenu(){
-      if (!menu.hidden){ menu.hidden = true; return; }
-      menu.hidden = false;
-      const onAway = (e)=>{ if (!menu.contains(e.target) && e.target !== phone){ menu.hidden = true; cleanup(); } };
-      const onEsc  = (e)=>{ if (e.key === 'Escape'){ menu.hidden = true; cleanup(); } };
-      function cleanup(){ document.removeEventListener('click', onAway, true); document.removeEventListener('keydown', onEsc, true); }
-      document.addEventListener('click', onAway, true);
-      document.addEventListener('keydown', onEsc, true);
-    }
-    phone.addEventListener('click', (e)=>{ e.preventDefault(); openMenu(); });
-  })();
 })();
 </script>
+
+{% include scripts-contact-phone.html %}
 
 <!-- Video Lightbox -->
 <script>
