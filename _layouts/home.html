@@ -1,9 +1,0 @@
----
-layout: default
----
-{%- assign sections = page.sections | default: "highlights,gallery,contact" | split: "," -%}
-
-{%- for section in sections -%}
-  {%- capture include_name -%}{{ section | strip }}.html{%- endcapture -%}
-  {%- include {{ include_name }} -%}
-{%- endfor -%}
