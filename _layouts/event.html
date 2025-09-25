@@ -14,13 +14,11 @@
       {% include event-hero.html %}
       {% include divider.html %}
       {% include event-sections.html %}
-    </div>
-
-    <!-- Divider used to keep FAB off the footer on some pages; JS will set bottom padding via CSS var -->
-    <div class="divider" id="contactTopDivider" style="margin-top:40px;"></div>
-    {% include contact.html %}
-    <div class="divider" style="margin-top:40px;"></div>
+    </div>    
   </main>
+
+  <div class="divider" id="contactTopDivider" style="margin-top:40px;"></div>
+    {% include contact.html %}
 
   <!-- Video Lightbox Modal -->
   <div id="vidModal" class="vid-modal" hidden>
