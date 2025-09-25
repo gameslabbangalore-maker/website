@@ -80,6 +80,7 @@
   const scDir     = document.getElementById('scDir');
   const scBook    = document.getElementById('scBook');
   const fabBook   = document.getElementById('fabBook');
+  const shareFab  = document.getElementById('shareFab');
 
   // Microbar parts
   const M = {
@@ -99,6 +100,17 @@
   const dGroup = "{{ page.highlights.group_size | default: '8–25 players' | escape }}";
   const dDiff = "{{ page.highlights.difficulty | default: 'Beginner-friendly' | escape }}";
   const dPrice = "{{ page.highlights.price | default: '₹ 350/-' | escape }}";
+
+  function updateShareOffset(){
+    if (!shareFab) return;
+    let bottom = 12;
+    if (fabBook && !fabBook.hasAttribute('hidden')){
+      const height = fabBook.getBoundingClientRect().height || fabBook.offsetHeight || 0;
+      if (!height){ requestAnimationFrame(updateShareOffset); return; }
+      bottom += Math.round(height + 8);
+    }
+    document.documentElement.style.setProperty('--fab-share-bottom', bottom + 'px');
+  }
 
   if (match){
     scheduled = CLEAN(match['Scheduled']).toLowerCase() === 'yes';
@@ -124,18 +136,26 @@
     if (scDir && locLink){ scDir.href = locLink; }
     if (ticket){
       scBook && (scBook.href = ticket);
-      if (fabBook){ fabBook.href = ticket; fabBook.removeAttribute('hidden'); }
+      if (fabBook){
+        fabBook.href = ticket;
+        fabBook.removeAttribute('hidden');
+        requestAnimationFrame(updateShareOffset);
+      } else {
+        updateShareOffset();
+      }
       document.documentElement.style.setProperty('--mobile-bottom-pad', '96px');
     } else {
-      fabBook && fabBook.setAttribute('hidden', '');
+      if (fabBook){ fabBook.setAttribute('hidden', ''); }
       document.documentElement.style.setProperty('--mobile-bottom-pad', '16px');
+      updateShareOffset();
     }
   } else {
     // Not scheduled
     scHeading && scHeading.setAttribute('hidden','');
     if (scBlock) scBlock.hidden = true;
-    fabBook && fabBook.setAttribute('hidden','');
+    if (fabBook){ fabBook.setAttribute('hidden',''); }
     document.documentElement.style.setProperty('--mobile-bottom-pad', '16px');
+    updateShareOffset();
   }
 
   // Microbar content + visibility
@@ -189,7 +209,7 @@
       }catch(e){}
     }
     document.getElementById('shareBtnSide')?.addEventListener('click', sharePage);
-    document.getElementById('shareFab')?.addEventListener('click', sharePage);
+    shareFab?.addEventListener('click', sharePage);
   })();
 
   // Contact phone chooser (same across site; kept here for event pages)

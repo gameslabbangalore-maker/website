@@ -2,12 +2,52 @@
 <div class="divider" aria-hidden="true"></div>
 
 <article class="content">
+  {% assign about_copy = page.about | default: nil %}
+  {% if about_copy or content %}
   <section id="details" aria-labelledby="about">
     <h3 id="about" class="section-title">About the Event</h3>
     <div class="prose">
-      {{ content }}
+      {% if about_copy %}
+        {{ about_copy | markdownify }}
+      {% endif %}
+      {% if content %}
+        {{ content }}
+      {% endif %}
     </div>
   </section>
+  {% endif %}
+
+  {% if page.what_makes_it_different %}
+  <div class="divider" aria-hidden="true"></div>
+  <section id="what-makes-it-different" aria-labelledby="what-makes-title">
+    <h3 id="what-makes-title" class="section-title">What makes it different?</h3>
+    <div class="prose">{{ page.what_makes_it_different | markdownify }}</div>
+  </section>
+  {% endif %}
+
+  {% if page.how_it_works %}
+  <div class="divider" aria-hidden="true"></div>
+  <section id="how-it-works" aria-labelledby="how-it-works-title">
+    <h3 id="how-it-works-title" class="section-title">How it works</h3>
+    <div class="prose">{{ page.how_it_works | markdownify }}</div>
+  </section>
+  {% endif %}
+
+  {% if page.why_join %}
+  <div class="divider" aria-hidden="true"></div>
+  <section id="why-join" aria-labelledby="why-join-title">
+    <h3 id="why-join-title" class="section-title">Why join?</h3>
+    <div class="prose">{{ page.why_join | markdownify }}</div>
+  </section>
+  {% endif %}
+
+  {% if page.closing %}
+  <div class="divider" aria-hidden="true"></div>
+  <section id="closing" aria-labelledby="closing-title">
+    <h3 id="closing-title" class="section-title">Closing note</h3>
+    <div class="prose">{{ page.closing | markdownify }}</div>
+  </section>
+  {% endif %}
 
   {% if page.about_video %}
   <div class="divider" aria-hidden="true"></div>

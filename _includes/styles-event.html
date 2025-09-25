@@ -1,7 +1,7 @@
 <style>
 :root {
   --bg:#181818; --card:#212121; --muted:#d0d0d0; --accent:#fce029; --datebox:#303030; --text-main:#fff;
-  --topbar-height-desktop:58px; --topbar-height-mobile:48px;
+  --topbar-height-desktop:58px; --topbar-height-mobile:48px; --fab-share-bottom:12px;
 }
 
 /* Base + topbar */
@@ -104,10 +104,10 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
 @media (min-width:960px){.mobile-info-bar{display:none !important}}
 
 /* FABs (mobile) */
-.fab-book,.fab-share{position:fixed;z-index:10000;bottom:12px;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.35);display:flex;align-items:center;gap:10px;padding:12px 16px;text-decoration:none}
-.fab-book{left:12px;right:calc(12px + 56px + 8px);background:var(--accent);color:#000;font-weight:900}
+.fab-book,.fab-share{position:fixed;z-index:10000;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.35);display:flex;align-items:center;gap:10px;padding:12px 16px;text-decoration:none}
+.fab-book{left:12px;right:calc(12px + 56px + 8px);bottom:12px;background:var(--accent);color:#000;font-weight:900;justify-content:center;text-align:center}
 .fab-book[hidden]{display:none}
-.fab-share{right:12px;background:rgba(24,24,24,.35);color:var(--text-main);border:1px solid rgba(255,255,255,.25);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.fab-share{right:12px;bottom:var(--fab-share-bottom,12px);background:rgba(24,24,24,.35);color:var(--text-main);border:1px solid rgba(255,255,255,.25);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .fab-share .fab-share-label{font-weight:900;font-size:.95rem}
 @media (prefers-color-scheme: light){.fab-share{background:rgba(255,255,255,.65);border-color:rgba(0,0,0,.15);color:inherit}}
 @media (min-width:960px){.fab-book,.fab-share{display:none}}
@@ -115,11 +115,26 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
 /* Ensure desktop has no extra bottom padding */
 @media (min-width:960px){ .wrap{ --mobile-bottom-pad: 16px; } }
 
-/* Contact drop-up menu (above the number) */
+/* Contact section */
+.title{text-align:center}
+.contact-wrap{max-width:1200px;margin:0 auto;padding:0 12px}
+.contact-head{display:flex;align-items:center;gap:12px;margin-bottom:18px;justify-content:center}
+.contact-head .logo-lg{width:44px;height:44px;border-radius:10px;object-fit:cover}
+.contact-sub{margin:0;font-weight:700;letter-spacing:.6px;color:var(--muted)}
+.contact-list{list-style:none;margin:0;padding:0;display:grid;gap:16px}
+.row{display:grid;grid-template-columns:28px 1fr;column-gap:12px;align-items:center}
+.icon{width:28px;height:28px;color:var(--accent)}
+.link{color:var(--text-main);text-decoration:none;font-weight:700}
+.link:hover{color:var(--accent)}
+.email-text{overflow-wrap:anywhere;word-break:break-word;line-break:anywhere}
 .phone-wrap{position:relative}
-.phone-menu{position:absolute;bottom:100%;left:40px;margin-bottom:6px;background:var(--card);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.4);padding:8px;display:flex;gap:8px;z-index:5}
+.phone-menu{position:absolute;top:100%;left:40px;margin-top:6px;background:var(--card);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.4);padding:8px;display:flex;gap:8px;z-index:5}
 .phone-menu[hidden]{display:none}
 .phone-menu a{display:inline-block;padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:700;background:rgba(255,255,255,.06);color:var(--text-main) !important}
 .phone-menu a:hover{background:rgba(255,255,255,.12);color:var(--accent) !important}
+@media (min-width:1100px){
+  .contact-list{display:flex;justify-content:center;flex-wrap:wrap;gap:24px 32px}
+  .row{display:flex;gap:12px}
+}
 @media (prefers-color-scheme: light){.phone-menu{box-shadow:0 8px 24px rgba(0,0,0,.12)}}
 </style>
