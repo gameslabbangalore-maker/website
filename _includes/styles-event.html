@@ -206,9 +206,13 @@
   bottom:68px;
 }
 
-/* 5) Only add bottom padding when Book FAB is visible */
-.wrap{ padding-bottom:14px; }          /* default small */
-.wrap.pad-for-fab{ padding-bottom:80px; } /* when Book FAB shown */
+/* Default bottom padding for mobile; desktop = no extra space */
+:root { --wrap-bottom-pad: 16px; }
+.wrap { padding-bottom: var(--wrap-bottom-pad); }
+@media (min-width:960px){
+  :root { --wrap-bottom-pad: 0px; }
+  .wrap { padding-bottom: 0; }
+}
 </style>
 <style>
 /* Highlights -> Share button: mimic FAB style (not floating) */
