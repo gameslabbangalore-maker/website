@@ -1,0 +1,50 @@
+---
+layout: default
+---
+<main class="event-page">
+  {% include microbar.html
+     title=page.title
+     date=page.date
+     duration=page.duration_hours
+     location_name=page.location_name
+     location_url=page.location_url
+     price=page.price
+     scheduled=page.scheduled
+     ticket_url=page.ticket_url
+  %}
+
+  {% if page.summary %}
+  <section class="event-summary">
+    <p>{{ page.summary }}</p>
+  </section>
+  {% endif %}
+
+  {% if page.highlights %}
+  <section class="event-highlights">
+    <h2>Why join?</h2>
+    <ul>
+      {% for h in page.highlights %}<li>{{ h }}</li>{% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  {% if page.instructions %}
+  <section class="event-instructions">
+    <h2>Important instructions</h2>
+    <ul>
+      {% for i in page.instructions %}<li>{{ i }}</li>{% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  <section class="event-body">
+    {{ content }}
+  </section>
+
+  {% include contact.html %}
+
+  {% include fab.html
+      ticket_url=page.ticket_url
+      scheduled=page.scheduled
+      share_url=page.share_url | default: page.url | absolute_url %}
+</main>

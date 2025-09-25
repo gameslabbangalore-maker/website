@@ -1,0 +1,36 @@
+<!-- Divider before the first section -->
+<div class="divider" aria-hidden="true"></div>
+
+<article class="content">
+  <section id="details" aria-labelledby="about">
+    <h3 id="about" class="section-title">About the Event</h3>
+    <div class="prose">
+      {{ content }}
+    </div>
+  </section>
+
+  {% if page.about_video %}
+  <div class="divider" aria-hidden="true"></div>
+  <section id="about-video" aria-labelledby="about-nom">
+    <h3 id="about-nom" class="section-title">About {{ page.title }}</h3>
+    <div class="video-portrait" data-embed="{{ page.about_video | escape }}">
+      <iframe loading="lazy" title="About {{ page.title }} (portrait)" src="{{ page.about_video | escape }}"></iframe>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if page.recap_videos and page.recap_videos.size > 0 %}
+  <div class="divider-left" aria-hidden="true"></div>
+  <section id="recaps" aria-labelledby="recaps-title">
+    <h3 id="recaps-title" class="section-title">Event recaps</h3>
+    <p class="contact-sub" style="margin:0 0 18px; text-align:left;">CATCH THE VIBE OF THE EVENT WITH THESE VIDEOS</p>
+    <div class="recap-grid-portrait">
+      {% for vid in page.recap_videos %}
+      <div class="video-portrait" data-embed="{{ vid | escape }}">
+        <iframe loading="lazy" title="Recap {{ forloop.index }}" src="{{ vid | escape }}"></iframe>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</article>
