@@ -1,0 +1,7 @@
+/* temporary minimal styles; safe to delete later */
+:root { --container: 1120px; }
+body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+.container { max-width: var(--container); margin: 0 auto; padding: 16px; }
+.site-header, .site-footer { background:#111; color:#fff; }
+.site-header a { color:#fff; text-decoration:none; font-weight:600; }
+.home-intro { padding: 48px 0; }
