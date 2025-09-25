@@ -133,4 +133,25 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
 .video-landscape, .video-portrait {
   text-decoration: none; /* avoid blue link look over thumbnails */
 }
+
+/* Keep structured text single-column on desktop */
+.structured-sections .section { display: block; }
+.structured-sections .section + .section { margin-top: var(--space-6, 24px); }
+
+/* Video tiles: enforce aspect ratios so a 1x1 placeholder still looks like a video */
+.video-wrap { position: relative; }
+.video-landscape { position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; }
+.video-portrait  { position: relative; display: block; width: 100%; aspect-ratio: 9 / 16; border-radius: 12px; overflow: hidden; }
+.video-landscape img,
+.video-portrait img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.video-landscape .play,
+.video-portrait .play { position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,.55); padding: 4px 8px; border-radius: 999px; font-size: 14px; }
+
+/* Recaps grid (let existing grid rules stand; ensure minimum width) */
+.recaps-grid > a { min-width: 140px; }
+
+/* Divider-left: full width on mobile, short on desktop (your include already draws a short line) */
+@media (max-width: 768px) {
+  .divider-left, .divider-left .rule { width: 100% !important; max-width: none !important; }
+}
 </style>
