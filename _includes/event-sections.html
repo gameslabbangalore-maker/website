@@ -1,3 +1,36 @@
+{%- comment -%} Find the matching event in the collection (by slug) {%- endcomment -%}
+{% assign ev = site.events | where: "slug", page.slug | first %}
+
+{%- comment -%} Render structured sections if present {%- endcomment -%}
+{% if ev %}
+  {% if ev.about %}
+  <section class="section">
+    <h2>About Night of Mafias</h2>
+    <div class="prose">{{ ev.about | markdownify }}</div>
+  </section>
+  {% endif %}
+
+  {% if ev.how_it_works %}
+  <section class="section">
+    <h2>How it works</h2>
+    <div class="prose">{{ ev.how_it_works | markdownify }}</div>
+  </section>
+  {% endif %}
+
+  {% if ev.why_join %}
+  <section class="section">
+    <h2>Why join?</h2>
+    <div class="prose">{{ ev.why_join | markdownify }}</div>
+  </section>
+  {% endif %}
+
+  {% if ev.closing %}
+  <section class="section">
+    <div class="prose">{{ ev.closing | markdownify }}</div>
+  </section>
+  {% endif %}
+{% endif %}
+
 <!-- Divider before the first section -->
 <div class="divider" aria-hidden="true"></div>
 
