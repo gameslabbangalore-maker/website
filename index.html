@@ -1,0 +1,48 @@
+---
+layout: null
+title: Games Lab — Events & Experiences
+permalink: /
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  {% include head.html %}
+  <!-- head.html should load:
+       - fonts/CSS
+       - PapaParse
+       - scripts-contact-phone.html (global Call/WhatsApp chooser)
+       - scripts-same-tab.html (force same-tab; respects data-newtab="true")
+  -->
+</head>
+<body>
+  {% include topbar-bleed.html %}
+  {% include header.html %}
+
+  {% include scripts-skeletons.html %}
+
+  <main id="main" class="wrap" role="main">
+    <h1 class="sr-only">Games Lab — Events & Experiences</h1>
+
+    {% include hero-animated.html %}
+    {% include divider.html %}
+
+    {% include cards-upcoming.html %}
+
+    {% include divider.html mt='40px' %}
+    {% include cards-explore.html %}
+
+    {% include divider.html mt='40px' %}
+    {% include gallery.html %}
+
+    {% include divider.html mt='40px' %}
+    {% include about.html %}
+
+    {% include divider.html mt='40px' %}
+    {% include reviews.html %}
+
+    {% include divider.html mt='40px' %}
+    {% include contact.html %}
+  </main>
+</body>
+</html>
