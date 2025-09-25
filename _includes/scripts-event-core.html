@@ -80,17 +80,20 @@
   const scDir     = document.getElementById('scDir');
   const scBook    = document.getElementById('scBook');
   const fabBook   = document.getElementById('fabBook');
+  const shareFab  = document.getElementById('shareFab');
 
   // Microbar parts
   const M = {
     bar: document.getElementById('mobileInfoBar'),
     title: document.getElementById('microTitle'),
+    line1: document.getElementById('microLine1'),
+    line2: document.getElementById('microLine2'),
+    line3: document.getElementById('microLine3'),
     L1: document.getElementById('microLeft1'),
     L2: document.getElementById('microLeft2'),
     L3: document.getElementById('microLeft3'),
-    R1: document.getElementById('microRight1'),
-    R2: document.getElementById('microRight2'),
-    R3: document.getElementById('microRight3'),
+    A1: document.getElementById('microAction1'),
+    A2: document.getElementById('microAction2'),
   };
 
   let scheduled = false, base = null, timeStr = '', locText = '', locLink = '', ticket = '';
@@ -99,6 +102,29 @@
   const dGroup = "{{ page.highlights.group_size | default: '8–25 players' | escape }}";
   const dDiff = "{{ page.highlights.difficulty | default: 'Beginner-friendly' | escape }}";
   const dPrice = "{{ page.highlights.price | default: '₹ 350/-' | escape }}";
+
+  function updateFabSpacing(){
+    const docEl = document.documentElement;
+    const bookVisible = fabBook && !fabBook.hasAttribute('hidden');
+    let bookHeight = 0;
+    if (bookVisible){
+      const rect = fabBook.getBoundingClientRect();
+      bookHeight = rect.height || fabBook.offsetHeight || 0;
+      if (!bookHeight){ requestAnimationFrame(updateFabSpacing); return; }
+    }
+
+    let shareBottom = 12;
+    if (shareFab){
+      if (bookVisible){ shareBottom += Math.round(bookHeight + 8); }
+      docEl.style.setProperty('--fab-share-bottom', shareBottom + 'px');
+    }
+
+    let pad = 16;
+    if (bookVisible && window.innerWidth < 960){
+      pad = Math.max(22, Math.round(bookHeight + 22));
+    }
+    docEl.style.setProperty('--mobile-bottom-pad', pad + 'px');
+  }
 
   if (match){
     scheduled = CLEAN(match['Scheduled']).toLowerCase() === 'yes';
@@ -124,38 +150,74 @@
     if (scDir && locLink){ scDir.href = locLink; }
     if (ticket){
       scBook && (scBook.href = ticket);
-      if (fabBook){ fabBook.href = ticket; fabBook.removeAttribute('hidden'); }
-      document.documentElement.style.setProperty('--mobile-bottom-pad', '96px');
+      if (fabBook){
+        fabBook.href = ticket;
+        fabBook.removeAttribute('hidden');
+      }
+      requestAnimationFrame(updateFabSpacing);
     } else {
-      fabBook && fabBook.setAttribute('hidden', '');
-      document.documentElement.style.setProperty('--mobile-bottom-pad', '16px');
+      if (fabBook){ fabBook.setAttribute('hidden', ''); }
+      updateFabSpacing();
     }
   } else {
     // Not scheduled
     scHeading && scHeading.setAttribute('hidden','');
     if (scBlock) scBlock.hidden = true;
-    fabBook && fabBook.setAttribute('hidden','');
-    document.documentElement.style.setProperty('--mobile-bottom-pad', '16px');
+    if (fabBook){ fabBook.setAttribute('hidden',''); }
+    updateFabSpacing();
   }
 
   // Microbar content + visibility
   if (M.title) M.title.textContent = titleFallback;
   if (scheduled && base){
     const timePart = timeStr && timeStr.trim() ? ` | ${timeStr.trim()}` : '';
-    M.L1 && (M.L1.textContent = fmtDateOnly(base) + timePart);
-    M.L2 && (M.L2.textContent = locText || '');
-    M.L3 && (M.L3.textContent = '');
-    if (M.R1) { M.R1.textContent = 'Add to Calendar'; M.R1.href = makeICS({ title: titleFallback, start: base, durationHours: 3, locationText: locText, locationUrl: locLink, description: location.href }); M.R1.removeAttribute('hidden'); }
-    if (M.R2) { M.R2.textContent = 'Get Directions'; if (locLink) { M.R2.href = locLink; M.R2.removeAttribute('hidden'); } else { M.R2.setAttribute('hidden',''); } }
-    if (M.R3) M.R3.textContent = '';
+    if (M.L1){ M.L1.textContent = fmtDateOnly(base) + timePart; M.line1?.removeAttribute('hidden'); }
+    if (M.A1){
+      M.A1.textContent = 'Add to Calendar';
+      M.A1.href = makeICS({ title: titleFallback, start: base, durationHours: 3, locationText: locText, locationUrl: locLink, description: location.href });
+      M.A1.hidden = false;
+    }
+
+    if (M.L2){
+      M.L2.textContent = locText || '';
+      if (locText){
+        M.line2?.removeAttribute('hidden');
+      } else {
+        M.line2?.setAttribute('hidden','');
+      }
+    }
+    if (M.A2){
+      if (locLink){
+        M.A2.textContent = 'Get Directions';
+        M.A2.href = locLink;
+        M.A2.hidden = false;
+      } else {
+        M.A2.hidden = true;
+        M.A2.removeAttribute('href');
+      }
+    }
+
+    if (M.L3){
+      M.L3.textContent = '';
+      M.line3?.setAttribute('hidden','');
+    }
   } else {
-    // three-line left, three tokens right
-    M.L1 && (M.L1.textContent = '{{ page.title | escape }}');
-    M.L2 && (M.L2.textContent = dFormat);
-    M.L3 && (M.L3.textContent = 'Beginner-friendly');
-    M.R1 && (M.R1.textContent = dGroup, M.R1.removeAttribute('href'), M.R1.removeAttribute('target'), M.R1.removeAttribute('rel'));
-    M.R2 && (M.R2.textContent = dDuration, M.R2.removeAttribute('href'));
-    M.R3 && (M.R3.textContent = dPrice);
+    if (M.line1){ M.line1.removeAttribute('hidden'); }
+    if (M.L1) M.L1.textContent = dFormat;
+    if (M.A1){ M.A1.hidden = true; M.A1.removeAttribute('href'); }
+
+    if (M.line2){ M.line2.removeAttribute('hidden'); }
+    if (M.L2) M.L2.textContent = dDuration;
+    if (M.A2){ M.A2.hidden = true; M.A2.removeAttribute('href'); }
+
+    if (M.L3){
+      const bits = [dDiff, dGroup, dPrice].filter(Boolean);
+      M.L3.textContent = bits.join(' · ');
+      if (M.line3){
+        if (bits.length){ M.line3.removeAttribute('hidden'); }
+        else { M.line3.setAttribute('hidden',''); }
+      }
+    }
   }
 
   // Microbar show when scrolled past banner/title area (mobile only)
@@ -179,6 +241,9 @@
     window.__updateMicrobarVis = update;
   })();
 
+  updateFabSpacing();
+  window.addEventListener('resize', ()=>{ updateFabSpacing(); });
+
   // Share handlers
   (function(){
     async function sharePage(){
@@ -189,31 +254,13 @@
       }catch(e){}
     }
     document.getElementById('shareBtnSide')?.addEventListener('click', sharePage);
-    document.getElementById('shareFab')?.addEventListener('click', sharePage);
+    shareFab?.addEventListener('click', sharePage);
   })();
 
-  // Contact phone chooser (same across site; kept here for event pages)
-  (function(){
-    const phone = document.getElementById('phone-link');
-    const menu  = document.getElementById('phone-menu');
-    const waBtn = document.getElementById('wa-now');
-    if (!phone || !menu || !waBtn) return;
-    const tel = (phone.dataset.tel || '').replace(/[^\d]/g,'');
-    const msg = encodeURIComponent("Hi! I'd like to know more about Games Lab events.");
-    waBtn.href = `https://wa.me/${tel}?text=${msg}`;
-    function openMenu(){
-      if (!menu.hidden){ menu.hidden = true; return; }
-      menu.hidden = false;
-      const onAway = (e)=>{ if (!menu.contains(e.target) && e.target !== phone){ menu.hidden = true; cleanup(); } };
-      const onEsc  = (e)=>{ if (e.key === 'Escape'){ menu.hidden = true; cleanup(); } };
-      function cleanup(){ document.removeEventListener('click', onAway, true); document.removeEventListener('keydown', onEsc, true); }
-      document.addEventListener('click', onAway, true);
-      document.addEventListener('keydown', onEsc, true);
-    }
-    phone.addEventListener('click', (e)=>{ e.preventDefault(); openMenu(); });
-  })();
 })();
 </script>
+
+{% include scripts-contact-phone.html %}
 
 <!-- Video Lightbox -->
 <script>
