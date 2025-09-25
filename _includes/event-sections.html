@@ -1,8 +1,7 @@
-<!-- Divider before the first section -->
-<div class="divider" aria-hidden="true"></div>
-
 <article class="content">
   {% assign about_copy = page.about | default: nil %}
+  {% assign has_sections = false %}
+
   {% if about_copy or content %}
   <section id="details" aria-labelledby="about">
     <h3 id="about" class="section-title">About the Event</h3>
@@ -15,52 +14,55 @@
       {% endif %}
     </div>
   </section>
+  {% assign has_sections = true %}
   {% endif %}
 
   {% if page.what_makes_it_different %}
-  <div class="divider" aria-hidden="true"></div>
+  {% if has_sections %}<div class="divider section-divider" aria-hidden="true"></div>{% endif %}
   <section id="what-makes-it-different" aria-labelledby="what-makes-title">
     <h3 id="what-makes-title" class="section-title">What makes it different?</h3>
     <div class="prose">{{ page.what_makes_it_different | markdownify }}</div>
   </section>
+  {% assign has_sections = true %}
   {% endif %}
 
   {% if page.how_it_works %}
-  <div class="divider" aria-hidden="true"></div>
+  {% if has_sections %}<div class="divider section-divider" aria-hidden="true"></div>{% endif %}
   <section id="how-it-works" aria-labelledby="how-it-works-title">
     <h3 id="how-it-works-title" class="section-title">How it works</h3>
     <div class="prose">{{ page.how_it_works | markdownify }}</div>
   </section>
+  {% assign has_sections = true %}
   {% endif %}
 
   {% if page.why_join %}
-  <div class="divider" aria-hidden="true"></div>
+  {% if has_sections %}<div class="divider section-divider" aria-hidden="true"></div>{% endif %}
   <section id="why-join" aria-labelledby="why-join-title">
     <h3 id="why-join-title" class="section-title">Why join?</h3>
     <div class="prose">{{ page.why_join | markdownify }}</div>
   </section>
+  {% assign has_sections = true %}
   {% endif %}
 
   {% if page.closing %}
-  <div class="divider" aria-hidden="true"></div>
-  <section id="closing" aria-labelledby="closing-title">
-    <h3 id="closing-title" class="section-title">Closing note</h3>
-    <div class="prose">{{ page.closing | markdownify }}</div>
-  </section>
+  {% if has_sections %}<div class="divider section-divider" aria-hidden="true"></div>{% endif %}
+  <div class="prose closing-note">{{ page.closing | markdownify }}</div>
+  {% assign has_sections = true %}
   {% endif %}
 
   {% if page.about_video %}
-  <div class="divider" aria-hidden="true"></div>
+  {% if has_sections %}<div class="divider section-divider" aria-hidden="true"></div>{% endif %}
   <section id="about-video" aria-labelledby="about-nom">
     <h3 id="about-nom" class="section-title">About {{ page.title }}</h3>
     <div class="video-portrait" data-embed="{{ page.about_video | escape }}">
       <iframe loading="lazy" title="About {{ page.title }} (portrait)" src="{{ page.about_video | escape }}"></iframe>
     </div>
   </section>
+  {% assign has_sections = true %}
   {% endif %}
 
   {% if page.recap_videos and page.recap_videos.size > 0 %}
-  <div class="divider-left" aria-hidden="true"></div>
+  <div class="divider section-divider divider-left" aria-hidden="true"></div>
   <section id="recaps" aria-labelledby="recaps-title">
     <h3 id="recaps-title" class="section-title">Event recaps</h3>
     <p class="contact-sub" style="margin:0 0 18px; text-align:left;">CATCH THE VIBE OF THE EVENT WITH THESE VIDEOS</p>

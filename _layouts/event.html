@@ -16,10 +16,8 @@
       {% include event-sections.html %}
     </div>
 
-    <!-- Divider used to keep FAB off the footer on some pages; JS will set bottom padding via CSS var -->
-    <div class="divider" id="contactTopDivider" style="margin-top:40px;"></div>
+    {% include divider.html mt='40px' %}
     {% include contact.html %}
-    <div class="divider" style="margin-top:40px;"></div>
   </main>
 
   <!-- Video Lightbox Modal -->
