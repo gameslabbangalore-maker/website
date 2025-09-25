@@ -224,4 +224,11 @@
   // allow other scripts to force a recompute after content loads
   window.__updateMicrobarVis = update;
 })();
+
+  // when scheduled + ticket:
+document.documentElement.style.setProperty('--wrap-bottom-pad','84px');
+
+// when NOT scheduled:
+document.documentElement.style.setProperty('--wrap-bottom-pad','16px');
+
 </script>
