@@ -1,0 +1,158 @@
+{%- comment -%}
+Schedule block (desktop-primary, mobile-secondary)
+Inputs: scheduled, date_utc, duration_hours, location_name, location_maps_url, price, ticket_url, title
+Rules:
+- scheduled:true -> show date/time/duration/location + Add to Calendar + Directions (+ Book if ticket_url)
+- scheduled:false -> show "Not scheduled yet", duration (if any), price (if any); hide Add to Calendar
+Edge cases handled in-line.
+{%- endcomment -%}
+
+<section class="schedule">
+  <div class="container">
+    <div class="schedule__card">
+      <h2 class="schedule__title">Schedule</h2>
+
+      <div class="schedule__rows">
+        {%- if page.scheduled == true -%}
+          <div class="schedule__row">
+            <span class="schedule__label">Date &amp; Time</span>
+            <span class="schedule__value">
+              {%- if page.date_utc -%}
+                {{ page.date_utc | date: "%a, %b %e, %Y" }}
+                &nbsp;•&nbsp;{{ page.date_utc | date: "%-I:%M %p" }} IST
+              {%- else -%}
+                Date coming soon
+              {%- endif -%}
+              {%- if page.duration_hours -%}
+                &nbsp;•&nbsp;{{ page.duration_hours }} hrs
+              {%- endif -%}
+            </span>
+          </div>
+
+          {%- if page.location_name -%}
+            <div class="schedule__row">
+              <span class="schedule__label">Location</span>
+              <span class="schedule__value">{{ page.location_name }}</span>
+            </div>
+          {%- endif -%}
+
+          <div class="schedule__actions">
+            <a href="#" class="btn btn--primary" id="schedAddToCal"
+               data-date="{{ page.date_utc | date: "%Y%m%dT%H%M%S" }}"
+               data-duration="{{ page.duration_hours | default: 2 }}"
+               data-title="{{ page.title | xml_escape }}"
+               data-location="{{ page.location_name | default: '' | xml_escape }}"
+               data-url="{{ page.url | absolute_url | xml_escape }}">
+              Add to Calendar
+            </a>
+
+            {%- if page.location_maps_url -%}
+              <a class="btn btn--ghost" href="{{ page.location_maps_url }}" target="_blank" rel="noopener">
+                Get Directions
+              </a>
+            {%- endif -%}
+
+            {%- if page.ticket_url -%}
+              <a class="btn btn--accent" href="{{ page.ticket_url }}" target="_blank" rel="noopener">
+                Book now
+              </a>
+            {%- endif -%}
+          </div>
+
+        {%- else -%}
+          <div class="schedule__row">
+            <span class="schedule__label">Status</span>
+            <span class="schedule__value">Not scheduled yet</span>
+          </div>
+
+          {%- if page.duration_hours -%}
+            <div class="schedule__row">
+              <span class="schedule__label">Duration</span>
+              <span class="schedule__value">{{ page.duration_hours }} hrs</span>
+            </div>
+          {%- endif -%}
+
+          {%- if page.price -%}
+            <div class="schedule__row">
+              <span class="schedule__label">Price</span>
+              <span class="schedule__value">{{ page.price }}</span>
+            </div>
+          {%- endif -%}
+
+          <div class="schedule__actions">
+            {%- if page.location_maps_url and page.location_name -%}
+              <a class="btn btn--ghost" href="{{ page.location_maps_url }}" target="_blank" rel="noopener">
+                Get Directions
+              </a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+/* Minimal, safe styles; we’ll migrate to SCSS partials later */
+.schedule { padding: 24px 0; }
+.schedule__card {
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 12px;
+  padding: 16px;
+  background: #fff;
+}
+@media (prefers-color-scheme: dark){
+  .schedule__card { background:#181818; border-color: rgba(255,255,255,.08); }
+}
+.schedule__title { margin: 0 0 12px; font-size: 1.125rem; }
+.schedule__rows { display: grid; gap: 10px; }
+.schedule__row { display: grid; grid-template-columns: 140px 1fr; gap: 12px; align-items: baseline; }
+.schedule__label { opacity:.7; }
+.schedule__actions { display:flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+.btn { display:inline-block; padding: 8px 12px; border-radius: 8px; text-decoration: none; }
+.btn--primary { background:#111; color:#fff; }
+.btn--accent  { background:#ffcc00; color:#000; }
+.btn--ghost   { border:1px solid rgba(0,0,0,.2); color:#111; background: transparent; }
+@media (prefers-color-scheme: dark){
+  .btn--ghost { border-color: rgba(255,255,255,.25); color:#fff; }
+}
+@media (max-width: 640px){
+  .schedule__row { grid-template-columns: 1fr; }
+}
+</style>
+
+<script>
+/* Calendar link builder (same logic as microbar; isolated id to avoid clashes) */
+(function(){
+  var link = document.getElementById('schedAddToCal');
+  if(!link) return;
+  var start = link.dataset.date;
+  var durHrs = parseFloat(link.dataset.duration || "2");
+  function addHours(yyyymmddThhmmss, hours){
+    var y = yyyymmddThhmmss.slice(0,4),
+        m = yyyymmddThhmmss.slice(4,6),
+        d = yyyymmddThhmmss.slice(6,8),
+        H = yyyymmddThhmmss.slice(9,11),
+        M = yyyymmddThhmmss.slice(11,13),
+        S = yyyymmddThhmmss.slice(13,15);
+    var dt = new Date(Date.UTC(+y, +m-1, +d, +H, +M, +S));
+    dt = new Date(dt.getTime() + hours*60*60*1000);
+    var pad = n => String(n).padStart(2,'0');
+    return dt.getUTCFullYear()
+      + pad(dt.getUTCMonth()+1)
+      + pad(dt.getUTCDate())
+      + "T" + pad(dt.getUTCHours()) + pad(dt.getUTCMinutes()) + pad(dt.getUTCSeconds());
+  }
+  var end = addHours(start, durHrs);
+  var params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: link.dataset.title || document.title,
+    dates: start + "/" + end,
+    details: (link.dataset.url || ""),
+    location: link.dataset.location || ""
+  });
+  link.href = "https://www.google.com/calendar/render?" + params.toString();
+  link.target = "_blank";
+  link.rel = "noopener";
+})();
+</script>

@@ -1,0 +1,104 @@
+<script>
+(function(){
+  function initOne(root){
+    const phone = root.querySelector('#phone-link');
+    const menu  = root.querySelector('#phone-menu');
+    const waBtn = root.querySelector('#wa-now');
+    if (!phone || !menu || !waBtn) return;
+
+    if (phone.dataset.bound === '1') return;
+    phone.dataset.bound = '1';
+
+    function setWhatsAppHref(){
+      const tel = (phone.getAttribute('data-tel') || '').replace(/[^\d]/g,'');
+      const msg = encodeURIComponent("Hi! I'd like to know more about Games Lab events.");
+      waBtn.href = tel ? `https://wa.me/${tel}?text=${msg}` : 'https://wa.me/';
+    }
+    setWhatsAppHref();
+
+    // Guard to ignore the first document click after opening
+    let justOpened = false;
+
+    function addAwayListeners(){
+      // Defer to the next tick so we don't catch the same tap/click that opened the menu
+      setTimeout(()=>{
+        const onAway = (e)=>{
+          if (justOpened) return;                          // ignore the very first one
+          const t = e.target;
+          if (menu.contains(t) || t === phone) return;     // clicks inside stay open
+          closeMenu();
+          cleanup();
+        };
+        const onEsc = (e)=>{
+          if (e.key === 'Escape'){ closeMenu(); cleanup(); }
+        };
+        function cleanup(){
+          document.removeEventListener('click', onAway, true);
+          document.removeEventListener('touchstart', onAway, true);
+          document.removeEventListener('keydown', onEsc, true);
+        }
+        // Capture phase to catch outside clicks reliably
+        document.addEventListener('click', onAway, true);
+        document.addEventListener('touchstart', onAway, true);
+        document.addEventListener('keydown', onEsc, true);
+        // Allow away handlers from the second event onward
+        requestAnimationFrame(()=>{ justOpened = false; });
+      }, 0);
+    }
+
+    function openMenu(){
+      if (!menu.hidden) return;
+      setWhatsAppHref();
+      menu.hidden = false;
+      phone.setAttribute('aria-expanded', 'true');
+      justOpened = true;
+      addAwayListeners();
+    }
+
+    function closeMenu(){
+      if (menu.hidden) return;
+      menu.hidden = true;
+      phone.setAttribute('aria-expanded', 'false');
+    }
+
+    function toggleMenu(){
+      if (menu.hidden) openMenu(); else closeMenu();
+    }
+
+    // Primary tap handler: prevent default & stop bubbling so we don't trigger away-closers
+    function onActivate(e){
+      e.preventDefault();
+      e.stopPropagation();
+      toggleMenu();
+    }
+
+    // Bind both click and touchend for snappy mobile; preventDefault is allowed
+    phone.addEventListener('click', onActivate, { passive: false });
+    phone.addEventListener('touchend', onActivate, { passive: false });
+  }
+
+  function bindAll(){
+    document.querySelectorAll('.contact-wrap').forEach(initOne);
+  }
+
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', bindAll);
+  } else {
+    bindAll();
+  }
+
+  // Rebind for dynamically-added contact sections
+  new MutationObserver((muts)=>{
+    for (const m of muts){
+      for (const n of m.addedNodes){
+        if (n.nodeType !== 1) continue;
+        if (n.classList && n.classList.contains('contact-wrap')) initOne(n);
+        else {
+          const wrap = n.querySelector && n.querySelector('.contact-wrap');
+          if (wrap) initOne(wrap);
+        }
+      }
+    }
+  }).observe(document.documentElement, { childList:true, subtree:true });
+})();
+</script>

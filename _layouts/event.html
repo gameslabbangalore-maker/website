@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  {% include head-event.html %}
+  {% include styles-event.html %}
+  <title>{{ page.title }} — Games Lab</title>
+</head>
+<body>
+  {% include header-event.html %}
+  {% include microbar.html %}
+
+  <main class="wrap" role="main">
+    <div class="page-grid">
+      {% include event-hero.html %}
+      {% include divider.html %}
+      {% include event-sections.html %}
+    </div>
+
+    <!-- Divider used to keep FAB off the footer on some pages; JS will set bottom padding via CSS var -->
+    <div class="divider" id="contactTopDivider" style="margin-top:40px;"></div>
+    {% include contact.html %}
+    <div class="divider" style="margin-top:40px;"></div>
+  </main>
+
+  <!-- Video Lightbox Modal -->
+  <div id="vidModal" class="vid-modal" hidden>
+    <div class="vid-stage" id="vidStage">
+      <button class="vid-close" id="vidClose" aria-label="Close video">Close ✕</button>
+      <iframe id="vidFrame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  {% include scripts-event-core.html %}
+</body>
+</html>

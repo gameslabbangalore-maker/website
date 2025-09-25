@@ -1,0 +1,25 @@
+<div class="animated-wrapper" aria-live="polite">
+  <div class="animated-text"></div>
+</div>
+<script>
+(function(){
+  const lines = [
+    'IF "HOW TO HAVE A GOOD TIME ?"',
+    'IS THE QUESTION,',
+    'WE ARE THE ANSWER'
+  ];
+  const msg = lines.join('\n');
+  const el = document.querySelector('.animated-text');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  el.textContent = msg;
+  if (reduce) return;
+  let i = 0; const delay = 55;
+  el.textContent = '';
+  (function typeOnce(){
+    if (i <= msg.length) {
+      el.textContent = msg.substring(0, i++);
+      setTimeout(typeOnce, delay);
+    }
+  })();
+})();
+</script>
