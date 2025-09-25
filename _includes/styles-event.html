@@ -134,25 +134,24 @@
 .fab-book[hidden]{display:none}
 @media (min-width:960px){ .fab-book{display:none!important} }
 
+/* Pill-shaped Share FAB with text */
 .fab-share{
   position:fixed; right:12px; bottom:68px; z-index:10000;
-  width:44px; height:44px; border-radius:12px;
+  display:flex; align-items:center; gap:8px;
+  padding:10px 14px; /* pill spacing */
+  height:auto; width:auto; border-radius:999px;
   background:rgba(24,24,24,.35); color:var(--text-main);
   border:1px solid rgba(255,255,255,.25);
   -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
-  display:flex; align-items:center; justify-content:center;
   box-shadow:0 6px 18px rgba(0,0,0,.35); cursor:pointer;
-  gap:8px;
 }
+.fab-share .fab-share-label{ display:inline; font-weight:900; font-size:.95rem; }
 @media (prefers-color-scheme: light){
-  .fab-share{ background:rgba(255,255,255,.65); border-color:rgba(0,0,0,.15) }
+  .fab-share{ background:rgba(255,255,255,.65); border-color:rgba(0,0,0,.15); color:#000; }
 }
+/* mobile only */
 @media (min-width:960px){ .fab-share{ display:none } }
-.fab-share .fab-share-label{ display:none; font-weight:900; font-size:.95rem }
-@media (max-width:959px){
-  .fab-share.with-text{ padding:0 12px; width:auto }
-  .fab-share.with-text .fab-share-label{ display:inline }
-}
+
 
 /* Mobile highlights (toggle) */
 .highlights-mobile{grid-area:highlights;display:grid;gap:8px;margin:0 0 8px}
