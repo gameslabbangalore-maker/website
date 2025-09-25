@@ -190,3 +190,38 @@
   })();
 })();
 </script>
+
+<script>
+// Mobile microbar: show after banner scroll
+(function(){
+  const microbar  = document.getElementById('mobileInfoBar');
+  const banner    = document.querySelector('.banner');
+  if (!microbar) return;
+
+  function isDesktop(){ return window.innerWidth >= 960; }
+
+  function update(){
+    // Hide on desktop
+    if (isDesktop()){
+      microbar.classList.remove('show');
+      microbar.setAttribute('aria-hidden','true');
+      return;
+    }
+    const topbar = document.querySelector('.topbar');
+    const topbarH = (topbar ? topbar.offsetHeight : 56);
+
+    // show when we've scrolled past the banner bottom
+    const threshold = banner ? (banner.getBoundingClientRect().bottom + window.scrollY - topbarH) : 0;
+    const show = window.scrollY >= threshold;
+
+    microbar.classList.toggle('show', show);
+    microbar.setAttribute('aria-hidden', show ? 'false' : 'true');
+  }
+
+  window.addEventListener('load',  update, { passive: true });
+  window.addEventListener('scroll',update, { passive: true });
+  window.addEventListener('resize',update);
+  // allow other scripts to force a recompute after content loads
+  window.__updateMicrobarVis = update;
+})();
+</script>
