@@ -22,3 +22,11 @@ section#contact,.contact-wrap,.contact-inner{height:auto!important;max-height:no
 .fab-share{width:48px;height:48px;min-width:48px;min-height:48px;border-radius:50%;padding:0}
 .fab-book + .fab-share{margin-top:12px}
 @media (max-width:768px){.fab-share{bottom:16px}.fab-book{bottom:76px}}
+
+/* Minimal event microbar */
+.microbar--event{padding:16px 16px 0}
+.mb-title{margin:0 0 6px 0;font-size:1.5rem;line-height:1.2}
+.mb-meta{opacity:.9;display:flex;flex-wrap:wrap;gap:.5rem .75rem}
+.mb-dot{opacity:.5}
+.mb-loc{text-decoration:underline}
+@media(min-width:960px){.mb-title{font-size:2rem}}
