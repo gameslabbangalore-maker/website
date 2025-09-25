@@ -198,12 +198,8 @@
     }
 
     if (M.L3){
-      const detailBits = [dDiff, dGroup, dPrice].filter(Boolean);
-      M.L3.textContent = detailBits.join(' · ');
-      if (M.line3){
-        if (M.L3.textContent){ M.line3.removeAttribute('hidden'); }
-        else { M.line3.setAttribute('hidden',''); }
-      }
+      M.L3.textContent = '';
+      M.line3?.setAttribute('hidden','');
     }
   } else {
     if (M.line1){ M.line1.removeAttribute('hidden'); }
