@@ -5,28 +5,3 @@ body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial,
 .site-header, .site-footer { background:#111; color:#fff; }
 .site-header a { color:#fff; text-decoration:none; font-weight:600; }
 .home-intro { padding: 48px 0; }
-
-
-/* --- Global Contact block (canonical) --- */
-.contact-wrap{max-width:1200px;margin:0 auto;padding:16px;overflow:visible}
-.contact-inner{display:block}
-.contact-head{display:grid;place-items:center;gap:8px;margin-bottom:12px;text-align:center}
-.contact-logo{width:48px;height:48px}
-.contact-list{list-style:none;padding:0;margin:0;display:grid;gap:8px}
-section#contact,.contact-wrap,.contact-inner{height:auto!important;max-height:none!important}
-
-
-/* --- FAB stacking & centering --- */
-.fab-stack{position:fixed;right:16px;bottom:16px;z-index:1000;display:grid;gap:12px}
-.fab{display:inline-flex;align-items:center;justify-content:center;min-width:112px;min-height:44px;padding:0 16px;border-radius:999px;text-decoration:none;font-weight:600}
-.fab-share{width:48px;height:48px;min-width:48px;min-height:48px;border-radius:50%;padding:0}
-.fab-book + .fab-share{margin-top:12px}
-@media (max-width:768px){.fab-share{bottom:16px}.fab-book{bottom:76px}}
-
-/* Minimal event microbar */
-.microbar--event{padding:16px 16px 0}
-.mb-title{margin:0 0 6px 0;font-size:1.5rem;line-height:1.2}
-.mb-meta{opacity:.9;display:flex;flex-wrap:wrap;gap:.5rem .75rem}
-.mb-dot{opacity:.5}
-.mb-loc{text-decoration:underline}
-@media(min-width:960px){.mb-title{font-size:2rem}}

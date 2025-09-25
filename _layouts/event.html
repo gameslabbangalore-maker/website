@@ -1,84 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  {% include head-event.html %}
+  {% include styles-event.html %}
+  <title>{{ page.title }} — Games Lab</title>
+</head>
+<body>
+  {% include header-event.html %}
+  {% include microbar.html %}
 
----
-layout: default
----
-<main class="event-page">
-
-  <!-- Server-rendered microbar (safe on any page, no JS required) -->
-  <section class="microbar microbar--event">
-    <div class="mb-left">
-      <h1 class="mb-title">{{ page.title }}</h1>
-      <div class="mb-meta">
-        {% if page.date %}
-          <span class="mb-date">{{ page.date | date: "%a, %b %-d'%y" }}</span>
-        {% endif %}
-        {% if page.duration_hours %}
-          <span class="mb-dot">•</span>
-          <span class="mb-duration">{{ page.duration_hours }} hours</span>
-        {% endif %}
-        {% if page.location_name %}
-          <span class="mb-dot">•</span>
-          {% if page.location_url %}
-            <a class="mb-loc" href="{{ page.location_url }}" target="_blank" rel="noopener">{{ page.location_name }}</a>
-          {% else %}
-            <span class="mb-loc">{{ page.location_name }}</span>
-          {% endif %}
-        {% endif %}
-        {% unless page.scheduled %}
-          {% if page.price %}
-            <span class="mb-dot">•</span>
-            <span class="mb-price">{{ page.price }}</span>
-          {% endif %}
-        {% endunless %}
-      </div>
+  <main class="wrap" role="main">
+    <div class="page-grid">
+      {% include event-hero.html %}
+      {% include divider.html %}
+      {% include event-sections.html %}
     </div>
-  </section>
 
-  {% if page.summary %}
-  <section class="event-summary">
-    <p>{{ page.summary }}</p>
-  </section>
-  {% endif %}
+    <!-- Divider used to keep FAB off the footer on some pages; JS will set bottom padding via CSS var -->
+    <div class="divider" id="contactTopDivider" style="margin-top:40px;"></div>
+    {% include contact.html %}
+    <div class="divider" style="margin-top:40px;"></div>
+  </main>
 
-  {% if page.highlights %}
-  <section class="event-highlights">
-    <h2>Why join?</h2>
-    <ul>
-      {%- comment -%}
-        Support both styles:
-        - Array of strings: [ "Beginner-friendly", "Pro moderators" ]
-        - Map/dict: { format: "Social deduction", duration: "3–4 hours" }
-      {%- endcomment -%}
-      {% if page.highlights.first %}
-        {% for h in page.highlights %}<li>{{ h }}</li>{% endfor %}
-      {% else %}
-        {% for key in page.highlights %}
-          <li><strong>{{ key | replace: '_',' ' | capitalize }}</strong> {{ page.highlights[key] }}</li>
-        {% endfor %}
-      {% endif %}
-    </ul>
-  </section>
-  {% endif %}
+  <!-- Video Lightbox Modal -->
+  <div id="vidModal" class="vid-modal" hidden>
+    <div class="vid-stage" id="vidStage">
+      <button class="vid-close" id="vidClose" aria-label="Close video">Close ✕</button>
+      <iframe id="vidFrame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+  </div>
 
-  {% if page.instructions %}
-  <section class="event-instructions">
-    <h2>Important instructions</h2>
-    <ul>
-      {% for i in page.instructions %}<li>{{ i }}</li>{% endfor %}
-    </ul>
-  </section>
-  {% endif %}
-
-  <section class="event-body">
-    {{ content }}
-  </section>
-
-  {% include contact.html %}
-
-  {% assign _share_url = page.share_url | default: page.url | absolute_url %}
-  {% include fab.html
-      ticket_url=page.ticket_url
-      scheduled=page.scheduled
-      share_url=_share_url %}
-
-</main>
+  {% include scripts-event-core.html %}
+</body>
+</html>
