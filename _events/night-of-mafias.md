@@ -2,6 +2,11 @@
 title: "Night of Mafias !"
 slug: night-of-mafias
 
+# Homepage card fallbacks
+card_image: "https://ik.imagekit.io/gameslab/Night_of_Mafias.png"
+card_intro: "Bluff, deduce, and bond in our signature social deduction showdown."
+card_location_label: "Bengaluru • Games Lab"
+
 # Hero
 banner: "https://ik.imagekit.io/gameslab/Night_of_Mafias.png"
 tagline: "Read faces, trade lies, and outlast the table in a social deduction showdown."
