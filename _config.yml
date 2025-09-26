@@ -16,11 +16,6 @@ permalink: pretty
 timezone: Asia/Kolkata
 future: true           # show upcoming-dated content (safe for collections)
 
-# ---- Sass (SCSS) ----
-sass:
-  sass_dir: assets/css
-  style: compressed
-
 # ---- Collections ----
 collections:
   events:
@@ -29,21 +24,12 @@ collections:
 
 # ---- Defaults (so you write less front matter) ----
 defaults:
-  # All pages get the generic layout unless overridden
-  - scope:
-      path: ""
-      type: "pages"
-    values:
-      layout: page
-
   # Event pages default to the event layout
   - scope:
       path: ""
       type: "events"
     values:
       layout: event
-
-  # The homepage (index) will override to layout: home in its own front matter
 
 # ---- Plugins (GitHub Pages–whitelisted) ----
 # These are safe & optional, but recommended.
