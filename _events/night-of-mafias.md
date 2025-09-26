@@ -5,6 +5,7 @@ slug: night-of-mafias
 # Hero
 banner: "https://ik.imagekit.io/gameslab/Night_of_Mafias.png"
 tagline: "Read faces, trade lies, and outlast the table in a social deduction showdown."
+intro: "A Social Deception Game with exciting Characters created by us for crazy fun."
 
 # Highlights (uniform fields across all events)
 highlights:
@@ -16,7 +17,7 @@ highlights:
   price: "₹ 350/-"
 
 # CTA
-ticket_link: ""   # fill when scheduled; leave blank to hide FAB/CTAs
+ticket_link: "https://rzp.io/rzp/Night-of-mafias"   
 
 # Optional videos
 about_video: "https://www.youtube.com/embed/p232ZZCCJKA?rel=0"   # hide section if blank
