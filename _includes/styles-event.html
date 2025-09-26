@@ -37,7 +37,6 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
 }
 
 .section-divider{margin:26px 0}
-.divider-left{width:160px;max-width:60%;margin-left:0;margin-right:auto}
 
 /* Grid */
 .page-grid{display:grid;grid-template-columns:1fr;grid-template-areas:"banner" "title" "tagline" "divider" "content";gap:12px}
@@ -102,9 +101,13 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
 @media (prefers-color-scheme: light){.mobile-info-bar{background:rgba(255,255,255,.55);border-bottom:1px solid rgba(0,0,0,.08)}}
 .mobile-info-bar.show{transform:translate3d(0,0,0);opacity:1;pointer-events:auto}
 .mobile-info-inner{display:flex;flex-direction:column;align-items:flex-start;gap:4px;max-width:1200px;margin:0 auto}
-.micro-title{font-size:1.02rem;font-weight:900;line-height:1.15}
+.micro-title{font-size:1.02rem;font-weight:900;line-height:1.15;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .micro-line{display:flex;align-items:center;gap:10px;width:100%;flex-wrap:nowrap}
-.micro-meta{font-size:.84rem;color:var(--muted);font-weight:800;line-height:1.2;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.micro-line[hidden]{display:none}
+.micro-meta{font-size:.84rem;color:var(--muted);font-weight:800;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.micro-left{flex:1;min-width:0}
+.micro-right{margin-left:auto;flex-shrink:0;text-align:right}
+.micro-title-row .micro-right{font-size:.88rem;font-weight:900;color:var(--text-main)}
 .micro-action{font-size:.82rem;color:var(--muted);font-weight:800;text-decoration:underline;text-underline-offset:2px;margin-left:auto;white-space:nowrap}
 .micro-action[hidden]{display:none}
 .micro-line:empty{display:none}
@@ -118,7 +121,10 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
 .fab-book[hidden]{display:none}
 .fab-share{right:12px;bottom:var(--fab-share-bottom,12px);background:rgba(24,24,24,.35);color:var(--text-main);border:1px solid rgba(255,255,255,.25);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .fab-share .fab-share-label{font-weight:900;font-size:.95rem}
-@media (prefers-color-scheme: light){.fab-share{background:rgba(255,255,255,.65);border-color:rgba(0,0,0,.15);color:inherit}}
+@media (prefers-color-scheme: light){
+  .btn-primary,.fab-book{color:#fff}
+  .fab-share{background:rgba(255,255,255,.65);border-color:rgba(0,0,0,.15);color:inherit}
+}
 @media (min-width:960px){.fab-book,.fab-share{display:none}}
 
 /* Contact section */

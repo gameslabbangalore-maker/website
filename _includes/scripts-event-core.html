@@ -94,6 +94,10 @@
     L3: document.getElementById('microLeft3'),
     A1: document.getElementById('microAction1'),
     A2: document.getElementById('microAction2'),
+    R0: document.getElementById('microRightTitle'),
+    R1: document.getElementById('microRight1'),
+    R2: document.getElementById('microRight2'),
+    R3: document.getElementById('microRight3'),
   };
 
   let scheduled = false, base = null, timeStr = '', locText = '', locLink = '', ticket = '';
@@ -102,6 +106,18 @@
   const dGroup = "{{ page.highlights.group_size | default: '8–25 players' | escape }}";
   const dDiff = "{{ page.highlights.difficulty | default: 'Beginner-friendly' | escape }}";
   const dPrice = "{{ page.highlights.price | default: '₹ 350/-' | escape }}";
+
+  function assignText(el, value){
+    if (!el) return;
+    const text = (value || '').trim();
+    if (text){
+      el.textContent = text;
+      el.removeAttribute('hidden');
+    } else {
+      el.textContent = '';
+      el.setAttribute('hidden','');
+    }
+  }
 
   function updateFabSpacing(){
     const docEl = document.documentElement;
@@ -170,22 +186,23 @@
   // Microbar content + visibility
   if (M.title) M.title.textContent = titleFallback;
   if (scheduled && base){
+    assignText(M.R0, '');
     const timePart = timeStr && timeStr.trim() ? ` | ${timeStr.trim()}` : '';
     if (M.L1){ M.L1.textContent = fmtDateOnly(base) + timePart; M.line1?.removeAttribute('hidden'); }
+    assignText(M.R1, '');
     if (M.A1){
       M.A1.textContent = 'Add to Calendar';
       M.A1.href = makeICS({ title: titleFallback, start: base, durationHours: 3, locationText: locText, locationUrl: locLink, description: location.href });
       M.A1.hidden = false;
     }
 
-    if (M.L2){
-      M.L2.textContent = locText || '';
-      if (locText){
-        M.line2?.removeAttribute('hidden');
-      } else {
-        M.line2?.setAttribute('hidden','');
-      }
+    if (M.L2){ M.L2.textContent = locText || ''; }
+    if (locText){
+      M.line2?.removeAttribute('hidden');
+    } else {
+      M.line2?.setAttribute('hidden','');
     }
+    assignText(M.R2, '');
     if (M.A2){
       if (locLink){
         M.A2.textContent = 'Get Directions';
@@ -197,27 +214,32 @@
       }
     }
 
-    if (M.L3){
-      M.L3.textContent = '';
-      M.line3?.setAttribute('hidden','');
-    }
+    if (M.L3){ M.L3.textContent = ''; }
+    assignText(M.R3, '');
+    M.line3?.setAttribute('hidden','');
   } else {
-    if (M.line1){ M.line1.removeAttribute('hidden'); }
+    assignText(M.R0, dGroup);
+    const hasLine1 = Boolean((dFormat || '').trim() || (dDuration || '').trim());
+    if (M.line1){
+      if (hasLine1){ M.line1.removeAttribute('hidden'); }
+      else { M.line1.setAttribute('hidden',''); }
+    }
     if (M.L1) M.L1.textContent = dFormat;
+    assignText(M.R1, dDuration);
     if (M.A1){ M.A1.hidden = true; M.A1.removeAttribute('href'); }
 
-    if (M.line2){ M.line2.removeAttribute('hidden'); }
-    if (M.L2) M.L2.textContent = dDuration;
+    const hasLine2 = Boolean((dDiff || '').trim() || (dPrice || '').trim());
+    if (M.line2){
+      if (hasLine2){ M.line2.removeAttribute('hidden'); }
+      else { M.line2.setAttribute('hidden',''); }
+    }
+    if (M.L2) M.L2.textContent = dDiff;
+    assignText(M.R2, dPrice);
     if (M.A2){ M.A2.hidden = true; M.A2.removeAttribute('href'); }
 
-    if (M.L3){
-      const bits = [dDiff, dGroup, dPrice].filter(Boolean);
-      M.L3.textContent = bits.join(' · ');
-      if (M.line3){
-        if (bits.length){ M.line3.removeAttribute('hidden'); }
-        else { M.line3.setAttribute('hidden',''); }
-      }
-    }
+    if (M.L3){ M.L3.textContent = ''; }
+    assignText(M.R3, '');
+    M.line3?.setAttribute('hidden','');
   }
 
   // Microbar show when scrolled past banner/title area (mobile only)
