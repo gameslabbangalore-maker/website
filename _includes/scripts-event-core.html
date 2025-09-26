@@ -92,10 +92,6 @@
     L1: document.getElementById('microLeft1'),
     L2: document.getElementById('microLeft2'),
     L3: document.getElementById('microLeft3'),
-    RTitle: document.getElementById('microRightTitle'),
-    R1: document.getElementById('microRight1'),
-    R2: document.getElementById('microRight2'),
-    R3: document.getElementById('microRight3'),
     A1: document.getElementById('microAction1'),
     A2: document.getElementById('microAction2'),
   };
@@ -173,11 +169,9 @@
 
   // Microbar content + visibility
   if (M.title) M.title.textContent = titleFallback;
-  if (M.RTitle) M.RTitle.textContent = '';
   if (scheduled && base){
     const timePart = timeStr && timeStr.trim() ? ` | ${timeStr.trim()}` : '';
     if (M.L1){ M.L1.textContent = fmtDateOnly(base) + timePart; M.line1?.removeAttribute('hidden'); }
-    if (M.R1) M.R1.textContent = '';
     if (M.A1){
       M.A1.textContent = 'Add to Calendar';
       M.A1.href = makeICS({ title: titleFallback, start: base, durationHours: 3, locationText: locText, locationUrl: locLink, description: location.href });
@@ -192,7 +186,6 @@
         M.line2?.setAttribute('hidden','');
       }
     }
-    if (M.R2) M.R2.textContent = '';
     if (M.A2){
       if (locLink){
         M.A2.textContent = 'Get Directions';
@@ -208,22 +201,23 @@
       M.L3.textContent = '';
       M.line3?.setAttribute('hidden','');
     }
-    if (M.R3) M.R3.textContent = '';
   } else {
-    if (M.RTitle) M.RTitle.textContent = dGroup;
     if (M.line1){ M.line1.removeAttribute('hidden'); }
     if (M.L1) M.L1.textContent = dFormat;
-    if (M.R1) M.R1.textContent = dDuration;
     if (M.A1){ M.A1.hidden = true; M.A1.removeAttribute('href'); }
 
     if (M.line2){ M.line2.removeAttribute('hidden'); }
-    if (M.L2) M.L2.textContent = dDiff;
-    if (M.R2) M.R2.textContent = dPrice;
+    if (M.L2) M.L2.textContent = dDuration;
     if (M.A2){ M.A2.hidden = true; M.A2.removeAttribute('href'); }
 
-    if (M.L3) M.L3.textContent = '';
-    if (M.R3) M.R3.textContent = '';
-    if (M.line3) M.line3.setAttribute('hidden','');
+    if (M.L3){
+      const bits = [dDiff, dGroup, dPrice].filter(Boolean);
+      M.L3.textContent = bits.join(' · ');
+      if (M.line3){
+        if (bits.length){ M.line3.removeAttribute('hidden'); }
+        else { M.line3.setAttribute('hidden',''); }
+      }
+    }
   }
 
   // Microbar show when scrolled past banner/title area (mobile only)
