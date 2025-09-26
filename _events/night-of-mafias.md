@@ -49,5 +49,5 @@ why_join: |
 
 closing: |
   ⚡ Will you outwit your friends, survive the accusations, and claim victory—or will you fall prey to the shadows of the night?
-  **Join us for Night of Mafias! — where deception is an art, and trust is the ultimate gamble.**
+    **Join us for Night of Mafias! — where deception is an art, and trust is the ultimate gamble.**
 ---
