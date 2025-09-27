@@ -100,7 +100,8 @@
     R3: document.getElementById('microRight3'),
   };
 
-  let scheduled = false, base = null, timeStr = '', locText = '', locLink = '', ticket = '';
+  const fallbackTicket = {{ page.ticket_link | jsonify }} || '';
+  let scheduled = false, base = null, timeStr = '', locText = '', locLink = '', ticket = fallbackTicket;
   const dFormat = "{{ page.highlights.format | default: 'Social deduction' | escape }}";
   const dDuration = "{{ page.highlights.duration | default: '3–4 hours' | escape }}";
   const dGroup = "{{ page.highlights.group_size | default: '8–25 players' | escape }}";
@@ -148,7 +149,8 @@
     timeStr = CLEAN(match['Time']);
     locText = CLEAN(match['Location']);
     locLink = CLEAN(match['Location Link']);
-    ticket  = CLEAN(match['Ticket Link']);
+    const sheetTicket = CLEAN(match['Ticket Link']);
+    if (sheetTicket) ticket = sheetTicket;
     base = parseEventDate(dateStr);
     if (base){
       const tm = parseTime12h(timeStr);
