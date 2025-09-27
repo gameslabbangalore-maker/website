@@ -1,87 +1,145 @@
 <div class="title" style="margin-top:40px;"><h2>Explore Our Other Events</h2></div>
 <div id="explore-cards" class="cards-row"></div>
 <script>
-(async function() {
+const EXPLORE_EVENT_META = [
+{% for event in site.events %}
+  {
+    slug: {{ event.data.slug | default: event.slug | jsonify }},
+    title: {{ event.title | jsonify }},
+    intro: {{ event.intro | default: event.tagline | default: '' | jsonify }},
+    banner: {{ event.banner | default: event.hero_image | jsonify }},
+    url: {{ event.url | relative_url | jsonify }}
+  }{% unless forloop.last %},{% endunless %}
+{% endfor %}
+];
+(function(){
   const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSs9vlFaLhdFNFXvWsBIXlAJu0J5Dj2deY_7SlwAGd9Jk1-djK6xP3rdXim7Co0BJ-pUJueDCYYugew/pub?gid=583837785&single=true&output=csv";
   const container = document.getElementById('explore-cards');
   const fallbackImage = "https://via.placeholder.com/800x450?text=Event+Image";
 
+  const metaBySlug = EXPLORE_EVENT_META.reduce((map, item) => {
+    if (!item) return map;
+    const slug = (item.slug || '').toLowerCase();
+    if (slug) map[slug] = item;
+    const pathSlug = (item.url || '').split('/').filter(Boolean).pop();
+    if (pathSlug && !map[pathSlug.toLowerCase()]) map[pathSlug.toLowerCase()] = item;
+    return map;
+  }, {});
+
+  function normalizeSlug(value){
+    if (!value) return '';
+    return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  }
+
+  function lookupMeta(row){
+    const pageLink = (row['Page Link'] || '').trim();
+    if (pageLink){
+      const pathSlug = pageLink.replace(/https?:\/\/[^/]+/i, '').replace(/^\/+|\/+$/g, '').split('/').pop();
+      if (pathSlug){
+        const hit = metaBySlug[pathSlug.toLowerCase()];
+        if (hit) return hit;
+      }
+    }
+    const byEvent = normalizeSlug(row['Event'] || row['EventName'] || '');
+    if (byEvent){
+      const hit = metaBySlug[byEvent];
+      if (hit) return hit;
+    }
+    return null;
+  }
+
+  function withTransform(url){
+    if (!url) return '';
+    if (/\/tr:/.test(url) || /[?&]tr=/.test(url)) return url;
+    if (url.includes('imagekit.io')){
+      return url.replace(/(imagekit\.io\/[^/]+)/, '$1/tr:w-800,h-450,fo-auto');
+    }
+    return url + (url.includes('?') ? '&' : '?') + 'tr=w-800,h-450,fo-auto';
+  }
+
   setSkeletons(container, 3);
 
-  try {
-    const res = await fetch(csvUrl + '&cb=' + Date.now(), { cache: "no-store" });
-    if (!res.ok) throw new Error("Failed to fetch explore events");
-    const csvText = await res.text();
-    const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+  fetch(csvUrl + '&cb=' + Date.now(), { cache: 'no-store' })
+    .then(res => {
+      if (!res.ok) throw new Error('Failed to fetch explore events');
+      return res.text();
+    })
+    .then(csvText => {
+      const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+      const items = parsed.data.filter(event =>
+        event && (String(event['Scheduled']||'').trim().toLowerCase() === 'no')
+      );
 
-    const items = parsed.data.filter(event =>
-      event && (String(event['Scheduled']||'').trim().toLowerCase() === 'no')
-    );
+      if (items.length > 0) setSkeletons(container, items.length);
 
-    if (items.length > 0) setSkeletons(container, items.length);
+      items.forEach((event, idx) => {
+        const meta = lookupMeta(event);
+        const card = document.createElement('div');
+        card.className = 'card';
 
-    items.forEach((event, idx) => {
-      const card = document.createElement('div');
-      card.className = 'card';
+        const media = document.createElement('div');
+        media.className = 'media';
+        const img = document.createElement('img');
+        const banner = (meta && meta.banner) ? meta.banner : '';
+        img.src = banner ? withTransform(banner) : ((event['Image Links'] || '').trim() || fallbackImage);
+        const titleText = ((meta && meta.title) || event['Event'] || '').trim();
+        img.alt = titleText;
+        img.loading = 'lazy';
+        img.width = 800; img.height = 450;
+        img.onerror = function(){ this.onerror=null; this.src = fallbackImage; };
+        media.appendChild(img);
+        card.appendChild(media);
 
-      const media = document.createElement('div');
-      media.className = 'media';
-      const img = document.createElement('img');
-      img.src = (event['Image Links'] || '').trim() || fallbackImage;
-      img.alt = (event['Event'] || '').trim();
-      img.loading = "lazy"; img.width = 800; img.height = 450;
-      img.onerror = function(){ this.onerror=null; this.src = fallbackImage; };
-      media.appendChild(img);
-      card.appendChild(media);
+        const body = document.createElement('div');
+        body.className = 'card-body';
 
-      const body = document.createElement('div');
-      body.className = 'card-body';
+        const title = document.createElement('div');
+        title.className = 'event-title';
+        title.textContent = titleText;
+        body.appendChild(title);
 
-      const title = document.createElement('div');
-      title.className = 'event-title';
-      title.textContent = (event['Event'] || '').trim();
-      body.appendChild(title);
-
-      if (event['Tagline'] && String(event['Tagline']).trim() !== '') {
-        const tagline = document.createElement('div');
-        tagline.className = 'event-tagline';
-        tagline.textContent = String(event['Tagline']).trim();
-        body.appendChild(tagline);
-      }
-
-      card.appendChild(body);
-
-      const footer = document.createElement('div');
-      footer.className = 'card-footer';
-
-      const learn = document.createElement('a');
-      learn.className = 'book-btn';
-      const pageUrl = (event['Page Link'] || '#').trim();
-      learn.href = pageUrl;
-      learn.textContent = 'Learn More';
-      learn.target = '_self';
-      learn.removeAttribute('rel');
-
-      footer.appendChild(learn);
-      card.appendChild(footer);
-
-      card.addEventListener('click', function(e) {
-        if (e.target.closest('a')) return;
-        if (window.innerWidth <= 768) {
-          const url = (event['Page Link'] || '').trim();
-          if (url) window.location.href = url;
+        const taglineText = (meta && meta.intro) ? meta.intro : event['Tagline'];
+        if (taglineText && String(taglineText).trim() !== '') {
+          const tagline = document.createElement('div');
+          tagline.className = 'event-tagline';
+          tagline.textContent = String(taglineText).trim();
+          body.appendChild(tagline);
         }
+
+        card.appendChild(body);
+
+        const footer = document.createElement('div');
+        footer.className = 'card-footer';
+
+        const learn = document.createElement('a');
+        learn.className = 'book-btn';
+        const pageUrl = (meta && meta.url) ? meta.url : (event['Page Link'] || '#').trim();
+        learn.href = pageUrl || '#';
+        learn.textContent = 'Learn More';
+        learn.target = '_self';
+        learn.removeAttribute('rel');
+
+        footer.appendChild(learn);
+        card.appendChild(footer);
+
+        card.addEventListener('click', function(e) {
+          if (e.target.closest('a')) return;
+          if (window.innerWidth <= 768) {
+            const url = learn.href;
+            if (url) window.location.href = url;
+          }
+        });
+
+        replaceSkeletonWithCard(container, idx, card);
       });
 
-      replaceSkeletonWithCard(container, idx, card);
+      if (!items.length) {
+        container.innerHTML = '<div style="color:#bbb;text-align:center;">No other events to explore at this time.</div>';
+      }
+    })
+    .catch(err => {
+      console.error('Error loading explore events:', err);
+      container.innerHTML = '<div style="color:#f66;text-align:center;">Could not load other events.</div>';
     });
-
-    if (!items.length) {
-      container.innerHTML = '<div style="color:#bbb;text-align:center;">No other events to explore at this time.</div>';
-    }
-  } catch (err) {
-    console.error('Error loading explore events:', err);
-    container.innerHTML = '<div style="color:#f66;text-align:center;">Could not load other events.</div>';
-  }
 })();
 </script>
