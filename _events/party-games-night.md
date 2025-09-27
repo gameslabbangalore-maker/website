@@ -20,8 +20,11 @@ highlights:
 ticket_link: "https://rzp.io/rzp/Party-Game-Night"   
 
 # Optional videos
-about_video: ""
-recap_videos: []  
+about_video: "https://www.youtube.com/embed/TmWqrMSGbbs"
+recap_videos:
+- "https://www.youtube.com/embed/58in-4CyTOA"
+- "https://www.youtube.com/embed/czILvALyn_0"
+- "https://www.youtube.com/embed/-IdIb-Qljmw"
 
 # Long-form sections
 about: |
