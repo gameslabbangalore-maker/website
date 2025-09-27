@@ -20,11 +20,11 @@ highlights:
 ticket_link: "https://rzp.io/rzp/Murder-Mystery"
 
 # Optional videos
-about_video: "https://www.youtube.com/shorts/bUdFcYPSd00"
+about_video: "https://www.youtube.com/embed/bUdFcYPSd00"   # hide section if blank
 recap_videos:
-- "https://youtu.be/3MFt3AGU01o"
-- "https://www.youtube.com/shorts/sLfAz1xhfbQ"
-- "https://www.youtube.com/shorts/LvWjRRUvfi4?feature=share"
+- "https://www.youtube.com/embed/3MFt3AGU01o"
+- "https://www.youtube.com/embed/sLfAz1xhfbQ"
+- "https://www.youtube.com/embed/LvWjRRUvfi4"
 
 # Long-form sections (markdown). Headings stay the same in layout.
 about: |
