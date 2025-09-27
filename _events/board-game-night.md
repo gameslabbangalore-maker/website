@@ -3,7 +3,7 @@ title: "Board Game Night"
 slug: board-game-night
 
 # Hero
-banner: "https://ik.imagekit.io/gameslab/Board_Game_Night.png"
+banner: "https://ik.imagekit.io/gameslab/Board_Game_Night_3.png"
 tagline: "From strategy to silliness—discover new worlds one game at a time."
 intro: "An open-table evening featuring a wide selection of modern board and card games for all moods."
 
