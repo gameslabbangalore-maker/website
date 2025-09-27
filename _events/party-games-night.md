@@ -1,9 +1,9 @@
 ---
-title: "Party Game Night"
-slug: party-game-night
+title: "Party Games Night"
+slug: party-games-night
 
 # Hero
-banner: "https://ik.imagekit.io/gameslab/Party_Game_Night.png"
+banner: "https://ik.imagekit.io/gameslab/Party_Games_Night.png"
 tagline: "Fast, fun, and full of laughs—where every round brings a new surprise."
 intro: "An evening of lighthearted, quick-fire games designed to break the ice and bring the energy up."
 
@@ -20,12 +20,12 @@ highlights:
 ticket_link: "https://rzp.io/rzp/Party-Game-Night"   
 
 # Optional videos
-about_video: ""   
+about_video: ""
 recap_videos: []  
 
 # Long-form sections
 about: |
-  Looking for non-stop laughter and excitement? *Party Game Night* brings a curated lineup 
+  Looking for non-stop laughter and excitement? *Party Games Night* brings a curated lineup 
   of hilarious, easy-to-play games perfect for big groups. No long rules, no downtime—just instant fun.  
 
 what_makes_it_different: |
@@ -45,5 +45,5 @@ why_join: |
   - A feel-good evening with something for everyone  
 
 closing: |
-  **🎉 Join us for Party Game Night — where the only rule is to have fun!**
+  **🎉 Join us for Party Games Night — where the only rule is to have fun!**
 ---
