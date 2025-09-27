@@ -50,12 +50,13 @@
   {% assign has_sections = true %}
   {% endif %}
 
-  {% if page.about_video %}
+  {% assign about_video_url = page.about_video | to_s | strip %}
+  {% if about_video_url != '' %}
   {% if has_sections %}<div class="divider section-divider" aria-hidden="true"></div>{% endif %}
   <section id="about-video" aria-labelledby="about-nom">
     <h3 id="about-nom" class="section-title">About {{ page.title }}</h3>
-    <div class="video-portrait" data-embed="{{ page.about_video | escape }}">
-      <iframe loading="lazy" title="About {{ page.title }} (portrait)" src="{{ page.about_video | escape }}"></iframe>
+    <div class="video-portrait" data-embed="{{ about_video_url | escape }}">
+      <iframe loading="lazy" title="About {{ page.title }} (portrait)" src="{{ about_video_url | escape }}"></iframe>
     </div>
   </section>
   {% assign has_sections = true %}
