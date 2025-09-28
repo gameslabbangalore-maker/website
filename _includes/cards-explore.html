@@ -21,7 +21,6 @@
   if (!container) return;
 
   const fallbackImage = "https://via.placeholder.com/800x450?text=Event+Image";
-  const upcomingCsv = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSs9vlFaLhdFNFXvWsBIXlAJu0J5Dj2deY_7SlwAGd9Jk1-djK6xP3rdXim7Co0BJ-pUJueDCYYugew/pub?gid=1356004046&single=true&output=csv";
 
   if (!EVENTS.length){
     container.innerHTML = '<div style="color:#bbb;text-align:center;">No events have been published yet.</div>';
@@ -37,22 +36,9 @@
 
   setSkeletons(container, Math.min(EVENTS.length, 3));
 
-  function clean(value){
-    if (value == null) return '';
-    return String(value).trim().replace(/^"|"$/g,'');
-  }
-
   function normalizeSlug(value){
     if (!value) return '';
     return value.toString().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
-  }
-
-  function slugFromUrl(url){
-    if (!url) return '';
-    const path = url.replace(/^https?:\/\/[^/]+/i,'').replace(/^\/+|\/+$/g,'');
-    if (!path) return '';
-    const segments = path.split('/');
-    return normalizeSlug(segments[segments.length - 1] || '');
   }
 
   function withTransform(url){
@@ -136,52 +122,10 @@
     }
   }
 
-  fetch(upcomingCsv + '&cb=' + Date.now(), { cache: 'no-store' })
-    .then(res => {
-      if (!res.ok) throw new Error('Failed to load upcoming events CSV');
-      return res.text();
-    })
-    .then(text => {
-      const parsed = Papa.parse(text, { skipEmptyLines: true });
-      const rows = parsed.data || [];
-      if (!rows.length){
-        renderCards(new Set());
-        return;
-      }
-      const header = rows[0].map(h => clean(h).toLowerCase());
-      const findIndex = (...candidates) => {
-        for (let i = 0; i < header.length; i++){
-          if (candidates.includes(header[i])) return i;
-        }
-        return -1;
-      };
-      const idxEvent = findIndex('event', 'event name', 'eventname');
-      const idxLink = findIndex('page link', 'pagelink', 'page');
-      const idxScheduled = findIndex('scheduled');
-
-      const scheduled = new Set();
-      for (let r = 1; r < rows.length; r++){
-        const row = rows[r];
-        if (!row) continue;
-        if (idxScheduled !== -1){
-          const flag = clean(row[idxScheduled]).toLowerCase();
-          if (flag && flag !== 'yes') continue;
-        }
-        if (idxLink !== -1){
-          const slug = slugFromUrl(clean(row[idxLink]));
-          if (slug) scheduled.add(slug);
-        }
-        if (idxEvent !== -1){
-          const nameSlug = normalizeSlug(clean(row[idxEvent]));
-          if (nameSlug) scheduled.add(nameSlug);
-        }
-      }
-
-      renderCards(scheduled);
-    })
-    .catch(err => {
-      console.error('Error determining scheduled events:', err);
-      renderCards(new Set());
-    });
+  const scheduledSlugs = {{ site.data.event_schedule.scheduled_slugs | default: [] | jsonify }};
+  const scheduledSet = new Set((scheduledSlugs || []).map(function(slug){
+    return (slug || '').toString().toLowerCase();
+  }));
+  renderCards(scheduledSet);
 })();
 </script>
