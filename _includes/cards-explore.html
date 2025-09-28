@@ -2,26 +2,14 @@
 <div id="explore-cards" class="cards-row"></div>
 <script>
 (function(){
-  const EVENTS = [
-  {% for event in site.events %}
-    {% unless event.draft or event.published == false %}
-    {
-      slug: {{ event.data.slug | default: event.slug | jsonify }},
-      title: {{ event.title | jsonify }},
-      intro: {{ event.intro | default: event.tagline | default: '' | jsonify }},
-      banner: {{ event.banner | default: event.hero_image | jsonify }},
-      url: {{ event.url | relative_url | jsonify }},
-      order: {{ event.card_order | default: event.order | default: forloop.index0 | jsonify }}
-    }{% unless forloop.last %},{% endunless %}
-    {% endunless %}
-  {% endfor %}
-  ].filter(Boolean);
+  const BASEURL = "{{ site.baseurl | default: '' }}";
+  const CALENDAR_URL = BASEURL + "/assets/data/calendar.json";
+  const EVENTS = window.__EVENTS_METADATA || (window.__EVENTS_METADATA = {% include events-metadata.json %});
 
   const container = document.getElementById('explore-cards');
   if (!container) return;
 
   const fallbackImage = "https://via.placeholder.com/800x450?text=Event+Image";
-  const upcomingCsv = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSs9vlFaLhdFNFXvWsBIXlAJu0J5Dj2deY_7SlwAGd9Jk1-djK6xP3rdXim7Co0BJ-pUJueDCYYugew/pub?gid=1356004046&single=true&output=csv";
 
   if (!EVENTS.length){
     container.innerHTML = '<div style="color:#bbb;text-align:center;">No events have been published yet.</div>';
@@ -37,22 +25,14 @@
 
   setSkeletons(container, Math.min(EVENTS.length, 3));
 
-  function clean(value){
-    if (value == null) return '';
-    return String(value).trim().replace(/^"|"$/g,'');
-  }
-
   function normalizeSlug(value){
     if (!value) return '';
-    return value.toString().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
-  }
-
-  function slugFromUrl(url){
-    if (!url) return '';
-    const path = url.replace(/^https?:\/\/[^/]+/i,'').replace(/^\/+|\/+$/g,'');
-    if (!path) return '';
-    const segments = path.split('/');
-    return normalizeSlug(segments[segments.length - 1] || '');
+    return value.toString()
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g,'')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g,'-')
+      .replace(/^-+|-+$/g,'');
   }
 
   function withTransform(url){
@@ -136,47 +116,18 @@
     }
   }
 
-  fetch(upcomingCsv + '&cb=' + Date.now(), { cache: 'no-store' })
+  fetch(CALENDAR_URL + '?v=' + Date.now(), { cache: 'no-store' })
     .then(res => {
-      if (!res.ok) throw new Error('Failed to load upcoming events CSV');
-      return res.text();
+      if (!res.ok) throw new Error('Failed to load calendar artifact');
+      return res.json();
     })
-    .then(text => {
-      const parsed = Papa.parse(text, { skipEmptyLines: true });
-      const rows = parsed.data || [];
-      if (!rows.length){
-        renderCards(new Set());
-        return;
-      }
-      const header = rows[0].map(h => clean(h).toLowerCase());
-      const findIndex = (...candidates) => {
-        for (let i = 0; i < header.length; i++){
-          if (candidates.includes(header[i])) return i;
-        }
-        return -1;
-      };
-      const idxEvent = findIndex('event', 'event name', 'eventname');
-      const idxLink = findIndex('page link', 'pagelink', 'page');
-      const idxScheduled = findIndex('scheduled');
-
+    .then(data => {
       const scheduled = new Set();
-      for (let r = 1; r < rows.length; r++){
-        const row = rows[r];
-        if (!row) continue;
-        if (idxScheduled !== -1){
-          const flag = clean(row[idxScheduled]).toLowerCase();
-          if (flag && flag !== 'yes') continue;
-        }
-        if (idxLink !== -1){
-          const slug = slugFromUrl(clean(row[idxLink]));
-          if (slug) scheduled.add(slug);
-        }
-        if (idxEvent !== -1){
-          const nameSlug = normalizeSlug(clean(row[idxEvent]));
-          if (nameSlug) scheduled.add(nameSlug);
-        }
-      }
-
+      (data.events || []).forEach(entry => {
+        if (!entry) return;
+        const slug = normalizeSlug(entry.slug || entry.title);
+        if (slug) scheduled.add(slug);
+      });
       renderCards(scheduled);
     })
     .catch(err => {

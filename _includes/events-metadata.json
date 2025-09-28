@@ -1,0 +1,16 @@
+{% assign first = true %}[
+{% for event in site.events %}
+  {% unless event.draft or event.published == false %}
+    {% unless first %},
+    {% endunless %}{% assign first = false %}
+    {
+      "slug": {{ event.data.slug | default: event.slug | jsonify }},
+      "title": {{ event.title | jsonify }},
+      "intro": {{ event.intro | default: event.tagline | default: '' | jsonify }},
+      "banner": {{ event.banner | default: event.hero_image | jsonify }},
+      "url": {{ event.url | relative_url | jsonify }},
+      "order": {{ event.card_order | default: event.order | default: forloop.index0 | jsonify }}
+    }
+  {% endunless %}
+{% endfor %}
+]

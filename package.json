@@ -1,0 +1,8 @@
+{
+  "name": "games-lab-website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:calendar": "node scripts/fetch-calendar.mjs"
+  }
+}
