@@ -1,5 +1,5 @@
 {
-  "generated_at": "2025-09-28T18:14:44.237Z",
+  "generated_at": "2025-09-28T18:40:10.125Z",
   "timezone": "Asia/Kolkata",
   "events": [
     {
@@ -34,6 +34,17 @@
       "location_map_url": "https://maps.app.goo.gl/m44qdH19FcHfErqk7",
       "location_warning": false,
       "raw_location": "SLAY Coffee\nSLAY Coffee Bar\n2735, 16th Cross Road, Iblur Camp Colony, HSR Layout, Bengaluru, 560102, Karnataka, India"
+    },
+    {
+      "title": "Trivia Takedown",
+      "slug": "trivia-takedown",
+      "start": "2025-10-13T13:30:00Z",
+      "day_key": "2025-10-13",
+      "timezone": "Asia/Kolkata",
+      "location_name": "Cafe Du L'Amour",
+      "location_map_url": "https://maps.app.goo.gl/vh3Pv3Y9UgYhEFuK7",
+      "location_warning": false,
+      "raw_location": "Cafe Du L’Amour\nCafe Du L'Amour\n980, 1st A Cross Road, Green Leaf Layout, Block 4, Koramangala, Bengaluru, 560034, Karnataka, India"
     }
   ]
 }
