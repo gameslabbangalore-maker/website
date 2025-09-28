@@ -1,10 +1,11 @@
 <script>
 (async function(){
-  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSs9vlFaLhdFNFXvWsBIXlAJu0J5Dj2deY_7SlwAGd9Jk1-djK6xP3rdXim7Co0BJ-pUJueDCYYugew/pub?gid=1356004046&single=true&output=csv";
-
+  const CALENDAR_URL = "{{ site.baseurl | default: '' }}/assets/data/calendar.json";
   const BASEURL = "{{ site.baseurl | default: '' }}";
-  const CLEAN = v => (v==null) ? "" : String(v).trim().replace(/^"|"$/g,'');
-  const stripDomain = p => p.replace(/^https?:\/\/[^/]+/, '');
+  const PAGE_SLUG = {{ page.slug | jsonify }} || '';
+  const CLEAN = v => (v == null) ? "" : String(v).trim();
+
+  function stripDomain(p){ return p.replace(/^https?:\/\/[^/]+/, ''); }
   function stripBaseAndSlash(p){
     let x = stripDomain(p);
     if (BASEURL && x.startsWith(BASEURL)) x = x.slice(BASEURL.length);
@@ -14,39 +15,60 @@
   const pagePath = stripBaseAndSlash(location.pathname || '/');
   const titleFallback = (document.getElementById('eventTitle')?.textContent || '').trim();
 
-  function parseEventDate(str){
-    if (!str) return null;
-    str = str.trim().replace(/^[A-Za-z]{3},?\s*/, '').replace(/’/g,"'").replace(/`/g,"'");
-    const m = str.match(/^(\d{1,2})\s+([A-Za-z]{3})\s+'(\d{2})$/);
-    if (!m) return null;
-    const day = parseInt(m[1],10);
-    const mon = { Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11 }[m[2]];
-    const year = 2000 + parseInt(m[3],10);
-    return new Date(year, mon, day);
+  function normalizeSlug(value){
+    if (!value) return '';
+    return value.toString()
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g,'')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g,'-')
+      .replace(/^-+|-+$/g,'');
   }
-  function fmtDateOnly(d){
-    const dt = new Date(d);
-    const wk = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()];
-    const day = String(dt.getDate()).padStart(2,'0');
-    const mon = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()];
-    const yr2 = String(dt.getFullYear()).slice(-2);
-    return `${wk}, ${day} ${mon} '${yr2}`;
+
+  function fmtDateOnly(date, timezone){
+    const parts = new Intl.DateTimeFormat('en-US', {
+      weekday: 'short',
+      day: '2-digit',
+      month: 'short',
+      year: '2-digit',
+      timeZone: timezone
+    }).formatToParts(date).reduce((acc, part) => {
+      if (part.type !== 'literal') acc[part.type] = part.value;
+      return acc;
+    }, {});
+    return `${parts.weekday || ''}, ${parts.day || ''} ${parts.month || ''} '${parts.year || ''}`.trim();
   }
-  function parseTime12h(t){
-    if(!t) return {h:19,m:0};
-    const m = t.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-    if(!m) return {h:19,m:0};
-    let h = parseInt(m[1],10), min = parseInt(m[2],10);
-    const ampm = m[3].toUpperCase();
-    if (ampm==='PM' && h<12) h+=12;
-    if (ampm==='AM' && h===12) h=0;
-    return {h, m:min};
+
+  function fmtTime(date, timezone){
+    const str = new Intl.DateTimeFormat('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+      timeZone: timezone
+    }).format(date).replace(/\u202f/g, ' ');
+    return str.toUpperCase();
   }
+
+  function dayKey(date, timezone){
+    return new Intl.DateTimeFormat('en-CA', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      timeZone: timezone
+    }).format(date);
+  }
+
+  function parseStart(entry){
+    if (!entry || !entry.start) return null;
+    const d = new Date(entry.start);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
   function makeICS({title, start, durationHours=3, locationText='', locationUrl='', description=''}){
     const dt = new Date(start);
     const end = new Date(dt.getTime() + durationHours*60*60*1000);
     const pad = n => String(n).padStart(2,'0');
-    const stamp = (x)=> x.getFullYear()+pad(x.getMonth()+1)+pad(x.getDate())+'T'+pad(x.getHours())+pad(x.getMinutes())+pad(x.getSeconds());
+    const stamp = (x)=> x.getUTCFullYear()+pad(x.getUTCMonth()+1)+pad(x.getUTCDate())+'T'+pad(x.getUTCHours())+pad(x.getUTCMinutes())+pad(x.getUTCSeconds())+'Z';
     const loc = locationUrl ? `${locationText} (${locationUrl})` : locationText;
     const lines = [
       'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Games Lab//Events//EN','BEGIN:VEVENT',
@@ -57,21 +79,30 @@
     return 'data:text/calendar;charset=utf8,' + encodeURIComponent(lines.join('\r\n'));
   }
 
-  // Fetch sheet + find this event
   let match = null;
-  try{
-    const res = await fetch(SHEET_URL + '&cb=' + Date.now(), { cache:'no-store' });
-    const text = await res.text();
-    const rows = Papa.parse(text, { header:true, skipEmptyLines:true }).data;
-    match = rows.find(r=>{
-      const linkPath = stripBaseAndSlash(CLEAN(r['Page Link']));
-      const name = CLEAN(r['EventName']);
-      if (linkPath && pagePath.endsWith(linkPath)) return true;
-      return (titleFallback && name.toLowerCase() === titleFallback.toLowerCase());
-    });
-  }catch(e){ console.error('Sheet load error', e); }
+  let timezone = 'Asia/Kolkata';
 
-  // Elements
+  try {
+    const res = await fetch(CALENDAR_URL + '?v=' + Date.now(), { cache:'no-store' });
+    if (!res.ok) throw new Error('Calendar fetch failed: ' + res.status);
+    const data = await res.json();
+    const events = Array.isArray(data.events) ? data.events : [];
+    timezone = CLEAN(data.timezone) || timezone;
+
+    const pathSlug = normalizeSlug(pagePath.split('/').filter(Boolean).pop());
+
+    match = events.find(entry => {
+      if (!entry) return false;
+      const entrySlug = normalizeSlug(entry.slug || entry.title);
+      if (PAGE_SLUG && entrySlug === normalizeSlug(PAGE_SLUG)) return true;
+      if (pathSlug && entrySlug === pathSlug) return true;
+      if (titleFallback && entry.title && entry.title.toLowerCase() === titleFallback.toLowerCase()) return true;
+      return false;
+    });
+  } catch (e) {
+    console.error('Calendar load error', e);
+  }
+
   const scHeading = document.getElementById('scheduleHeading');
   const scBlock   = document.getElementById('scheduleBlock');
   const scWhen    = document.getElementById('scWhen');
@@ -82,7 +113,6 @@
   const fabBook   = document.getElementById('fabBook');
   const shareFab  = document.getElementById('shareFab');
 
-  // Microbar parts
   const M = {
     bar: document.getElementById('mobileInfoBar'),
     title: document.getElementById('microTitle'),
@@ -101,7 +131,6 @@
   };
 
   const fallbackTicket = {{ page.ticket_link | jsonify }} || '';
-  let scheduled = false, base = null, timeStr = '', locText = '', locLink = '', ticket = fallbackTicket;
   const dFormat = "{{ page.highlights.format | default: 'Social deduction' | escape }}";
   const dDuration = "{{ page.highlights.duration | default: '3–4 hours' | escape }}";
   const dGroup = "{{ page.highlights.group_size | default: '8–25 players' | escape }}";
@@ -143,72 +172,74 @@
     docEl.style.setProperty('--mobile-bottom-pad', pad + 'px');
   }
 
-  if (match){
-    scheduled = CLEAN(match['Scheduled']).toLowerCase() === 'yes';
-    const dateStr = CLEAN(match['Date']);
-    timeStr = CLEAN(match['Time']);
-    locText = CLEAN(match['Location']);
-    locLink = CLEAN(match['Location Link']);
-    const sheetTicket = CLEAN(match['Ticket Link']);
-    if (sheetTicket) ticket = sheetTicket;
-    base = parseEventDate(dateStr);
-    if (base){
-      const tm = parseTime12h(timeStr);
-      base.setHours(tm.h, tm.m, 0, 0);
-    }
+  const scheduleDate = parseStart(match);
+  const todayKey = dayKey(new Date(), timezone);
+  const eventDayKey = scheduleDate ? dayKey(scheduleDate, timezone) : '';
+  const isUpcoming = Boolean(scheduleDate) && eventDayKey >= todayKey;
+
+  if (match?.location_warning && match.raw_location){
+    console.warn('Calendar location mismatch for "%s": "%s"', titleFallback, match.raw_location);
   }
 
-  // Wire schedule (desktop) + FAB
-  if (scheduled && base){
+  const locationText = match?.location_name || 'To be Announced';
+  const locationUrl = match?.location_map_url || '';
+  const timeStr = scheduleDate ? fmtTime(scheduleDate, timezone) : '';
+  const whenText = scheduleDate ? fmtDateOnly(scheduleDate, timezone) : '';
+  const ticket = fallbackTicket;
+
+  if (M.title) M.title.textContent = titleFallback;
+
+  if (isUpcoming && scheduleDate){
     scHeading && scHeading.removeAttribute('hidden');
     if (scBlock) scBlock.hidden = false;
-    scWhen && (scWhen.textContent = fmtDateOnly(base));
-    scWhere && (scWhere.textContent = locText || '');
-    if (scAdd) scAdd.href = makeICS({ title: titleFallback, start: base, durationHours: 3, locationText: locText, locationUrl: locLink, description: location.href });
-    if (scDir && locLink){ scDir.href = locLink; }
+    scWhen && (scWhen.textContent = whenText);
+    scWhere && (scWhere.textContent = locationText || '');
+    if (scAdd) scAdd.href = makeICS({ title: titleFallback, start: scheduleDate, durationHours: 3, locationText, locationUrl, description: location.href });
+    if (scDir){
+      if (locationUrl){
+        scDir.href = locationUrl;
+        scDir.removeAttribute('hidden');
+      } else {
+        scDir.setAttribute('hidden','');
+        scDir.removeAttribute('href');
+      }
+    }
     if (ticket){
-      scBook && (scBook.href = ticket);
+      if (scBook) scBook.href = ticket;
       if (fabBook){
         fabBook.href = ticket;
         fabBook.removeAttribute('hidden');
       }
       requestAnimationFrame(updateFabSpacing);
     } else {
-      if (fabBook){ fabBook.setAttribute('hidden', ''); }
+      if (fabBook){ fabBook.setAttribute('hidden',''); }
       updateFabSpacing();
     }
   } else {
-    // Not scheduled
     scHeading && scHeading.setAttribute('hidden','');
     if (scBlock) scBlock.hidden = true;
     if (fabBook){ fabBook.setAttribute('hidden',''); }
     updateFabSpacing();
   }
 
-  // Microbar content + visibility
-  if (M.title) M.title.textContent = titleFallback;
-  if (scheduled && base){
+  if (isUpcoming && scheduleDate){
     assignText(M.R0, '');
-    const timePart = timeStr && timeStr.trim() ? ` | ${timeStr.trim()}` : '';
-    if (M.L1){ M.L1.textContent = fmtDateOnly(base) + timePart; M.line1?.removeAttribute('hidden'); }
+    const timePart = timeStr ? ` | ${timeStr}` : '';
+    if (M.L1){ M.L1.textContent = whenText + timePart; M.line1?.removeAttribute('hidden'); }
     assignText(M.R1, '');
     if (M.A1){
       M.A1.textContent = 'Add to Calendar';
-      M.A1.href = makeICS({ title: titleFallback, start: base, durationHours: 3, locationText: locText, locationUrl: locLink, description: location.href });
+      M.A1.href = makeICS({ title: titleFallback, start: scheduleDate, durationHours: 3, locationText, locationUrl, description: location.href });
       M.A1.hidden = false;
     }
 
-    if (M.L2){ M.L2.textContent = locText || ''; }
-    if (locText){
-      M.line2?.removeAttribute('hidden');
-    } else {
-      M.line2?.setAttribute('hidden','');
-    }
+    if (M.L2){ M.L2.textContent = locationText || ''; }
+    if (locationText){ M.line2?.removeAttribute('hidden'); } else { M.line2?.setAttribute('hidden',''); }
     assignText(M.R2, '');
     if (M.A2){
-      if (locLink){
+      if (locationUrl){
         M.A2.textContent = 'Get Directions';
-        M.A2.href = locLink;
+        M.A2.href = locationUrl;
         M.A2.hidden = false;
       } else {
         M.A2.hidden = true;
@@ -244,7 +275,6 @@
     M.line3?.setAttribute('hidden','');
   }
 
-  // Microbar show when scrolled past banner/title area (mobile only)
   (function(){
     const microbar = M.bar;
     const banner = document.querySelector('.banner');
@@ -268,7 +298,6 @@
   updateFabSpacing();
   window.addEventListener('resize', ()=>{ updateFabSpacing(); });
 
-  // Share handlers
   (function(){
     async function sharePage(){
       const data = { title: document.title, text: document.title, url: location.href };
@@ -280,7 +309,6 @@
     document.getElementById('shareBtnSide')?.addEventListener('click', sharePage);
     shareFab?.addEventListener('click', sharePage);
   })();
-
 })();
 </script>
 
