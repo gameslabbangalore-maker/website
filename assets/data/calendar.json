@@ -1,5 +1,5 @@
 {
-  "generated_at": "2025-09-28T17:41:15.529Z",
+  "generated_at": "2025-09-28T18:08:43.973Z",
   "timezone": "Asia/Kolkata",
   "events": [
     {
@@ -23,6 +23,17 @@
       "location_map_url": "https://maps.app.goo.gl/SN7w4itJnqGMP2Qw9",
       "location_warning": false,
       "raw_location": "Big Bean Cafe\n29, 80 Feet Road\nKoramangala, Bengaluru, Karnataka, India"
+    },
+    {
+      "title": "Party Games Night",
+      "slug": "party-games-night",
+      "start": "2025-10-12T14:30:00Z",
+      "day_key": "2025-10-12",
+      "timezone": "Asia/Kolkata",
+      "location_name": "The Coffee Brewery",
+      "location_map_url": "https://maps.app.goo.gl/8gpKvEDMUzYUwyKv7",
+      "location_warning": false,
+      "raw_location": "The Coffee Brewery\nThe Coffee Brewery\nMahakavi Vemana Rd, Bengaluru, India"
     }
   ]
 }
