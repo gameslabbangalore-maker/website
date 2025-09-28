@@ -1,75 +1,72 @@
 <script>
-(async function(){
-  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSs9vlFaLhdFNFXvWsBIXlAJu0J5Dj2deY_7SlwAGd9Jk1-djK6xP3rdXim7Co0BJ-pUJueDCYYugew/pub?gid=1356004046&single=true&output=csv";
+(function(){
+  const schedule = {{ site.data.event_schedule | jsonify }} || {};
+  const pageSlug = {{ page.slug | jsonify }};
+  const fallbackTicket = {{ page.ticket_link | jsonify }} || '';
+  const fallbackTitle = (document.getElementById('eventTitle')?.textContent || '').trim();
 
-  const BASEURL = "{{ site.baseurl | default: '' }}";
-  const CLEAN = v => (v==null) ? "" : String(v).trim().replace(/^"|"$/g,'');
-  const stripDomain = p => p.replace(/^https?:\/\/[^/]+/, '');
-  function stripBaseAndSlash(p){
-    let x = stripDomain(p);
-    if (BASEURL && x.startsWith(BASEURL)) x = x.slice(BASEURL.length);
-    return x.replace(/\/+$/, '');
+  const dFormat = "{{ page.highlights.format | default: 'Social deduction' | escape }}";
+  const dDuration = "{{ page.highlights.duration | default: '3–4 hours' | escape }}";
+  const dGroup = "{{ page.highlights.group_size | default: '8–25 players' | escape }}";
+  const dDiff = "{{ page.highlights.difficulty | default: 'Beginner-friendly' | escape }}";
+  const dPrice = "{{ page.highlights.price | default: '₹ 350/-' | escape }}";
+
+  function pickEventEntry(){
+    if (!schedule.by_slug) return null;
+    if (pageSlug && schedule.by_slug[pageSlug]) return schedule.by_slug[pageSlug];
+    const normalized = fallbackTitle.toLowerCase();
+    if (!normalized) return null;
+    for (const key in schedule.by_slug){
+      const entry = schedule.by_slug[key];
+      if ((entry.title || '').toLowerCase() === normalized){
+        return entry;
+      }
+    }
+    return null;
   }
 
-  const pagePath = stripBaseAndSlash(location.pathname || '/');
-  const titleFallback = (document.getElementById('eventTitle')?.textContent || '').trim();
-
-  function parseEventDate(str){
-    if (!str) return null;
-    str = str.trim().replace(/^[A-Za-z]{3},?\s*/, '').replace(/’/g,"'").replace(/`/g,"'");
-    const m = str.match(/^(\d{1,2})\s+([A-Za-z]{3})\s+'(\d{2})$/);
-    if (!m) return null;
-    const day = parseInt(m[1],10);
-    const mon = { Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11 }[m[2]];
-    const year = 2000 + parseInt(m[3],10);
-    return new Date(year, mon, day);
-  }
-  function fmtDateOnly(d){
-    const dt = new Date(d);
-    const wk = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()];
-    const day = String(dt.getDate()).padStart(2,'0');
-    const mon = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()];
-    const yr2 = String(dt.getFullYear()).slice(-2);
+  function fmtDateOnly(date){
+    if (!date) return '';
+    const weekdays = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const wk = weekdays[date.getDay()];
+    const day = String(date.getDate()).padStart(2,'0');
+    const mon = months[date.getMonth()];
+    const yr2 = String(date.getFullYear()).slice(-2);
     return `${wk}, ${day} ${mon} '${yr2}`;
   }
-  function parseTime12h(t){
-    if(!t) return {h:19,m:0};
-    const m = t.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-    if(!m) return {h:19,m:0};
-    let h = parseInt(m[1],10), min = parseInt(m[2],10);
-    const ampm = m[3].toUpperCase();
-    if (ampm==='PM' && h<12) h+=12;
-    if (ampm==='AM' && h===12) h=0;
-    return {h, m:min};
-  }
-  function makeICS({title, start, durationHours=3, locationText='', locationUrl='', description=''}){
-    const dt = new Date(start);
-    const end = new Date(dt.getTime() + durationHours*60*60*1000);
+
+  function makeICS({ title, start, end, locationText = '', locationUrl = '', description = '' }){
+    if (!start) return '#';
+    const startDate = new Date(start);
+    const endDate = end ? new Date(end) : new Date(startDate.getTime() + 3 * 60 * 60 * 1000);
     const pad = n => String(n).padStart(2,'0');
-    const stamp = (x)=> x.getFullYear()+pad(x.getMonth()+1)+pad(x.getDate())+'T'+pad(x.getHours())+pad(x.getMinutes())+pad(x.getSeconds());
+    const stamp = dt => `${dt.getFullYear()}${pad(dt.getMonth()+1)}${pad(dt.getDate())}T${pad(dt.getHours())}${pad(dt.getMinutes())}${pad(dt.getSeconds())}`;
     const loc = locationUrl ? `${locationText} (${locationUrl})` : locationText;
     const lines = [
       'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Games Lab//Events//EN','BEGIN:VEVENT',
-      `DTSTAMP:${stamp(new Date())}`,`DTSTART:${stamp(dt)}`,`DTEND:${stamp(end)}`,
-      `SUMMARY:${title}`,`LOCATION:${loc.replace(/,/g,'\\,')}`,`DESCRIPTION:${description}`,
+      `DTSTAMP:${stamp(new Date())}`,
+      `DTSTART:${stamp(startDate)}`,
+      `DTEND:${stamp(endDate)}`,
+      `SUMMARY:${title}`,
+      `LOCATION:${(loc || '').replace(/,/g,'\\,')}`,
+      `DESCRIPTION:${description || ''}`,
       'END:VEVENT','END:VCALENDAR'
     ];
     return 'data:text/calendar;charset=utf8,' + encodeURIComponent(lines.join('\r\n'));
   }
 
-  // Fetch sheet + find this event
-  let match = null;
-  try{
-    const res = await fetch(SHEET_URL + '&cb=' + Date.now(), { cache:'no-store' });
-    const text = await res.text();
-    const rows = Papa.parse(text, { header:true, skipEmptyLines:true }).data;
-    match = rows.find(r=>{
-      const linkPath = stripBaseAndSlash(CLEAN(r['Page Link']));
-      const name = CLEAN(r['EventName']);
-      if (linkPath && pagePath.endsWith(linkPath)) return true;
-      return (titleFallback && name.toLowerCase() === titleFallback.toLowerCase());
-    });
-  }catch(e){ console.error('Sheet load error', e); }
+  const entry = pickEventEntry();
+  const next = entry?.next_occurrence || null;
+  const startIso = next?.start || null;
+  const endIso = next?.end || null;
+  const startDate = startIso ? new Date(startIso) : null;
+  const locationInfo = next?.location || {};
+  const locationName = locationInfo.name || locationInfo.raw || '';
+  const locationUrl = locationInfo.map_url || '';
+  const displayTime = next?.display_time || '';
+  const ticketLink = (entry?.ticket_link) || fallbackTicket;
+  const scheduled = Boolean(startDate);
 
   // Elements
   const scHeading = document.getElementById('scheduleHeading');
@@ -82,7 +79,6 @@
   const fabBook   = document.getElementById('fabBook');
   const shareFab  = document.getElementById('shareFab');
 
-  // Microbar parts
   const M = {
     bar: document.getElementById('mobileInfoBar'),
     title: document.getElementById('microTitle'),
@@ -99,14 +95,6 @@
     R2: document.getElementById('microRight2'),
     R3: document.getElementById('microRight3'),
   };
-
-  const fallbackTicket = {{ page.ticket_link | jsonify }} || '';
-  let scheduled = false, base = null, timeStr = '', locText = '', locLink = '', ticket = fallbackTicket;
-  const dFormat = "{{ page.highlights.format | default: 'Social deduction' | escape }}";
-  const dDuration = "{{ page.highlights.duration | default: '3–4 hours' | escape }}";
-  const dGroup = "{{ page.highlights.group_size | default: '8–25 players' | escape }}";
-  const dDiff = "{{ page.highlights.difficulty | default: 'Beginner-friendly' | escape }}";
-  const dPrice = "{{ page.highlights.price | default: '₹ 350/-' | escape }}";
 
   function assignText(el, value){
     if (!el) return;
@@ -143,72 +131,46 @@
     docEl.style.setProperty('--mobile-bottom-pad', pad + 'px');
   }
 
-  if (match){
-    scheduled = CLEAN(match['Scheduled']).toLowerCase() === 'yes';
-    const dateStr = CLEAN(match['Date']);
-    timeStr = CLEAN(match['Time']);
-    locText = CLEAN(match['Location']);
-    locLink = CLEAN(match['Location Link']);
-    const sheetTicket = CLEAN(match['Ticket Link']);
-    if (sheetTicket) ticket = sheetTicket;
-    base = parseEventDate(dateStr);
-    if (base){
-      const tm = parseTime12h(timeStr);
-      base.setHours(tm.h, tm.m, 0, 0);
-    }
-  }
+  const microTitle = fallbackTitle || entry?.title || '';
+  if (M.title) M.title.textContent = microTitle;
 
-  // Wire schedule (desktop) + FAB
-  if (scheduled && base){
-    scHeading && scHeading.removeAttribute('hidden');
+  if (scheduled && startDate){
+    scHeading?.removeAttribute('hidden');
     if (scBlock) scBlock.hidden = false;
-    scWhen && (scWhen.textContent = fmtDateOnly(base));
-    scWhere && (scWhere.textContent = locText || '');
-    if (scAdd) scAdd.href = makeICS({ title: titleFallback, start: base, durationHours: 3, locationText: locText, locationUrl: locLink, description: location.href });
-    if (scDir && locLink){ scDir.href = locLink; }
-    if (ticket){
-      scBook && (scBook.href = ticket);
-      if (fabBook){
-        fabBook.href = ticket;
-        fabBook.removeAttribute('hidden');
-      }
-      requestAnimationFrame(updateFabSpacing);
-    } else {
-      if (fabBook){ fabBook.setAttribute('hidden', ''); }
-      updateFabSpacing();
+    if (scWhen) scWhen.textContent = fmtDateOnly(startDate);
+    if (scWhere) scWhere.textContent = locationName || '';
+    if (scAdd) scAdd.href = makeICS({ title: microTitle, start: startIso, end: endIso, locationText: locationName, locationUrl, description: location.href });
+    if (scDir){
+      if (locationUrl){ scDir.href = locationUrl; scDir.removeAttribute('hidden'); }
+      else { scDir.removeAttribute('href'); scDir.setAttribute('hidden',''); }
     }
-  } else {
-    // Not scheduled
-    scHeading && scHeading.setAttribute('hidden','');
-    if (scBlock) scBlock.hidden = true;
-    if (fabBook){ fabBook.setAttribute('hidden',''); }
-    updateFabSpacing();
-  }
+    if (ticketLink){
+      if (scBook){ scBook.href = ticketLink; scBook.removeAttribute('hidden'); }
+      if (fabBook){ fabBook.href = ticketLink; fabBook.removeAttribute('hidden'); }
+    } else {
+      scBook?.setAttribute('hidden','');
+      fabBook?.setAttribute('hidden','');
+    }
 
-  // Microbar content + visibility
-  if (M.title) M.title.textContent = titleFallback;
-  if (scheduled && base){
-    assignText(M.R0, '');
-    const timePart = timeStr && timeStr.trim() ? ` | ${timeStr.trim()}` : '';
-    if (M.L1){ M.L1.textContent = fmtDateOnly(base) + timePart; M.line1?.removeAttribute('hidden'); }
+    const line1Text = displayTime ? `${fmtDateOnly(startDate)} | ${displayTime}` : fmtDateOnly(startDate);
+    if (M.L1) M.L1.textContent = line1Text;
+    M.line1?.removeAttribute('hidden');
     assignText(M.R1, '');
+
+    if (M.L2) M.L2.textContent = locationName || '';
+    if (locationName){ M.line2?.removeAttribute('hidden'); } else { M.line2?.setAttribute('hidden',''); }
+    assignText(M.R2, '');
+
     if (M.A1){
       M.A1.textContent = 'Add to Calendar';
-      M.A1.href = makeICS({ title: titleFallback, start: base, durationHours: 3, locationText: locText, locationUrl: locLink, description: location.href });
+      M.A1.href = makeICS({ title: microTitle, start: startIso, end: endIso, locationText: locationName, locationUrl, description: location.href });
       M.A1.hidden = false;
     }
 
-    if (M.L2){ M.L2.textContent = locText || ''; }
-    if (locText){
-      M.line2?.removeAttribute('hidden');
-    } else {
-      M.line2?.setAttribute('hidden','');
-    }
-    assignText(M.R2, '');
     if (M.A2){
-      if (locLink){
+      if (locationUrl){
         M.A2.textContent = 'Get Directions';
-        M.A2.href = locLink;
+        M.A2.href = locationUrl;
         M.A2.hidden = false;
       } else {
         M.A2.hidden = true;
@@ -216,10 +178,16 @@
       }
     }
 
-    if (M.L3){ M.L3.textContent = ''; }
+    if (M.L3) M.L3.textContent = '';
+    assignText(M.R0, '');
     assignText(M.R3, '');
     M.line3?.setAttribute('hidden','');
   } else {
+    scHeading?.setAttribute('hidden','');
+    if (scBlock) scBlock.hidden = true;
+    scBook?.setAttribute('hidden','');
+    fabBook?.setAttribute('hidden','');
+
     assignText(M.R0, dGroup);
     const hasLine1 = Boolean((dFormat || '').trim() || (dDuration || '').trim());
     if (M.line1){
@@ -244,7 +212,9 @@
     M.line3?.setAttribute('hidden','');
   }
 
-  // Microbar show when scrolled past banner/title area (mobile only)
+  updateFabSpacing();
+  window.addEventListener('resize', updateFabSpacing);
+
   (function(){
     const microbar = M.bar;
     const banner = document.querySelector('.banner');
@@ -265,10 +235,6 @@
     window.__updateMicrobarVis = update;
   })();
 
-  updateFabSpacing();
-  window.addEventListener('resize', ()=>{ updateFabSpacing(); });
-
-  // Share handlers
   (function(){
     async function sharePage(){
       const data = { title: document.title, text: document.title, url: location.href };
@@ -280,7 +246,6 @@
     document.getElementById('shareBtnSide')?.addEventListener('click', sharePage);
     shareFab?.addEventListener('click', sharePage);
   })();
-
 })();
 </script>
 

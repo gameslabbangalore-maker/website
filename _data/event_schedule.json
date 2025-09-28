@@ -1,0 +1,126 @@
+{
+  "generated_at": "2025-09-28T14:20:38+05:30",
+  "timezone": "Asia/Kolkata",
+  "upcoming": [
+    {
+      "slug": "board-game-night",
+      "title": "Board Game Night",
+      "page_url": "/events/board-game-night/",
+      "banner": "https://ik.imagekit.io/gameslab/Board_Game_Night_3.png",
+      "intro": "An open-table evening featuring a wide selection of modern board and card games for all moods.",
+      "ticket_link": "https://rzp.io/rzp/Board-Game-Night",
+      "start": "2025-10-05T19:00:00+05:30",
+      "end": "2025-10-05T21:30:00+05:30",
+      "display_date": "05 Oct 2025",
+      "display_time": "7:00 PM – 9:30 PM",
+      "location": {
+        "name": "Dialogues Cafe, Koramangala",
+        "map_url": "https://maps.app.goo.gl/iL4GWxFT7PQ13xtCA",
+        "raw": "Dialogues Cafe, Koramangala"
+      }
+    },
+    {
+      "slug": "night-of-mafias",
+      "title": "Night of Mafias !",
+      "page_url": "/events/night-of-mafias/",
+      "banner": "https://ik.imagekit.io/gameslab/Night_of_Mafias.png",
+      "intro": "Read faces, trade lies, and outlast the table in a social deduction showdown.",
+      "ticket_link": null,
+      "start": "2025-10-12T19:00:00+05:30",
+      "end": "2025-10-12T21:30:00+05:30",
+      "display_date": "12 Oct 2025",
+      "display_time": "7:00 PM – 9:30 PM",
+      "location": {
+        "name": "Big Bean Cafe, Koramangala",
+        "map_url": "https://maps.app.goo.gl/SN7w4itJnqGMP2Qw9",
+        "raw": "Big Bean Cafe, Koramangala"
+      }
+    }
+  ],
+  "scheduled_slugs": [
+    "board-game-night",
+    "night-of-mafias"
+  ],
+  "by_slug": {
+    "board-game-night": {
+      "slug": "board-game-night",
+      "title": "Board Game Night",
+      "banner": "https://ik.imagekit.io/gameslab/Board_Game_Night_3.png",
+      "intro": "An open-table evening featuring a wide selection of modern board and card games for all moods.",
+      "ticket_link": "https://rzp.io/rzp/Board-Game-Night",
+      "page_url": "/events/board-game-night/",
+      "occurrences": [
+        {
+          "summary": "Board Game Night",
+          "start": "2025-10-05T19:00:00+05:30",
+          "end": "2025-10-05T21:30:00+05:30",
+          "all_day": false,
+          "status": "CONFIRMED",
+          "location": {
+            "name": "Dialogues Cafe, Koramangala",
+            "map_url": "https://maps.app.goo.gl/iL4GWxFT7PQ13xtCA",
+            "raw": "Dialogues Cafe, Koramangala"
+          },
+          "display_date": "05 Oct 2025",
+          "display_time": "7:00 PM – 9:30 PM",
+          "uid": "board-game-night-20251005"
+        }
+      ],
+      "next_occurrence": {
+        "summary": "Board Game Night",
+        "start": "2025-10-05T19:00:00+05:30",
+        "end": "2025-10-05T21:30:00+05:30",
+        "all_day": false,
+        "status": "CONFIRMED",
+        "location": {
+          "name": "Dialogues Cafe, Koramangala",
+          "map_url": "https://maps.app.goo.gl/iL4GWxFT7PQ13xtCA",
+          "raw": "Dialogues Cafe, Koramangala"
+        },
+        "display_date": "05 Oct 2025",
+        "display_time": "7:00 PM – 9:30 PM",
+        "uid": "board-game-night-20251005"
+      }
+    },
+    "night-of-mafias": {
+      "slug": "night-of-mafias",
+      "title": "Night of Mafias !",
+      "banner": "https://ik.imagekit.io/gameslab/Night_of_Mafias.png",
+      "intro": "Read faces, trade lies, and outlast the table in a social deduction showdown.",
+      "ticket_link": null,
+      "page_url": "/events/night-of-mafias/",
+      "occurrences": [
+        {
+          "summary": "Night of Mafias !",
+          "start": "2025-10-12T19:00:00+05:30",
+          "end": "2025-10-12T21:30:00+05:30",
+          "all_day": false,
+          "status": "CONFIRMED",
+          "location": {
+            "name": "Big Bean Cafe, Koramangala",
+            "map_url": "https://maps.app.goo.gl/SN7w4itJnqGMP2Qw9",
+            "raw": "Big Bean Cafe, Koramangala"
+          },
+          "display_date": "12 Oct 2025",
+          "display_time": "7:00 PM – 9:30 PM",
+          "uid": "night-of-mafias-20251012"
+        }
+      ],
+      "next_occurrence": {
+        "summary": "Night of Mafias !",
+        "start": "2025-10-12T19:00:00+05:30",
+        "end": "2025-10-12T21:30:00+05:30",
+        "all_day": false,
+        "status": "CONFIRMED",
+        "location": {
+          "name": "Big Bean Cafe, Koramangala",
+          "map_url": "https://maps.app.goo.gl/SN7w4itJnqGMP2Qw9",
+          "raw": "Big Bean Cafe, Koramangala"
+        },
+        "display_date": "12 Oct 2025",
+        "display_time": "7:00 PM – 9:30 PM",
+        "uid": "night-of-mafias-20251012"
+      }
+    }
+  }
+}
