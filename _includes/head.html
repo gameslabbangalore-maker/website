@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#181818" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-<!-- CSP: allow inline scripts, PapaParse, Google CSV (incl. redirects) -->
+<!-- CSP: allow inline scripts and third-party embeds -->
 <meta http-equiv="Content-Security-Policy"
 content="
   default-src 'self';
@@ -25,9 +25,7 @@ content="
              'unsafe-inline';
   style-src  'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src   https://fonts.gstatic.com data:;
-  connect-src https://docs.google.com
-              https://*.googleusercontent.com
-              https://*.elfsight.com
+  connect-src https://*.elfsight.com
               https://*.elfsightcdn.com;
   frame-src https://www.youtube.com https://player.vimeo.com https://*.elfsight.com https://*.elfsightcdn.com;
   object-src 'none';
@@ -55,7 +53,6 @@ content="
 <link rel="preconnect" href="https://service-reviews-ultimate.elfsight.com" crossorigin>
 
 <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
 <!-- === INLINE STYLES (copied exactly from your original) === -->
 <style>
@@ -130,7 +127,7 @@ content="
 
   @media (max-width:768px){.topbar,.topbar-bleed{transform:translateZ(0);-webkit-transform:translateZ(0)}}
 
-  .card{width:340px;background:var(--card);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;transition:transform .16s ease, box-shadow .16s ease;cursor:default;box-shadow:0 6px 22px rgba(0,0,0,.8);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+  .card{width:340px;background:var(--card);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;transition:transform .16s ease, box-shadow .16s ease;cursor:default;box-shadow:0 6px 22px rgba(0,0,0,.8);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-sizing:border-box}
   .card:hover{transform:translateY(-6px);box-shadow:0 10px 28px rgba(0,0,0,.9)}
   .media{width:100%;padding-top:56.25%;position:relative;background:#111}
   .media img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover}
@@ -145,7 +142,7 @@ content="
   .book-btn{background:var(--accent);color:#000;padding:10px 16px;border-radius:999px;font-weight:700;text-decoration:none;display:inline-block}
   .book-btn:hover{background:#ffe974}
 
-  .sk-card{width:340px;background:var(--card);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 6px 22px rgba(0,0,0,.8)}
+  .sk-card{width:340px;background:var(--card);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 6px 22px rgba(0,0,0,.8);box-sizing:border-box}
   .sk-media{width:100%;padding-top:56.25%;position:relative;overflow:hidden;background:#111}
   .sk-body{padding:14px}
   .sk-footer{padding:12px 14px 18px;display:flex;justify-content:center}
@@ -160,8 +157,8 @@ content="
   .card-date{display:none}
   @media (max-width:768px){
     .cards-row{justify-content:center}
-    .card,.sk-card{width:90vw;max-width:400px;height:auto;flex-direction:row;align-items:center;gap:8px;padding:calc(10px + 1vw) calc(8px + 1vw);border-radius:12px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.8);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
-    .media,.sk-media{width:18vw;max-width:72px;aspect-ratio:1/1;height:auto;padding-top:0;border-radius:10px;overflow:hidden;flex-shrink:0;background:#111}
+    .card,.sk-card{width:100%;max-width:420px;height:auto;flex-direction:row;align-items:center;gap:calc(8px + .5vw);padding:calc(10px + 1vw) calc(8px + 1vw);border-radius:12px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.8);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+    .media,.sk-media{width:clamp(64px,18vw,80px);aspect-ratio:1/1;height:auto;padding-top:0;border-radius:10px;overflow:hidden;flex-shrink:0;background:#111}
     .media img{position:static}
     .card-body,.sk-body{padding:0;display:flex;flex-direction:column;gap:calc(4px + .3vw);flex:1 1 auto}
     .event-title{font-size:calc(13px + 1.5vw) !important;font-weight:900 !important;color:#fff;margin:0}
@@ -172,11 +169,12 @@ content="
     .card-footer{display:none}
     .sk-footer{display:none}
     .card-date{
-      display:flex;width:18vw; max-width:72px;height:auto; aspect-ratio:1/1;
-      flex-direction:column; justify-content:center; align-items:center;
-      border-radius:10px; background:var(--datebox);
+      display:flex;width:clamp(56px,18vw,80px);height:auto;aspect-ratio:1/1;
+      flex-direction:column;justify-content:center;align-items:center;
+      border-radius:10px;background:var(--datebox);
       border:1.5px solid rgba(255,255,255,.08);
       color:#fff;
+      flex-shrink:0;
     }
     .card-date .day{font-weight:800;font-size:calc(22px + 2vw);line-height:1;color:var(--accent);}
     .card-date .month{font-size:calc(12px + 1vw);line-height:1;color:#fff;}
