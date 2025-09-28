@@ -37,3 +37,9 @@ When the Google Calendar cannot be reached (for example, on a network that block
 4. Run `node scripts/sync-events.mjs` and commit the updated `_data/event_schedule.json`.
 
 The homepage will automatically show the event in the "Upcoming" section once the calendar entry is in the future; otherwise, it remains in "Explore Our Other Events." Event detail pages also read the same schedule snapshot, so CTAs, location, and calendar links always reflect the latest data without fetching Google Sheets in the browser.
+
+### Automated refresh via GitHub Actions
+
+A scheduled workflow (`Sync event schedule`) runs every hour and on manual dispatch to execute the same script in CI and commit the refreshed `_data/event_schedule.json`. Populate the optional `GOOGLE_CALENDAR_ICS_URL` repository secret if you need to override the default public calendar URL without committing it to the repo.
+
+If no changes are detected the workflow exits without pushing a commit.
