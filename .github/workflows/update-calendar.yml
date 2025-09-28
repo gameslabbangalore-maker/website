@@ -1,17 +1,7 @@
 name: Update calendar feed
 
 on:
-  schedule:
-    - cron: '*/30 * * * *'
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - scripts/fetch-calendar.mjs
-      - _data/locations.yml
-      - .github/workflows/update-calendar.yml
-      - package.json
 
 jobs:
   build:
