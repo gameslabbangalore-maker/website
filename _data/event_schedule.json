@@ -1,15 +1,10 @@
 {
-  "generated_at": "2025-09-28T06:08:34.904Z",
   "source": {
     "kind": "google-calendar-ics",
     "url": "https://calendar.google.com/calendar/ical/da645a8c3679d92a4f5aa27a0415af79342a316216a0f83f9d299327c1f0b56e%40group.calendar.google.com/public/basic.ics"
   },
   "timezone": "Asia/Kolkata",
-  "warnings": [
-    "Unable to fetch ICS feed: fetch failed",
-    "No events were parsed from the ICS feed."
-  ],
-  "upcoming": [],
+
   "other": [
     {
       "slug": "board-game-night",
@@ -28,14 +23,6 @@
       "ticket_url": "https://rzp.io/rzp/Murder-Mystery"
     },
     {
-      "slug": "night-of-mafias",
-      "title": "Night of Mafias !",
-      "intro": "A Social Deception Game with exciting Characters created by us for crazy fun.",
-      "banner": "https://ik.imagekit.io/gameslab/Night_of_Mafias.png",
-      "page_url": "/events/night-of-mafias/",
-      "ticket_url": "https://rzp.io/rzp/Night-of-mafias"
-    },
-    {
       "slug": "party-games-night",
       "title": "Party Games Night",
       "intro": "An evening of lighthearted, quick-fire games designed to break the ice and bring the energy up.",
@@ -52,7 +39,6 @@
       "ticket_url": "https://rzp.io/rzp/Trivia-Takedown"
     }
   ],
-  "scheduled_slugs": [],
   "by_slug": {
     "board-game-night": {
       "slug": "board-game-night",
@@ -122,8 +108,6 @@
         "https://www.youtube.com/embed/KwDyHylu-Ik?rel=0",
         "https://www.youtube.com/embed/IsGh10mGWbM?rel=0"
       ],
-      "upcoming": [],
-      "next": null
     },
     "party-games-night": {
       "slug": "party-games-night",

@@ -4,20 +4,6 @@
 <div id="upcoming-cards" class="cards-row">
   {% if upcoming.size > 0 %}
     {% for item in upcoming %}
-      {% assign banner = item.banner | default: '' | strip %}
-      {% if banner contains 'imagekit.io' and banner contains '/tr:' %}
-        {% assign banner_url = banner %}
-      {% elsif banner contains 'imagekit.io' and banner != '' %}
-        {% assign base_parts = banner | split: 'imagekit.io/' %}
-        {% if base_parts.size > 1 %}
-          {% assign base = base_parts[0] | append: 'imagekit.io/' %}
-          {% assign path = base_parts[1] %}
-          {% assign account = path | split: '/' | first %}
-          {% assign remainder = path | remove_first: account %}
-          {% assign banner_url = base | append: account | append: '/tr:w-800,h-450,fo-auto' | append: remainder %}
-        {% else %}
-          {% assign banner_url = banner %}
-        {% endif %}
       {% elsif banner != '' %}
         {% assign banner_url = banner %}
       {% else %}
