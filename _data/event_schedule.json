@@ -1,0 +1,175 @@
+{
+  "generated_at": "2025-09-28T06:08:34.904Z",
+  "source": {
+    "kind": "google-calendar-ics",
+    "url": "https://calendar.google.com/calendar/ical/da645a8c3679d92a4f5aa27a0415af79342a316216a0f83f9d299327c1f0b56e%40group.calendar.google.com/public/basic.ics"
+  },
+  "timezone": "Asia/Kolkata",
+  "warnings": [
+    "Unable to fetch ICS feed: fetch failed",
+    "No events were parsed from the ICS feed."
+  ],
+  "upcoming": [],
+  "other": [
+    {
+      "slug": "board-game-night",
+      "title": "Board Game Night",
+      "intro": "An open-table evening featuring a wide selection of modern board and card games for all moods.",
+      "banner": "https://ik.imagekit.io/gameslab/Board_Game_Night_3.png",
+      "page_url": "/events/board-game-night/",
+      "ticket_url": "https://rzp.io/rzp/Board-Game-Night"
+    },
+    {
+      "slug": "murder-mystery",
+      "title": "Murder Mystery",
+      "intro": "An Immersive Roleplay Game where you become part of a thrilling investigation filled with twists and betrayals.",
+      "banner": "https://ik.imagekit.io/gameslab/Murder_Mystery.png",
+      "page_url": "/events/murder-mystery/",
+      "ticket_url": "https://rzp.io/rzp/Murder-Mystery"
+    },
+    {
+      "slug": "night-of-mafias",
+      "title": "Night of Mafias !",
+      "intro": "A Social Deception Game with exciting Characters created by us for crazy fun.",
+      "banner": "https://ik.imagekit.io/gameslab/Night_of_Mafias.png",
+      "page_url": "/events/night-of-mafias/",
+      "ticket_url": "https://rzp.io/rzp/Night-of-mafias"
+    },
+    {
+      "slug": "party-games-night",
+      "title": "Party Games Night",
+      "intro": "An evening of lighthearted, quick-fire games designed to break the ice and bring the energy up.",
+      "banner": "https://ik.imagekit.io/gameslab/Party_Games_Night.png",
+      "page_url": "/events/party-games-night/",
+      "ticket_url": "https://rzp.io/rzp/Party-Game-Night"
+    },
+    {
+      "slug": "trivia-takedown",
+      "title": "Trivia Takedown",
+      "intro": "A high-energy quiz night with rounds full of twists, wildcards, and bragging rights.",
+      "banner": "https://ik.imagekit.io/gameslab/Trivia_Takedown_3.png",
+      "page_url": "/events/trivia-takedown/",
+      "ticket_url": "https://rzp.io/rzp/Trivia-Takedown"
+    }
+  ],
+  "scheduled_slugs": [],
+  "by_slug": {
+    "board-game-night": {
+      "slug": "board-game-night",
+      "title": "Board Game Night",
+      "intro": "An open-table evening featuring a wide selection of modern board and card games for all moods.",
+      "tagline": "From strategy to silliness—discover new worlds one game at a time.",
+      "banner": "https://ik.imagekit.io/gameslab/Board_Game_Night_3.png",
+      "ticket_url": "https://rzp.io/rzp/Board-Game-Night",
+      "page_url": "/events/board-game-night/",
+      "highlights": {
+        "format": "Tabletop games",
+        "duration": "3–4 hours",
+        "group_size": "6–25 players",
+        "difficulty": "All skill levels",
+        "age": "12+",
+        "price": "₹ 350/-"
+      },
+      "about_video": "",
+      "recap_videos": [],
+      "upcoming": [],
+      "next": null
+    },
+    "murder-mystery": {
+      "slug": "murder-mystery",
+      "title": "Murder Mystery",
+      "intro": "An Immersive Roleplay Game where you become part of a thrilling investigation filled with twists and betrayals.",
+      "tagline": "Step into a world of secrets, clues, and suspense—where every guest could be the killer.",
+      "banner": "https://ik.imagekit.io/gameslab/Murder_Mystery.png",
+      "ticket_url": "https://rzp.io/rzp/Murder-Mystery",
+      "page_url": "/events/murder-mystery/",
+      "highlights": {
+        "format": "Roleplay & deduction",
+        "duration": "3–4 hours",
+        "group_size": "12–20 players",
+        "difficulty": "Easy to Moderate",
+        "age": "16+",
+        "price": "₹ 550/-"
+      },
+      "about_video": "https://www.youtube.com/embed/bUdFcYPSd00",
+      "recap_videos": [
+        "https://www.youtube.com/embed/3MFt3AGU01o",
+        "https://www.youtube.com/embed/sLfAz1xhfbQ",
+        "https://www.youtube.com/embed/LvWjRRUvfi4"
+      ],
+      "upcoming": [],
+      "next": null
+    },
+    "night-of-mafias": {
+      "slug": "night-of-mafias",
+      "title": "Night of Mafias !",
+      "intro": "A Social Deception Game with exciting Characters created by us for crazy fun.",
+      "tagline": "Read faces, trade lies, and outlast the table in a social deduction showdown.",
+      "banner": "https://ik.imagekit.io/gameslab/Night_of_Mafias.png",
+      "ticket_url": "https://rzp.io/rzp/Night-of-mafias",
+      "page_url": "/events/night-of-mafias/",
+      "highlights": {
+        "format": "Social deduction",
+        "duration": "3–4 hours",
+        "group_size": "8–25 players",
+        "difficulty": "Beginner-friendly",
+        "age": "14+",
+        "price": "₹ 350/-"
+      },
+      "about_video": "https://www.youtube.com/embed/p232ZZCCJKA?rel=0",
+      "recap_videos": [
+        "https://www.youtube.com/embed/zZpkFg1jOo8?rel=0",
+        "https://www.youtube.com/embed/KwDyHylu-Ik?rel=0",
+        "https://www.youtube.com/embed/IsGh10mGWbM?rel=0"
+      ],
+      "upcoming": [],
+      "next": null
+    },
+    "party-games-night": {
+      "slug": "party-games-night",
+      "title": "Party Games Night",
+      "intro": "An evening of lighthearted, quick-fire games designed to break the ice and bring the energy up.",
+      "tagline": "Fast, fun, and full of laughs—where every round brings a new surprise.",
+      "banner": "https://ik.imagekit.io/gameslab/Party_Games_Night.png",
+      "ticket_url": "https://rzp.io/rzp/Party-Game-Night",
+      "page_url": "/events/party-games-night/",
+      "highlights": {
+        "format": "Casual & social games",
+        "duration": "2–3 hours",
+        "group_size": "8–30 players",
+        "difficulty": "Beginner-friendly",
+        "age": "12+",
+        "price": "₹ 300/-"
+      },
+      "about_video": "https://www.youtube.com/embed/TmWqrMSGbbs",
+      "recap_videos": [
+        "https://www.youtube.com/embed/58in-4CyTOA",
+        "https://www.youtube.com/embed/czILvALyn_0",
+        "https://www.youtube.com/embed/-IdIb-Qljmw"
+      ],
+      "upcoming": [],
+      "next": null
+    },
+    "trivia-takedown": {
+      "slug": "trivia-takedown",
+      "title": "Trivia Takedown",
+      "intro": "A high-energy quiz night with rounds full of twists, wildcards, and bragging rights.",
+      "tagline": "Test your brain, battle the buzzer, and claim trivia glory.",
+      "banner": "https://ik.imagekit.io/gameslab/Trivia_Takedown_3.png",
+      "ticket_url": "https://rzp.io/rzp/Trivia-Takedown",
+      "page_url": "/events/trivia-takedown/",
+      "highlights": {
+        "format": "Quiz competition",
+        "duration": "2 hours",
+        "group_size": "4–20 teams",
+        "difficulty": "All levels",
+        "age": "14+",
+        "price": "₹ 350/-"
+      },
+      "about_video": "",
+      "recap_videos": [],
+      "upcoming": [],
+      "next": null
+    }
+  }
+}
