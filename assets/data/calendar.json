@@ -1,5 +1,5 @@
 {
-  "generated_at": "2025-09-28T17:02:01.283Z",
+  "generated_at": "2025-09-28T17:21:14.596Z",
   "timezone": "Asia/Kolkata",
   "events": [
     {
@@ -12,6 +12,17 @@
       "location_map_url": "",
       "location_warning": true,
       "raw_location": "Dialogues Cafe\\nDialogues\\n21\\, 20th Main Road\\, KHB Colony\\, Block 5\\, Koramangala\\, Bengaluru\\, 560095\\, Karnataka\\, India"
+    },
+    {
+      "title": "Board Game Night",
+      "slug": "board-game-night",
+      "start": "2025-10-11T14:00:00Z",
+      "day_key": "2025-10-11",
+      "timezone": "Asia/Kolkata",
+      "location_name": "Big Bean Cafe\\n29\\, 80 Feet Road\\nKoramangala\\, Bengaluru\\, Karnataka\\, India",
+      "location_map_url": "",
+      "location_warning": true,
+      "raw_location": "Big Bean Cafe\\n29\\, 80 Feet Road\\nKoramangala\\, Bengaluru\\, Karnataka\\, India"
     }
   ]
 }
