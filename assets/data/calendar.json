@@ -1,18 +1,7 @@
 {
-  "generated_at": "2025-09-28T17:08:56.959Z",
+  "generated_at": "2025-09-28T17:13:30.468Z",
   "timezone": "Asia/Kolkata",
   "events": [
-    {
-      "title": "Murder Mystery",
-      "slug": "murder-mystery",
-      "start": "2025-10-09T12:30:00Z",
-      "day_key": "2025-10-09",
-      "timezone": "Asia/Kolkata",
-      "location_name": "Cafe Du L'Amour",
-      "location_map_url": "https://maps.app.goo.gl/vh3Pv3Y9UgYhEFuK7",
-      "location_warning": false,
-      "raw_location": "Cafe Du L’Amour\nCafe Du L'Amour\n980, 1st A Cross Road, Green Leaf Layout, Block 4, Koramangala, Bengaluru, 560034, Karnataka, India"
-    },
     {
       "title": "Night of Mafias !",
       "slug": "night-of-mafias",
