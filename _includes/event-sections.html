@@ -50,7 +50,7 @@
   {% assign has_sections = true %}
   {% endif %}
 
-  {% assign about_video_url = page.about_video | to_s | strip %}
+{% assign about_video_url = page.about_video | default: '' | strip %}
   {% if about_video_url != '' %}
   {% if has_sections %}<div class="divider section-divider" aria-hidden="true"></div>{% endif %}
   <section id="about-video" aria-labelledby="about-nom">

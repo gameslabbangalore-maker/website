@@ -4,7 +4,7 @@
 <div id="upcoming-cards" class="cards-row">
   {% if upcoming.size > 0 %}
     {% for item in upcoming %}
-      {% assign banner = item.banner | to_s %}
+      {% assign banner = item.banner | default: '' %}
       {% if banner contains 'imagekit.io' and banner contains '/tr:' %}
         {% assign banner_url = banner %}
       {% elsif banner contains 'imagekit.io' %}
