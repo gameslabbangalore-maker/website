@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#181818" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-<!-- CSP: allow inline scripts, PapaParse, Google CSV (incl. redirects) -->
+<!-- CSP: allow inline scripts and third-party embeds -->
 <meta http-equiv="Content-Security-Policy"
 content="
   default-src 'self';
@@ -25,9 +25,7 @@ content="
              'unsafe-inline';
   style-src  'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src   https://fonts.gstatic.com data:;
-  connect-src https://docs.google.com
-              https://*.googleusercontent.com
-              https://*.elfsight.com
+  connect-src https://*.elfsight.com
               https://*.elfsightcdn.com;
   frame-src https://www.youtube.com https://player.vimeo.com https://*.elfsight.com https://*.elfsightcdn.com;
   object-src 'none';
@@ -55,7 +53,6 @@ content="
 <link rel="preconnect" href="https://service-reviews-ultimate.elfsight.com" crossorigin>
 
 <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
 <!-- === INLINE STYLES (copied exactly from your original) === -->
 <style>
