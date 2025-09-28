@@ -1,5 +1,5 @@
 {
-  "generated_at": "2025-09-28T18:08:43.973Z",
+  "generated_at": "2025-09-28T18:12:17.512Z",
   "timezone": "Asia/Kolkata",
   "events": [
     {
@@ -30,10 +30,10 @@
       "start": "2025-10-12T14:30:00Z",
       "day_key": "2025-10-12",
       "timezone": "Asia/Kolkata",
-      "location_name": "The Coffee Brewery",
-      "location_map_url": "https://maps.app.goo.gl/8gpKvEDMUzYUwyKv7",
+      "location_name": "Now Boarding Cafe",
+      "location_map_url": "https://maps.app.goo.gl/11Y7eLoUekZf8M4KA",
       "location_warning": false,
-      "raw_location": "The Coffee Brewery\nThe Coffee Brewery\nMahakavi Vemana Rd, Bengaluru, India"
+      "raw_location": "Now Boarding Cafe\nNow Boarding Café\n68/1, 18th Cross Road, Block 3, Jayanagar, Bengaluru, 560011, Karnataka, India"
     }
   ]
 }
