@@ -40,6 +40,6 @@ The homepage will automatically show the event in the "Upcoming" section once th
 
 ### Automated refresh via GitHub Actions
 
-A scheduled workflow (`Sync event schedule`) runs every hour and on manual dispatch to execute the same script in CI and commit the refreshed `_data/event_schedule.json`. Populate the optional `GOOGLE_CALENDAR_ICS_URL` repository secret if you need to override the default public calendar URL without committing it to the repo.
+The `Sync event schedule` workflow now runs on every push to `main`, every hour via cron, and on manual dispatch. Each run executes the same sync script in CI and commits the refreshed `_data/event_schedule.json`. Populate the optional `GOOGLE_CALENDAR_ICS_URL` repository secret if you need to override the default public calendar URL without committing it to the repo.
 
 If no changes are detected the workflow exits without pushing a commit.
