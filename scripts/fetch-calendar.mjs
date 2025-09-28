@@ -64,6 +64,24 @@ function offsetForTz(tzid) {
   return DEFAULT_OFFSET;
 }
 
+function decodeText(value = '') {
+  return value.replace(/\\([nN,;\\])/g, (_, ch) => {
+    switch (ch) {
+      case 'n':
+      case 'N':
+        return String.fromCharCode(10);
+      case ',':
+        return ',';
+      case ';':
+        return ';';
+      case '\\':
+        return '\\';
+      default:
+        return ch;
+    }
+  });
+}
+
 function parseDateTime(value, params) {
   if (!value) return null;
   const normalized = value.replace(/Z$/, '');
@@ -95,6 +113,10 @@ function formatDayKey(date) {
     day: '2-digit',
     timeZone: DEFAULT_TIMEZONE,
   }).format(date);
+}
+
+function normalizeLocationKey(value) {
+  return value ? value.replace(/\s+/g, ' ').trim().toLowerCase() : '';
 }
 
 async function loadLocations() {
@@ -131,7 +153,9 @@ async function loadLocations() {
       if (!entry) continue;
       const name = (entry.name || '').trim();
       if (!name) continue;
-      map.set(name.toLowerCase(), {
+      const key = normalizeLocationKey(name);
+      if (!key) continue;
+      map.set(key, {
         name,
         map_url: entry.map_url || '',
       });
@@ -141,6 +165,52 @@ async function loadLocations() {
     console.warn('Could not read locations.yml:', err.message);
     return new Map();
   }
+}
+
+function resolveLocation(decodedLocation, locations) {
+  const trimmed = (decodedLocation || '').trim();
+  if (!trimmed) {
+    return { match: null, warning: false };
+  }
+
+  const candidates = new Set();
+  candidates.add(trimmed);
+
+  const withoutCarriage = trimmed.replace(/\r/g, '');
+  for (const part of withoutCarriage.split(/\n+/)) {
+    const piece = part.trim();
+    if (!piece) continue;
+    candidates.add(piece);
+    const commaPiece = piece.split(',')[0].trim();
+    if (commaPiece && commaPiece.length >= 2) {
+      candidates.add(commaPiece);
+    }
+  }
+
+  const firstComma = withoutCarriage.split(',')[0]?.trim();
+  if (firstComma) {
+    candidates.add(firstComma);
+  }
+
+  for (const candidate of candidates) {
+    const key = normalizeLocationKey(candidate);
+    if (!key) continue;
+    const match = locations.get(key);
+    if (match) {
+      return { match, warning: false };
+    }
+  }
+
+  const haystack = normalizeLocationKey(trimmed);
+  if (haystack) {
+    for (const [key, match] of locations.entries()) {
+      if (haystack.includes(key)) {
+        return { match, warning: false };
+      }
+    }
+  }
+
+  return { match: null, warning: true };
 }
 
 async function fetchIcs(source) {
@@ -184,8 +254,10 @@ async function main() {
     if (dayKey < todayKey) continue;
 
     const slug = slugify(summary);
-    const rawLocation = (props.get('LOCATION')?.value || '').trim();
-    const locationMatch = rawLocation ? locations.get(rawLocation.toLowerCase()) : null;
+    const rawLocationValue = props.get('LOCATION')?.value || '';
+    const decodedLocation = decodeText(rawLocationValue);
+    const rawLocation = decodedLocation.trim();
+    const { match: locationMatch, warning: locationWarning } = resolveLocation(rawLocation, locations);
 
     const event = {
       title: summary,
@@ -193,10 +265,10 @@ async function main() {
       start: toIsoString(start),
       day_key: dayKey,
       timezone: DEFAULT_TIMEZONE,
-      location_name: locationMatch ? locationMatch.name : (rawLocation || 'To be Announced'),
+      location_name: locationMatch ? locationMatch.name : 'To be Announced',
       location_map_url: locationMatch ? locationMatch.map_url : '',
-      location_warning: Boolean(rawLocation && !locationMatch),
-      raw_location: rawLocation || '',
+      location_warning: Boolean(rawLocation) && locationWarning,
+      raw_location: rawLocation,
     };
 
     const existing = deduped.get(slug);
