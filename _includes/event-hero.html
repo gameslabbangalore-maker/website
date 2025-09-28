@@ -1,0 +1,72 @@
+<!-- Banner -->
+<figure class="banner">
+  <img src="{{ page.banner | default: page.hero_image | escape }}" alt="{{ page.title | escape }} event banner">
+</figure>
+
+<!-- Right card (desktop) -->
+<aside class="side-card" aria-label="Highlights">
+  <div class="info-card" role="complementary">
+    <h3 id="scheduleHeading" hidden>Schedule</h3>
+    <!-- schedule block toggled by JS -->
+    <div id="scheduleBlock" hidden>
+      <div class="schedule-list">
+        <div class="schedule-row">
+          <div class="when" id="scWhen">—</div>
+          <a id="scAddCal" class="inline-link" href="#" download>Add to Calendar</a>
+        </div>
+        <div class="schedule-row">
+          <div class="where" id="scWhere">—</div>
+          <a id="scDir" class="inline-link" href="#" target="_blank" rel="noopener">Get directions</a>
+        </div>
+      </div>
+      <a id="scBook" class="btn btn-primary wide-cta" href="#" target="_blank" rel="noopener">Book Now</a>
+      <div class="row-div" aria-hidden="true"></div>
+    </div>
+
+    <h3>Highlights</h3>
+    <div class="facts" id="factsList">
+      <div class="fact"><span class="label">Format</span><span>{{ page.highlights.format | default: 'Social deduction' }}</span></div>
+      <div class="fact"><span class="label">Duration</span><span>{{ page.highlights.duration | default: '3–4 hours' }}</span></div>
+      <div class="fact"><span class="label">Group size</span><span>{{ page.highlights.group_size | default: '8–25 players' }}</span></div>
+      <div class="fact"><span class="label">Difficulty</span><span>{{ page.highlights.difficulty | default: 'Beginner-friendly' }}</span></div>
+      <div class="fact"><span class="label">Age</span><span>{{ page.highlights.age | default: '14+' }}</span></div>
+      <div class="fact"><span class="label">Price</span><span>{{ page.highlights.price | default: '₹ 350/-' }}</span></div>
+    </div>
+
+    <div class="share-row">
+      <button class="btn" id="shareBtnSide" aria-label="Share this event">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7a3.27 3.27 0 000-1.39l7.02-4.11A2.99 2.99 0 0018 7.91a3 3 0 10-2.82-4H15a3 3 0 00.04 1.5l-7.02 4.11a3 3 0 10.01 4.96l7.02 4.11A3 3 0 1018 16.09z"/></svg>
+        <span>Share</span>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- Floating FABs (mobile) -->
+<a id="fabBook" class="fab-book" href="#" target="_blank" rel="noopener" hidden>Book Now</a>
+<button id="shareFab" class="fab-share" aria-label="Share this event" title="Share">
+  <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+    <path fill="currentColor" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7a3.27 3.27 0 000-1.39l7.02-4.11A2.99 2.99 0 0018 7.91a3 3 0 10-2.82-4H15a3 3 0 00.04 1.5l-7.02 4.11a3 3 0 10.01 4.96l7.02 4.11A3 3 0 1018 16.09z"/>
+  </svg>
+  <span class="fab-share-label">Share</span>
+</button>
+
+<!-- Title + tagline -->
+<div class="title-row">
+  <h2 class="heading" id="eventTitle">{{ page.title }}</h2>
+</div>
+<p class="tagline">{{ page.tagline }}</p>
+
+<!-- MOBILE highlights header (shown only when scheduled) -->
+<div class="highlights-mobile" id="highlightsMobile" hidden>
+  <div class="divider" aria-hidden="true" style="margin-top:4px;margin-bottom:8px;"></div>
+  <h3 class="hl-card-title">Highlights</h3>
+  <div class="highlights-grid" aria-label="Event highlights">
+    <div class="h-item"><div class="h-label">Format</div><div class="h-value">{{ page.highlights.format | default: 'Social deduction' }}</div></div>
+    <div class="h-item"><div class="h-label">Duration</div><div class="h-value">{{ page.highlights.duration | default: '3–4 hours' }}</div></div>
+    <div class="h-item"><div class="h-label">Group size</div><div class="h-value">{{ page.highlights.group_size | default: '8–25 players' }}</div></div>
+    <div class="h-item"><div class="h-label">Difficulty</div><div class="h-value">{{ page.highlights.difficulty | default: 'Beginner-friendly' }}</div></div>
+    <div class="h-item"><div class="h-label">Age</div><div class="h-value">{{ page.highlights.age | default: '14+' }}</div></div>
+    <div class="h-item"><div class="h-label">Price</div><div class="h-value">{{ page.highlights.price | default: '₹ 350/-' }}</div></div>
+  </div>
+</div>

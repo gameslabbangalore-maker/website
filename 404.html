@@ -1,0 +1,33 @@
+---
+layout: null
+permalink: /404.html
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Page not found — Games Lab</title>
+  {% include head.html %}
+  <style>
+    .notfound{max-width:720px;margin:40px auto;padding:0 16px;text-align:center}
+    .notfound h1{font-size:2rem;margin-bottom:.25rem}
+    .notfound p{color:var(--muted);margin-top:0}
+    .notfound .actions{margin-top:18px}
+    .notfound .actions a{display:inline-block;margin:6px 8px;padding:10px 16px;border-radius:8px;background:var(--accent);color:#000;font-weight:700;text-decoration:none}
+  </style>
+</head>
+<body>
+  {% include topbar-bleed.html %}
+  {% include header.html %}
+  <main class="wrap">
+    <div class="notfound">
+      <h1>That page isn’t here</h1>
+      <p>It may have moved or the link is incorrect.</p>
+      <div class="actions">
+        <a href="{{ '/' | relative_url }}">Go to Homepage</a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
