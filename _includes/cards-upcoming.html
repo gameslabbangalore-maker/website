@@ -66,6 +66,13 @@
     return str.toUpperCase();
   }
 
+  function formatWeekday(date, timezone){
+    return new Intl.DateTimeFormat('en-US', {
+      weekday: 'short',
+      timeZone: timezone
+    }).format(date);
+  }
+
   try{
     const res = await fetch(CALENDAR_URL + '?v=' + Date.now(), { cache: 'no-store' });
     if (!res.ok) throw new Error('Calendar fetch failed: ' + res.status);
@@ -114,6 +121,7 @@
       const start = entry.start ? new Date(entry.start) : null;
       const dateLabel = start ? formatDate(start, timezone) : '';
       const timeLabel = start ? formatTime(start, timezone) : '';
+      const weekdayLabel = start ? formatWeekday(start, timezone) : '';
 
       const metaLine = document.createElement('p');
       metaLine.className = 'meta';
@@ -132,10 +140,10 @@
         body.appendChild(locP);
       }
 
-      if (timeLabel){
+      if (timeLabel || weekdayLabel){
         const timeP = document.createElement('p');
         timeP.className = 'time';
-        timeP.textContent = timeLabel;
+        timeP.textContent = [weekdayLabel, timeLabel].filter(Boolean).join(' | ');
         body.appendChild(timeP);
       }
 
