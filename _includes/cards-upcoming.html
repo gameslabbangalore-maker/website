@@ -103,6 +103,9 @@
       media.appendChild(img);
       card.appendChild(media);
 
+      const details = document.createElement('div');
+      details.className = 'card-details';
+
       const body = document.createElement('div');
       body.className = 'card-body';
 
@@ -134,12 +137,17 @@
 
       const mobileInfo = document.createElement('p');
       mobileInfo.className = 'mobile-info';
-      if (timeLabel) mobileInfo.appendChild(document.createTextNode(timeLabel));
-      if (timeLabel && locationText) mobileInfo.appendChild(document.createTextNode(' | '));
-      if (locationText) mobileInfo.appendChild(document.createTextNode(locationText));
-      body.appendChild(mobileInfo);
+      const infoParts = [];
+      if (timeLabel) infoParts.push(timeLabel);
+      if (locationText) infoParts.push(locationText);
+      const infoText = infoParts.join(' | ');
+      if (infoText){
+        mobileInfo.textContent = infoText;
+        mobileInfo.title = infoText;
+        body.appendChild(mobileInfo);
+      }
 
-      card.appendChild(body);
+      details.appendChild(body);
 
       if (start){
         const dayNum = new Intl.DateTimeFormat('en-US', { day: '2-digit', timeZone: timezone }).format(start);
@@ -150,8 +158,10 @@
           <div class="day">${dayNum}</div>
           <div class="month">${monthShort}</div>
           <div class="time"></div>`;
-        card.appendChild(dateBox);
+        details.appendChild(dateBox);
       }
+
+      card.appendChild(details);
 
       const footer = document.createElement('div');
       footer.className = 'card-footer';
