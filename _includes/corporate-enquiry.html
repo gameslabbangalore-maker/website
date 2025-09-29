@@ -1,0 +1,204 @@
+<section class="corporate-enquiry" aria-labelledby="corporate-enquiry-heading">
+  <div class="corporate-enquiry__inner">
+    <p id="corporate-enquiry-heading" class="corporate-enquiry__copy">
+      We organize corporate, team-building, and private events — to create yours…
+    </p>
+    <button type="button" class="book-btn corporate-enquiry__trigger" data-modal-target="corporate-enquiry-modal">
+      Enquire Now
+    </button>
+  </div>
+</section>
+
+<div class="corporate-modal" id="corporate-enquiry-modal" role="dialog" aria-modal="true" aria-labelledby="corporate-modal-title" hidden>
+  <div class="corporate-modal__backdrop" data-modal-close></div>
+  <div class="corporate-modal__dialog" role="document">
+    <button type="button" class="corporate-modal__close" aria-label="Close enquiry form" data-modal-close>
+      ×
+    </button>
+    <div class="corporate-modal__content">
+      <h2 id="corporate-modal-title">Plan Your Event with Games Lab</h2>
+      <form class="corporate-form" novalidate>
+        <div class="corporate-form__grid">
+          <label class="corporate-form__field">
+            <span class="corporate-form__label">Name *</span>
+            <input type="text" name="name" autocomplete="name" required />
+          </label>
+          <label class="corporate-form__field">
+            <span class="corporate-form__label">Company / Organization Name</span>
+            <input type="text" name="company" autocomplete="organization" />
+          </label>
+          <label class="corporate-form__field">
+            <span class="corporate-form__label">Event Type *</span>
+            <select name="eventType" required>
+              <option value="" disabled selected>Select an option</option>
+              <option>Corporate Event</option>
+              <option>Team-Building Event</option>
+              <option>Private Celebration</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <label class="corporate-form__field">
+            <span class="corporate-form__label">Contact Number *</span>
+            <input type="tel" name="contact" autocomplete="tel" required />
+          </label>
+          <label class="corporate-form__field">
+            <span class="corporate-form__label">Email Address *</span>
+            <input type="email" name="email" autocomplete="email" required />
+          </label>
+          <label class="corporate-form__field">
+            <span class="corporate-form__label">Preferred Date &amp; Time</span>
+            <input type="datetime-local" name="datetime" />
+          </label>
+          <label class="corporate-form__field">
+            <span class="corporate-form__label">Preferred Location (area / cafe / space)</span>
+            <input type="text" name="location" />
+          </label>
+          <label class="corporate-form__field">
+            <span class="corporate-form__label">Group Size</span>
+            <input type="number" name="groupSize" min="1" />
+          </label>
+          <label class="corporate-form__field corporate-form__field--full">
+            <span class="corporate-form__label">What are you looking for?</span>
+            <textarea name="details" rows="3"></textarea>
+          </label>
+          <label class="corporate-form__field corporate-form__field--full">
+            <span class="corporate-form__label">How did you hear about us?</span>
+            <input type="text" name="referral" />
+          </label>
+        </div>
+        <div class="corporate-form__actions">
+          <button type="submit" class="book-btn">Submit Enquiry</button>
+        </div>
+        <p class="corporate-form__error" role="alert" hidden>Please fill in all required fields.</p>
+      </form>
+      <div class="corporate-form__success" role="status" hidden>
+        <p>Thank you for enquiring with Games Lab. We will get back to you within 24 hours with next steps, ideas, and availability.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const modal = document.getElementById('corporate-enquiry-modal');
+  if (!modal) return;
+
+  const form = modal.querySelector('.corporate-form');
+  const success = modal.querySelector('.corporate-form__success');
+  const error = modal.querySelector('.corporate-form__error');
+  const triggers = document.querySelectorAll('[data-modal-target="corporate-enquiry-modal"]');
+  const closeButtons = modal.querySelectorAll('[data-modal-close]');
+  let lastFocused = null;
+
+  function openModal(){
+    if (!modal.hasAttribute('hidden')) return;
+    lastFocused = document.activeElement;
+    modal.removeAttribute('hidden');
+    document.body.classList.add('corporate-modal-open');
+    const firstInput = modal.querySelector('input, select, textarea, button');
+    window.setTimeout(() => {
+      (firstInput || modal).focus({ preventScroll: true });
+    }, 10);
+    modal.addEventListener('keydown', handleKeydown);
+  }
+
+  function closeModal(){
+    if (modal.hasAttribute('hidden')) return;
+    modal.setAttribute('hidden', '');
+    document.body.classList.remove('corporate-modal-open');
+    modal.removeEventListener('keydown', handleKeydown);
+    if (lastFocused && typeof lastFocused.focus === 'function'){
+      lastFocused.focus({ preventScroll: true });
+    }
+    resetForm();
+  }
+
+  function handleKeydown(event){
+    if (event.key === 'Escape'){
+      event.preventDefault();
+      closeModal();
+    } else if (event.key === 'Tab'){
+      trapFocus(event);
+    }
+  }
+
+  function trapFocus(event){
+    const focusable = Array.from(modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+      .filter(el => !el.hasAttribute('hidden') && !el.closest('[hidden]') && !el.disabled);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first){
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last){
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  function resetForm(){
+    if (!form) return;
+    form.reset();
+    if (error) error.setAttribute('hidden', '');
+    if (success) success.setAttribute('hidden', '');
+    form.removeAttribute('hidden');
+  }
+
+  function getValue(name){
+    const field = form.elements[name];
+    if (!field) return '';
+    if (field instanceof RadioNodeList){
+      return field.value.trim();
+    }
+    return (field.value || '').trim();
+  }
+
+  triggers.forEach(btn => {
+    btn.addEventListener('click', openModal);
+  });
+
+  closeButtons.forEach(btn => {
+    btn.addEventListener('click', closeModal);
+  });
+
+  modal.addEventListener('click', function(event){
+    if (event.target.classList.contains('corporate-modal__backdrop')){
+      closeModal();
+    }
+  });
+
+  if (form){
+    form.addEventListener('submit', function(event){
+      event.preventDefault();
+      if (!form.checkValidity()){
+        if (error) error.removeAttribute('hidden');
+        form.reportValidity();
+        return;
+      }
+      if (error) error.setAttribute('hidden', '');
+
+      const name = getValue('name');
+      const company = getValue('company');
+      const eventType = getValue('eventType');
+      const contact = getValue('contact');
+      const email = getValue('email');
+      const datetime = getValue('datetime');
+      const location = getValue('location');
+      const groupSize = getValue('groupSize');
+      const details = getValue('details');
+      const referral = getValue('referral');
+
+      const bodyTemplate = `Hello ${name || 'there'},\n\nThank you for reaching out to Games Lab about your upcoming event. We’re excited to explore how we can host a fun and engaging experience for your team! 🎉\n\nHere’s what you shared with us:\n\nCompany/Organization: ${company || 'N/A'}\n\nEvent Type: ${eventType || 'N/A'}\n\nContact Number: ${contact || 'N/A'}\n\nEmail Address: ${email || 'N/A'}\n\nPreferred Date/Time: ${datetime || 'N/A'}\n\nPreferred Location: ${location || 'N/A'}\n\nGroup Size: ${groupSize || 'N/A'}\n\nDetails: ${details || 'N/A'}\n\nHow did you hear about us?: ${referral || 'N/A'}\n\nOur team will review your enquiry and get back to you within 24 hours with next steps, ideas, and availability.\n\nIn the meantime, feel free to check out our upcoming events: gameslab.co.in\n\nLooking forward to creating something memorable with you!\n\nWarm regards,\nTeam Games Lab\n📧 corporate@gameslab.co.in | 📞 +91-76760 99857`;
+
+      const subject = encodeURIComponent('Thank you for enquiring with Games Lab');
+      const body = encodeURIComponent(bodyTemplate);
+      const mailto = `mailto:corporate@gameslab.co.in?subject=${subject}&body=${body}`;
+      window.location.href = mailto;
+
+      if (form) form.setAttribute('hidden', '');
+      if (success) success.removeAttribute('hidden');
+    });
+  }
+})();
+</script>
