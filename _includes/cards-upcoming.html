@@ -98,7 +98,7 @@
 
       const originalSize = parseFloat(window.getComputedStyle(title).fontSize) || 16;
       let size = originalSize;
-      const minSize = 12;
+      const minSize = 11;
       const maxIterations = 12;
       title.style.setProperty('--mobile-title-size', `${size}px`);
 
@@ -177,19 +177,16 @@
         const locP = document.createElement('p');
         locP.className = 'location';
         locP.textContent = locationText;
+        locP.title = locationText;
         body.appendChild(locP);
       }
 
-      const mobileInfo = document.createElement('p');
-      mobileInfo.className = 'mobile-info';
-      const infoParts = [];
-      if (timeLabel) infoParts.push(timeLabel);
-      if (locationText) infoParts.push(locationText);
-      const infoText = infoParts.join(' | ');
-      if (infoText){
-        mobileInfo.textContent = infoText;
-        mobileInfo.title = infoText;
-        body.appendChild(mobileInfo);
+      if (timeLabel){
+        const timeP = document.createElement('p');
+        timeP.className = 'time-line';
+        timeP.textContent = timeLabel;
+        timeP.title = timeLabel;
+        body.appendChild(timeP);
       }
 
       details.appendChild(body);
@@ -201,8 +198,7 @@
         dateBox.className = 'card-date';
         dateBox.innerHTML = `
           <div class="day">${dayNum}</div>
-          <div class="month">${monthShort}</div>
-          <div class="time">${timeLabel || ''}</div>`;
+          <div class="month">${monthShort}</div>`;
         details.appendChild(dateBox);
       }
 
