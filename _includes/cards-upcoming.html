@@ -243,6 +243,15 @@
         body.appendChild(timeP);
       }
 
+      const mobileInfoText = [timeLabel, locationText].filter(Boolean).join(' | ');
+      if (mobileInfoText){
+        const mobileInfo = document.createElement('p');
+        mobileInfo.className = 'mobile-info';
+        mobileInfo.textContent = mobileInfoText;
+        mobileInfo.title = mobileInfoText;
+        body.appendChild(mobileInfo);
+      }
+
       details.appendChild(body);
 
       if (start){
