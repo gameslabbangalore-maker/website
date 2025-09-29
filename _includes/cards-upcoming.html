@@ -83,48 +83,66 @@
 
     if (list.length > 0) setSkeletons(container, list.length);
 
-    const cardsForTitleFit = new Set();
+    const titleCards = new Set();
 
-    function fitMobileTitle(card){
-      if (!card) return;
-      const title = card.querySelector('.event-title');
-      if (!title) return;
-
+    function recomputeMobileTitleSize(){
       const isMobile = window.matchMedia('(max-width: 768px)').matches;
       if (!isMobile){
-        title.style.removeProperty('--mobile-title-size');
+        container.style.removeProperty('--mobile-title-size');
+        titleCards.forEach(card => {
+          const title = card.querySelector('.event-title');
+          if (title) title.style.removeProperty('--mobile-title-size');
+        });
         return;
       }
 
-      const originalSize = parseFloat(window.getComputedStyle(title).fontSize) || 16;
-      let size = originalSize;
+      container.style.removeProperty('--mobile-title-size');
+
+      let targetSize = Infinity;
       const minSize = 11;
-      const maxIterations = 12;
-      title.style.setProperty('--mobile-title-size', `${size}px`);
+      const maxIterations = 20;
 
-      let iterations = 0;
-      while (title.scrollWidth > title.clientWidth + 0.5 && size > minSize && iterations < maxIterations){
-        size -= 0.5;
+      titleCards.forEach(card => {
+        const title = card.querySelector('.event-title');
+        if (!title) return;
+
+        title.style.removeProperty('--mobile-title-size');
+        const computedSize = parseFloat(window.getComputedStyle(title).fontSize) || 16;
+        let size = computedSize;
+        let iterations = 0;
+
         title.style.setProperty('--mobile-title-size', `${size}px`);
-        iterations++;
-      }
 
-      if (title.scrollWidth > title.clientWidth + 0.5){
-        title.style.setProperty('--mobile-title-size', `${Math.max(size, minSize)}px`);
+        while (title.scrollWidth > title.clientWidth + 0.5 && size > minSize && iterations < maxIterations){
+          size -= 0.5;
+          title.style.setProperty('--mobile-title-size', `${size}px`);
+          iterations++;
+        }
+
+        if (title.scrollWidth > title.clientWidth + 0.5){
+          size = Math.max(size, minSize);
+        }
+
+        targetSize = Math.min(targetSize, size);
+        title.style.removeProperty('--mobile-title-size');
+      });
+
+      if (targetSize !== Infinity){
+        container.style.setProperty('--mobile-title-size', `${targetSize}px`);
       }
     }
 
     function scheduleTitleFit(card){
       if (!card) return;
-      cardsForTitleFit.add(card);
-      requestAnimationFrame(() => fitMobileTitle(card));
+      titleCards.add(card);
+      requestAnimationFrame(() => recomputeMobileTitleSize());
     }
 
     let resizeFrame;
     window.addEventListener('resize', () => {
       if (resizeFrame) cancelAnimationFrame(resizeFrame);
       resizeFrame = requestAnimationFrame(() => {
-        cardsForTitleFit.forEach(card => fitMobileTitle(card));
+        recomputeMobileTitleSize();
       });
     });
 
@@ -229,6 +247,8 @@
       replaceSkeletonWithCard(container, idx, card);
       scheduleTitleFit(card);
     });
+
+    requestAnimationFrame(() => recomputeMobileTitleSize());
 
     if (!list.length){
       container.innerHTML = '<p style="color:#bbb">No upcoming events.</p>';
