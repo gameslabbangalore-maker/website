@@ -177,17 +177,34 @@ content="
     .card-date{
       --datebox-size:72px;
       display:flex;
+      inline-size:var(--datebox-size);
+      block-size:var(--datebox-size);
       width:var(--datebox-size);
       height:var(--datebox-size);
       flex:0 0 var(--datebox-size);
       margin-left:auto;
-      flex-direction:column; justify-content:center; align-items:center;
-      border-radius:10px; background:var(--datebox);
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      border-radius:10px;
+      background:var(--datebox);
       border:1.5px solid rgba(255,255,255,.08);
       color:#fff;
+      box-sizing:border-box;
     }
-    .card-date .day{font-weight:800;font-size:calc(22px + 2vw);line-height:1;color:var(--accent);}
-    .card-date .month{font-size:calc(12px + 1vw);line-height:1;color:#fff;}
+    .card-date .day{
+      font-weight:800;
+      font-size:27px;
+      line-height:1;
+      color:var(--accent);
+    }
+    .card-date .month{
+      font-size:16px;
+      line-height:1;
+      color:#fff;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+    }
     .sk-line{height:8px;margin:4px 0}
   }
 
