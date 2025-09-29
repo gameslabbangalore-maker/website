@@ -132,12 +132,12 @@
         body.appendChild(locP);
       }
 
-      const mobileInfo = document.createElement('p');
-      mobileInfo.className = 'mobile-info';
-      if (locationText) mobileInfo.appendChild(document.createTextNode(locationText));
-      if (locationText && timeLabel) mobileInfo.appendChild(document.createTextNode(' | '));
-      if (timeLabel) mobileInfo.appendChild(document.createTextNode(timeLabel));
-      body.appendChild(mobileInfo);
+      if (timeLabel){
+        const timeP = document.createElement('p');
+        timeP.className = 'time';
+        timeP.textContent = timeLabel;
+        body.appendChild(timeP);
+      }
 
       card.appendChild(body);
 
@@ -148,8 +148,7 @@
         dateBox.className = 'card-date';
         dateBox.innerHTML = `
           <div class="day">${dayNum}</div>
-          <div class="month">${monthShort}</div>
-          <div class="time"></div>`;
+          <div class="month">${monthShort}</div>`;
         card.appendChild(dateBox);
       }
 
@@ -178,6 +177,8 @@
       replaceSkeletonWithCard(container, idx, card);
     });
 
+    requestAnimationFrame(() => adjustMobileTitles(container));
+
     if (!list.length){
       container.innerHTML = '<p style="color:#bbb">No upcoming events.</p>';
     }
@@ -185,5 +186,74 @@
     console.error('Upcoming events error:', err);
     container.innerHTML = '<p style="color:#f66">Could not load events — check the calendar artifact and CSP settings.</p>';
   }
+  function adjustMobileTitles(root){
+    const scope = root || container;
+    if (!scope) return;
+    const titles = Array.from(scope.querySelectorAll('.event-title'));
+    if (!titles.length) return;
+
+    const isMobile = window.innerWidth <= 768;
+
+    if (!isMobile){
+      titles.forEach(title => {
+        title.style.removeProperty('font-size');
+        title.style.removeProperty('white-space');
+        title.style.removeProperty('max-width');
+        title.style.removeProperty('display');
+      });
+      return;
+    }
+
+    const MIN_FONT_SIZE = 12;
+    let minSize = Infinity;
+
+    titles.forEach(title => {
+      const previousInline = title.style.fontSize;
+      title.style.fontSize = '';
+      const computed = window.getComputedStyle(title);
+      const base = parseFloat(computed.fontSize || '0');
+      if (!base){
+        if (previousInline) title.style.fontSize = previousInline;
+        return;
+      }
+      let size = base;
+      title.style.whiteSpace = 'nowrap';
+      title.style.display = 'block';
+      title.style.maxWidth = '100%';
+      title.style.fontSize = size + 'px';
+      let iterations = 0;
+      while (title.scrollWidth > title.clientWidth && iterations < 80 && size > MIN_FONT_SIZE){
+        size -= 0.5;
+        title.style.fontSize = size + 'px';
+        iterations += 1;
+      }
+      minSize = Math.min(minSize, size);
+    });
+
+    if (!isFinite(minSize) || minSize === Infinity) return;
+
+    const finalSize = Math.max(minSize, MIN_FONT_SIZE);
+    titles.forEach(title => {
+      title.style.fontSize = finalSize + 'px';
+      title.style.whiteSpace = 'nowrap';
+      title.style.maxWidth = '100%';
+    });
+  }
+
+  let resizeTimer = null;
+  function handleResize(){
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => adjustMobileTitles(container), 120);
+  }
+
+  window.addEventListener('resize', handleResize);
+  window.addEventListener('orientationchange', () => adjustMobileTitles(container));
+
+  window.addEventListener('load', function handleLoad(){
+    adjustMobileTitles(container);
+    window.removeEventListener('load', handleLoad);
+  });
+
+  adjustMobileTitles(container);
 })();
 </script>
