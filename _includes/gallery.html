@@ -133,6 +133,13 @@
 
       slide.addEventListener('click', () => openLightbox(obj.idx));
       slide.appendChild(img);
+
+      if (obj.caption) {
+        const cap = document.createElement('div');
+        cap.className = 'gal-cap';
+        cap.textContent = obj.caption;
+        slide.appendChild(cap);
+      }
       return slide;
     }
 
