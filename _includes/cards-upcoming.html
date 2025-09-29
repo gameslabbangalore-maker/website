@@ -134,9 +134,9 @@
 
       const mobileInfo = document.createElement('p');
       mobileInfo.className = 'mobile-info';
-      if (locationText) mobileInfo.appendChild(document.createTextNode(locationText));
-      if (locationText && timeLabel) mobileInfo.appendChild(document.createTextNode(' | '));
       if (timeLabel) mobileInfo.appendChild(document.createTextNode(timeLabel));
+      if (timeLabel && locationText) mobileInfo.appendChild(document.createTextNode(' | '));
+      if (locationText) mobileInfo.appendChild(document.createTextNode(locationText));
       body.appendChild(mobileInfo);
 
       card.appendChild(body);
