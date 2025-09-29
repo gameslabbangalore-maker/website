@@ -8,26 +8,22 @@
 <meta name="theme-color" content="#181818" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-<!-- CSP: allow inline scripts, PapaParse, Google CSV (incl. redirects), and local calendar JSON -->
+<!-- CSP: allow inline scripts, Elfsight embeds, and local calendar JSON -->
 <meta http-equiv="Content-Security-Policy"
 content="
   default-src 'self';
   img-src 'self'
            https://ik.imagekit.io
            https://via.placeholder.com
-           https://*.googleusercontent.com
            https://*.elfsightcdn.com
            data:;
   script-src 'self'
-             https://cdnjs.cloudflare.com
              https://*.elfsight.com
              https://*.elfsightcdn.com
              'unsafe-inline';
   style-src  'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src   https://fonts.gstatic.com data:;
   connect-src 'self'
-              https://docs.google.com
-              https://*.googleusercontent.com
               https://*.elfsight.com
               https://*.elfsightcdn.com;
   frame-src https://www.youtube.com https://player.vimeo.com https://*.elfsight.com https://*.elfsightcdn.com;
@@ -56,8 +52,6 @@ content="
 <link rel="preconnect" href="https://service-reviews-ultimate.elfsight.com" crossorigin>
 
 <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-
 <!-- === INLINE STYLES (copied exactly from your original) === -->
 <style>
   :root {
@@ -210,6 +204,8 @@ content="
   .gal-bg{position:absolute;inset:0;filter:blur(18px) brightness(.55);transform:scale(1.1);background-size:cover;background-position:center;z-index:0}
   .gal-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;transition:opacity .2s ease}
   .gal-slide.portrait .gal-img{object-fit:contain;}
+  .gal-cap{position:absolute;left:0;right:0;bottom:0;padding:12px 14px;font-size:1rem;line-height:1.4;color:#fff;background:linear-gradient(180deg,rgba(7,7,7,0) 0%,rgba(7,7,7,.78) 100%);z-index:2;pointer-events:none}
+  .gal-slide.portrait .gal-cap{background:linear-gradient(180deg,rgba(10,10,10,0) 0%,rgba(10,10,10,.85) 100%);}
   .gal-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:3;background:rgba(0,0,0,.35);border:none;color:#fff;font-size:28px;line-height:1;border-radius:10px;padding:10px 14px;cursor:pointer;backdrop-filter:blur(6px)}
   .gal-prev{left:8px}.gal-next{right:8px}
   .gal-nav:hover{background:rgba(0,0,0,.5)}
@@ -236,6 +232,7 @@ content="
     .gal-lightbox{background:rgba(255,255,255,.9)}
     .gal-lightbox-close,.gal-lightbox-prev,.gal-lightbox-next{background:rgba(255,255,255,.7);color:#000}
     .gal-lightbox-cap{color:#222}
+    .gal-cap{color:#fff;background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.7) 100%)}
   }
   @media (min-width: 992px){ .gallery-wrap { max-width: 720px; } }
   @media (min-width: 1440px){ .gallery-wrap { max-width: 820px; } }
