@@ -66,10 +66,30 @@
     return str.toUpperCase();
   }
 
+  function renderEmpty(message){
+    const text = message || 'No upcoming events.';
+    container.innerHTML = `<p class="empty-state">${text}</p>`;
+  }
+
   try{
     const res = await fetch(CALENDAR_URL + '?v=' + Date.now(), { cache: 'no-store' });
+
+    if (res.status === 404){
+      console.warn('Calendar artifact not found at %s', CALENDAR_URL);
+      renderEmpty();
+      return;
+    }
+
     if (!res.ok) throw new Error('Calendar fetch failed: ' + res.status);
-    const data = await res.json();
+
+    let data;
+    try {
+      data = await res.json();
+    } catch (jsonErr){
+      console.error('Calendar JSON parse error:', jsonErr);
+      renderEmpty();
+      return;
+    }
     const timezone = (typeof data.timezone === 'string' && data.timezone.trim()) || TIMEZONE;
     const list = Array.isArray(data.events) ? data.events.slice() : [];
 
@@ -201,11 +221,11 @@
     });
 
     if (!list.length){
-      container.innerHTML = '<p style="color:#bbb">No upcoming events.</p>';
+      renderEmpty();
     }
   } catch (err) {
     console.error('Upcoming events error:', err);
-    container.innerHTML = '<p style="color:#f66">Could not load events — check the calendar artifact and CSP settings.</p>';
+    renderEmpty();
   }
 })();
 </script>
