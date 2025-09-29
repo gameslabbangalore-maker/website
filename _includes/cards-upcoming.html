@@ -83,6 +83,51 @@
 
     if (list.length > 0) setSkeletons(container, list.length);
 
+    const cardsForTitleFit = new Set();
+
+    function fitMobileTitle(card){
+      if (!card) return;
+      const title = card.querySelector('.event-title');
+      if (!title) return;
+
+      const isMobile = window.matchMedia('(max-width: 768px)').matches;
+      if (!isMobile){
+        title.style.removeProperty('--mobile-title-size');
+        return;
+      }
+
+      const originalSize = parseFloat(window.getComputedStyle(title).fontSize) || 16;
+      let size = originalSize;
+      const minSize = 12;
+      const maxIterations = 12;
+      title.style.setProperty('--mobile-title-size', `${size}px`);
+
+      let iterations = 0;
+      while (title.scrollWidth > title.clientWidth + 0.5 && size > minSize && iterations < maxIterations){
+        size -= 0.5;
+        title.style.setProperty('--mobile-title-size', `${size}px`);
+        iterations++;
+      }
+
+      if (title.scrollWidth > title.clientWidth + 0.5){
+        title.style.setProperty('--mobile-title-size', `${Math.max(size, minSize)}px`);
+      }
+    }
+
+    function scheduleTitleFit(card){
+      if (!card) return;
+      cardsForTitleFit.add(card);
+      requestAnimationFrame(() => fitMobileTitle(card));
+    }
+
+    let resizeFrame;
+    window.addEventListener('resize', () => {
+      if (resizeFrame) cancelAnimationFrame(resizeFrame);
+      resizeFrame = requestAnimationFrame(() => {
+        cardsForTitleFit.forEach(card => fitMobileTitle(card));
+      });
+    });
+
     list.forEach((entry, idx) => {
       if (!entry) return;
       const slug = normalizeSlug(entry.slug || entry.title);
@@ -137,7 +182,10 @@
 
       const mobileInfo = document.createElement('p');
       mobileInfo.className = 'mobile-info';
-      const infoText = locationText || '';
+      const infoParts = [];
+      if (timeLabel) infoParts.push(timeLabel);
+      if (locationText) infoParts.push(locationText);
+      const infoText = infoParts.join(' | ');
       if (infoText){
         mobileInfo.textContent = infoText;
         mobileInfo.title = infoText;
@@ -183,6 +231,7 @@
       });
 
       replaceSkeletonWithCard(container, idx, card);
+      scheduleTitleFit(card);
     });
 
     if (!list.length){
