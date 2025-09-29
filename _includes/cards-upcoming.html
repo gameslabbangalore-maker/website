@@ -137,10 +137,7 @@
 
       const mobileInfo = document.createElement('p');
       mobileInfo.className = 'mobile-info';
-      const infoParts = [];
-      if (timeLabel) infoParts.push(timeLabel);
-      if (locationText) infoParts.push(locationText);
-      const infoText = infoParts.join(' | ');
+      const infoText = locationText || '';
       if (infoText){
         mobileInfo.textContent = infoText;
         mobileInfo.title = infoText;
@@ -157,7 +154,7 @@
         dateBox.innerHTML = `
           <div class="day">${dayNum}</div>
           <div class="month">${monthShort}</div>
-          <div class="time"></div>`;
+          <div class="time">${timeLabel || ''}</div>`;
         details.appendChild(dateBox);
       }
 
