@@ -83,39 +83,50 @@
 
     if (list.length > 0) setSkeletons(container, list.length);
 
-    const titleCards = new Set();
+    const titleNodes = new Set();
+    const mobileQuery = window.matchMedia('(max-width: 768px)');
+    let recomputeQueued = false;
+
+    function clearMobileSizing(){
+      const root = document.documentElement;
+      root.style.removeProperty('--mobile-title-size');
+      container.style.removeProperty('--mobile-title-size');
+      titleNodes.forEach(title => {
+        if (!title) return;
+        title.style.removeProperty('--mobile-title-size');
+        title.style.removeProperty('font-size');
+      });
+    }
 
     function recomputeMobileTitleSize(){
-      const isMobile = window.matchMedia('(max-width: 768px)').matches;
-      if (!isMobile){
-        container.style.removeProperty('--mobile-title-size');
-        titleCards.forEach(card => {
-          const title = card.querySelector('.event-title');
-          if (title) title.style.removeProperty('--mobile-title-size');
-        });
+      const root = document.documentElement;
+      if (!mobileQuery.matches){
+        clearMobileSizing();
         return;
       }
 
-      container.style.removeProperty('--mobile-title-size');
-
       let targetSize = Infinity;
       const minSize = 11;
-      const maxIterations = 20;
+      const maxIterations = 40;
 
-      titleCards.forEach(card => {
-        const title = card.querySelector('.event-title');
-        if (!title) return;
-
+      titleNodes.forEach(title => {
+        if (!title?.isConnected) return;
         title.style.removeProperty('--mobile-title-size');
+        title.style.removeProperty('font-size');
+      });
+
+      titleNodes.forEach(title => {
+        if (!title?.isConnected) return;
+
         const computedSize = parseFloat(window.getComputedStyle(title).fontSize) || 16;
         let size = computedSize;
         let iterations = 0;
 
-        title.style.setProperty('--mobile-title-size', `${size}px`);
-
         while (title.scrollWidth > title.clientWidth + 0.5 && size > minSize && iterations < maxIterations){
           size -= 0.5;
-          title.style.setProperty('--mobile-title-size', `${size}px`);
+          title.style.setProperty('font-size', `${size}px`, 'important');
+          // Force layout so Safari recalculates scrollWidth before the next iteration.
+          void title.offsetWidth;
           iterations++;
         }
 
@@ -124,27 +135,52 @@
         }
 
         targetSize = Math.min(targetSize, size);
-        title.style.removeProperty('--mobile-title-size');
+        title.style.removeProperty('font-size');
       });
 
-      if (targetSize !== Infinity){
-        container.style.setProperty('--mobile-title-size', `${targetSize}px`);
-      }
+      if (targetSize === Infinity) return;
+
+      const value = `${targetSize}px`;
+      root.style.setProperty('--mobile-title-size', value);
+      container.style.setProperty('--mobile-title-size', value);
+      titleNodes.forEach(title => {
+        if (!title?.isConnected) return;
+        title.style.setProperty('--mobile-title-size', value);
+        title.style.setProperty('font-size', value, 'important');
+      });
     }
 
-    function scheduleTitleFit(card){
-      if (!card) return;
-      titleCards.add(card);
-      requestAnimationFrame(() => recomputeMobileTitleSize());
-    }
-
-    let resizeFrame;
-    window.addEventListener('resize', () => {
-      if (resizeFrame) cancelAnimationFrame(resizeFrame);
-      resizeFrame = requestAnimationFrame(() => {
+    function queueMobileTitleFit(){
+      if (recomputeQueued) return;
+      recomputeQueued = true;
+      requestAnimationFrame(() => {
+        recomputeQueued = false;
         recomputeMobileTitleSize();
       });
-    });
+    }
+
+    function registerTitle(title){
+      if (!title) return;
+      titleNodes.add(title);
+      queueMobileTitleFit();
+    }
+
+    window.addEventListener('resize', queueMobileTitleFit);
+    window.addEventListener('pageshow', queueMobileTitleFit);
+    if (typeof mobileQuery.addEventListener === 'function'){
+      mobileQuery.addEventListener('change', queueMobileTitleFit);
+    } else if (typeof mobileQuery.addListener === 'function'){
+      mobileQuery.addListener(queueMobileTitleFit);
+    }
+
+    if (document.fonts && document.fonts.ready){
+      document.fonts.ready.then(() => queueMobileTitleFit());
+    }
+
+    if ('ResizeObserver' in window){
+      const observer = new ResizeObserver(() => queueMobileTitleFit());
+      observer.observe(container);
+    }
 
     list.forEach((entry, idx) => {
       if (!entry) return;
@@ -245,10 +281,10 @@
       });
 
       replaceSkeletonWithCard(container, idx, card);
-      scheduleTitleFit(card);
+      registerTitle(h);
     });
 
-    requestAnimationFrame(() => recomputeMobileTitleSize());
+    queueMobileTitleFit();
 
     if (!list.length){
       container.innerHTML = '<p style="color:#bbb">No upcoming events.</p>';
