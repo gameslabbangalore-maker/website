@@ -86,6 +86,8 @@
   const form = modal.querySelector('.corporate-form');
   const success = modal.querySelector('.corporate-form__success');
   const error = modal.querySelector('.corporate-form__error');
+  const content = modal.querySelector('.corporate-modal__content');
+  const detailsField = form ? form.querySelector('textarea[name="details"]') : null;
   const triggers = document.querySelectorAll('[data-modal-target="corporate-enquiry-modal"]');
   const closeButtons = modal.querySelectorAll('[data-modal-close]');
   let lastFocused = null;
@@ -98,8 +100,10 @@
     const firstInput = modal.querySelector('input, select, textarea, button');
     window.setTimeout(() => {
       (firstInput || modal).focus({ preventScroll: true });
+      adjustTextareaHeight();
     }, 10);
     modal.addEventListener('keydown', handleKeydown);
+    window.addEventListener('resize', handleResize);
   }
 
   function closeModal(){
@@ -107,6 +111,7 @@
     modal.setAttribute('hidden', '');
     document.body.classList.remove('corporate-modal-open');
     modal.removeEventListener('keydown', handleKeydown);
+    window.removeEventListener('resize', handleResize);
     if (lastFocused && typeof lastFocused.focus === 'function'){
       lastFocused.focus({ preventScroll: true });
     }
@@ -137,12 +142,46 @@
     }
   }
 
+  function adjustTextareaHeight(){
+    if (!detailsField || !content) return;
+    detailsField.style.height = '';
+    if (!window.matchMedia('(min-width: 769px)').matches){
+      content.style.overflow = 'auto';
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      const overflow = content.scrollHeight - content.clientHeight;
+      if (overflow > 0){
+        const currentHeight = detailsField.offsetHeight;
+        const targetHeight = Math.max(72, currentHeight - overflow - 12);
+        if (targetHeight < currentHeight){
+          detailsField.style.height = `${targetHeight}px`;
+        }
+      }
+      const remainingOverflow = content.scrollHeight - content.clientHeight;
+      content.style.overflow = remainingOverflow > 0 ? 'auto' : 'visible';
+    });
+  }
+
+  function handleResize(){
+    if (!modal.hasAttribute('hidden')){
+      adjustTextareaHeight();
+    }
+  }
+
   function resetForm(){
     if (!form) return;
     form.reset();
     if (error) error.setAttribute('hidden', '');
     if (success) success.setAttribute('hidden', '');
     form.removeAttribute('hidden');
+    if (detailsField){
+      detailsField.style.height = '';
+    }
+    if (content){
+      content.style.overflow = 'auto';
+    }
   }
 
   function getValue(name){
@@ -198,6 +237,7 @@
 
       if (form) form.setAttribute('hidden', '');
       if (success) success.removeAttribute('hidden');
+      adjustTextareaHeight();
     });
   }
 })();
