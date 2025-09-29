@@ -10,7 +10,7 @@ const LOCATIONS_PATH = path.join(ROOT, '_data', 'locations.yml');
 
 const DEFAULT_TIMEZONE = 'Asia/Kolkata';
 const DEFAULT_OFFSET = '+05:30';
-const PUBLIC_CALENDAR_URL = 'https://calendar.google.com/calendar/ical/da645a8c3679d92a4f5aa27a0415af79342a316216a0f83f9d299327c1f0b56e%40group.calendar.google.com/public/basic.ics';
+const PUBLIC_CALENDAR_URL = 'https://calendar.google.com/calendar/ical/gameslab.bangalore%40gmail.com/public/basic.ics';
 
 function slugify(value) {
   if (!value) return '';
