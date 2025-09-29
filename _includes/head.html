@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#181818" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-<!-- CSP: allow inline scripts, PapaParse, Google CSV (incl. redirects) -->
+<!-- CSP: allow inline scripts, PapaParse, Google CSV (incl. redirects), and local calendar JSON -->
 <meta http-equiv="Content-Security-Policy"
 content="
   default-src 'self';
@@ -25,7 +25,8 @@ content="
              'unsafe-inline';
   style-src  'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src   https://fonts.gstatic.com data:;
-  connect-src https://docs.google.com
+  connect-src 'self'
+              https://docs.google.com
               https://*.googleusercontent.com
               https://*.elfsight.com
               https://*.elfsightcdn.com;
@@ -88,7 +89,7 @@ content="
       backdrop-filter: saturate(180%) blur(14px);
     }
   }
-  
+
   .topbar-left.home-link { color: inherit; text-decoration: none; }
   .topbar-left.home-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 
@@ -163,11 +164,14 @@ content="
     .card,.sk-card{width:90vw;max-width:400px;height:auto;flex-direction:row;align-items:center;gap:8px;padding:calc(10px + 1vw) calc(8px + 1vw);border-radius:12px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.8);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
     .media,.sk-media{width:18vw;max-width:72px;aspect-ratio:1/1;height:auto;padding-top:0;border-radius:10px;overflow:hidden;flex-shrink:0;background:#111}
     .media img{position:static}
-    .card-body,.sk-body{padding:0;display:flex;flex-direction:column;gap:calc(4px + .3vw);flex:1 1 auto}
+    .card-body,.sk-body{padding:0;display:flex;flex-direction:column;gap:calc(4px + .3vw);flex:1 1 auto;min-width:0}
     .event-title{font-size:calc(13px + 1.5vw) !important;font-weight:900 !important;color:#fff;margin:0}
     .meta,.location{display:none}
-    .mobile-info{display:block;font-size:calc(11px + .7vw);color:var(--muted);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90vw}
-    .mobile-info a{color:var(--accent);text-decoration:none;font-weight:600}
+    .mobile-info{display:flex;align-items:center;gap:6px;font-size:calc(11px + .7vw);color:var(--muted);margin:0;max-width:90vw}
+    .mobile-info .mobile-location{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .mobile-info .mobile-separator{flex:0 0 auto}
+    .mobile-info .mobile-time{flex:0 0 auto;white-space:nowrap}
+    .mobile-info a{color:var(--accent);text-decoration:none;font-weight:600;white-space:nowrap}
     .mobile-info a:hover{text-decoration:underline}
     .card-footer{display:none}
     .sk-footer{display:none}
@@ -178,6 +182,7 @@ content="
       border:1.5px solid rgba(255,255,255,.08);
       color:#fff;
     }
+    .card-date{flex:0 0 auto}
     .card-date .day{font-weight:800;font-size:calc(22px + 2vw);line-height:1;color:var(--accent);}
     .card-date .month{font-size:calc(12px + 1vw);line-height:1;color:#fff;}
     .sk-line{height:8px;margin:4px 0}

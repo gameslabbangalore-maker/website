@@ -11,11 +11,10 @@
 {% if page.description %}<meta name="description" content="{{ page.description | escape }}">{% endif %}
 {% if page.og_image %}<meta property="og:image" content="{{ page.og_image | escape }}">{% endif %}
 
-<!-- Google Font + PapaParse -->
+<!-- Google Font -->
 <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
-<!-- CSP tuned for events (images, CSV, YouTube) -->
+<!-- CSP tuned for events (images, calendar JSON, YouTube) -->
 <meta http-equiv="Content-Security-Policy"
 content="
   default-src 'self';
@@ -23,7 +22,7 @@ content="
   script-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline';
   style-src  'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src   https://fonts.gstatic.com data:;
-  connect-src https://docs.google.com https://*.googleusercontent.com;
+  connect-src 'self' https://docs.google.com https://*.googleusercontent.com;
   frame-src   https://www.youtube.com https://player.vimeo.com;
   object-src 'none';
   base-uri 'self';
