@@ -89,6 +89,7 @@
       }
       document.getElementById('formsLightBox_316948').style.display = 'block';
       document.body.style.overflow = 'hidden';
+      document.body.classList.add('enquiry-modal-open');
       setTimeout(function() {
         var containerDiv = document.getElementById('containerDiv_316948');
         containerDiv.setAttribute('tabindex', '-1');
@@ -100,6 +101,7 @@
       var divCont = document.getElementById('formsLightBox_316948');
       divCont.style.display='none';
       document.body.style.overflow = '';
+      document.body.classList.remove('enquiry-modal-open');
 
       var iframe = document.getElementById('U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI_316948').getElementsByTagName('iframe')[0];
       if (iframe) {
