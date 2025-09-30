@@ -29,49 +29,55 @@
           <div class="corporate-form__grid">
             <label class="corporate-form__field">
               <span class="corporate-form__label">Name *</span>
-              <input type="text" name="name" data-zoho-field="Name" autocomplete="name" required />
+              <input
+                type="text"
+                name="name"
+                data-zoho-field="Name"
+                data-zoho-split="Name_First,Name_Last"
+                autocomplete="name"
+                required
+              />
             </label>
-            <label class="corporate-form__field">
-              <span class="corporate-form__label">Company / Organization Name</span>
-              <input type="text" name="company" data-zoho-field="CompanyOrganizationName" autocomplete="organization" />
-            </label>
+              <label class="corporate-form__field">
+                <span class="corporate-form__label">Company / Organization Name</span>
+                <input type="text" name="company" data-zoho-field="SingleLine" autocomplete="organization" />
+              </label>
             <label class="corporate-form__field">
               <span class="corporate-form__label">Event Type *</span>
-              <select name="eventType" data-zoho-field="EventType" required>
+              <select name="eventType" data-zoho-field="Dropdown" required>
                 <option value="" disabled selected>Select an option</option>
-                <option>Corporate Event</option>
-                <option>Team-Building Event</option>
-                <option>Private Celebration</option>
-                <option>Other</option>
+                <option value="Corporate Event">Corporate Event</option>
+                <option value="Team Event">Team-Building Event</option>
+                <option value="Private Celebration">Private Celebration</option>
               </select>
             </label>
             <label class="corporate-form__field">
               <span class="corporate-form__label">Contact Number *</span>
-              <input type="tel" name="contact" data-zoho-field="ContactNumber" autocomplete="tel" required />
+              <input type="tel" name="contact" data-zoho-field="PhoneNumber" autocomplete="tel" required />
             </label>
             <label class="corporate-form__field">
               <span class="corporate-form__label">Email Address *</span>
-              <input type="email" name="email" data-zoho-field="EmailAddress" autocomplete="email" required />
+              <input type="email" name="email" data-zoho-field="Email" autocomplete="email" required />
             </label>
             <label class="corporate-form__field">
               <span class="corporate-form__label">Preferred Date &amp; Time</span>
-              <input type="datetime-local" name="datetime" data-zoho-field="PreferredDateTime" />
+              <input type="datetime-local" name="datetime" data-zoho-field="DateTime" />
             </label>
             <label class="corporate-form__field">
               <span class="corporate-form__label">Preferred Location (area / cafe / space)</span>
-              <input type="text" name="location" data-zoho-field="PreferredLocation" />
+              <input type="text" name="location" data-zoho-field="SingleLine1" />
             </label>
             <label class="corporate-form__field">
               <span class="corporate-form__label">Group Size</span>
-              <input type="number" name="groupSize" data-zoho-field="GroupSize" min="1" />
+              <input type="number" name="groupSize" data-zoho-field="Number" min="1" />
             </label>
             <label class="corporate-form__field corporate-form__field--full">
               <span class="corporate-form__label">What are you looking for?</span>
-              <textarea name="details" data-zoho-field="WhatAreYouLookingFor" rows="3"></textarea>
+              <textarea name="details" data-zoho-field="MultiLine" rows="3"></textarea>
             </label>
             <label class="corporate-form__field corporate-form__field--full">
               <span class="corporate-form__label">How did you hear about us?</span>
-              <input type="text" name="referral" data-zoho-field="HowDidYouHearAboutUs" />
+              <input type="text" name="referral" data-zoho-field="SingleLine2" />
             </label>
           </div>
           <div class="corporate-form__actions">
@@ -94,6 +100,7 @@
   method="POST"
   target="corporate-zoho-target"
   accept-charset="UTF-8"
+  enctype="multipart/form-data"
   hidden
   aria-hidden="true"
 ></form>
@@ -244,23 +251,52 @@
 
   function buildEntries(){
     const entries = [];
+    const requiredNames = new Set();
     const hiddenFields = {
       zf_referrer_name: document.title || 'Games Lab Corporate Enquiry',
       zf_redirect_url: '',
-      zf_source: window.location.href
+      zf_source: window.location.href,
+      zc_gad: '',
+      zf_fieldsmode: '1'
     };
     if (zohoToken){
       hiddenFields.zf_token = zohoToken;
       hiddenFields.formLinkId = zohoToken;
     }
-    Object.keys(hiddenFields).forEach(key => {
-      entries.push([key, hiddenFields[key] || '']);
-    });
+
     zohoFields.forEach(field => {
-      const zohoName = field.getAttribute('data-zoho-field');
-      if (!zohoName) return;
-      entries.push([zohoName, getFieldValue(field)]);
+      const primaryNames = parseZohoNames(field.getAttribute('data-zoho-field'));
+      if (!primaryNames.length) return;
+      const additionalNames = parseZohoNames(field.getAttribute('data-zoho-split'));
+      const value = getFieldValue(field);
+
+      if (additionalNames.length){
+        const { first, last } = splitName(value);
+        primaryNames.forEach(name => {
+          entries.push([name, value]);
+          if (field.required) requiredNames.add(name);
+        });
+        additionalNames.forEach((name, index) => {
+          const nameValue = index === 0 ? first : index === 1 ? last : value;
+          entries.push([name, nameValue]);
+          if (field.required) requiredNames.add(name);
+        });
+      } else {
+        primaryNames.forEach(name => {
+          entries.push([name, value]);
+          if (field.required) requiredNames.add(name);
+        });
+      }
     });
+
+    if (!hiddenFields.zf_fieldsreq && requiredNames.size){
+      hiddenFields.zf_fieldsreq = Array.from(requiredNames).join(',');
+    }
+
+    Object.keys(hiddenFields).forEach(key => {
+      entries.unshift([key, hiddenFields[key] || '']);
+    });
+
     return entries;
   }
 
@@ -275,7 +311,53 @@
         .filter(Boolean)
         .join(', ');
     }
+    if (field.type === 'datetime-local'){
+      return formatZohoDateTime(field.value);
+    }
     return (field.value || '').trim();
+  }
+
+  function parseZohoNames(value){
+    if (!value) return [];
+    return value
+      .split(',')
+      .map(name => name.trim())
+      .filter(Boolean);
+  }
+
+  function splitName(value){
+    const parts = (value || '')
+      .split(/\s+/)
+      .map(part => part.trim())
+      .filter(Boolean);
+    if (!parts.length){
+      return { first: '', last: '' };
+    }
+    if (parts.length === 1){
+      return { first: parts[0], last: parts[0] };
+    }
+    const [first, ...rest] = parts;
+    return { first, last: rest.join(' ') || first };
+  }
+
+  function formatZohoDateTime(value){
+    if (!value) return '';
+    const [datePart, timePart] = value.split('T');
+    if (!datePart || !timePart) return '';
+    const [year, month, day] = datePart.split('-').map(part => parseInt(part, 10));
+    const [hourStr, minuteStr] = timePart.split(':');
+    if (!year || !month || !day || typeof hourStr === 'undefined') return '';
+    let hours = parseInt(hourStr, 10);
+    const minutes = parseInt(minuteStr || '0', 10);
+    if (Number.isNaN(hours) || Number.isNaN(minutes)) return '';
+    const meridiem = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    if (hours === 0) hours = 12;
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthName = monthNames[month - 1];
+    if (!monthName) return '';
+    const pad = num => String(num).padStart(2, '0');
+    return `${pad(day)}-${monthName}-${year} ${pad(hours)}:${pad(minutes)} ${meridiem}`;
   }
 
   function submitViaProxy(entries){
