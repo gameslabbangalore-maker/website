@@ -16,63 +16,67 @@
       ×
     </button>
     <div class="corporate-modal__content">
-      <h2 id="corporate-modal-title">Plan Your Event with Games Lab</h2>
-      <form class="corporate-form" novalidate>
-        <div class="corporate-form__grid">
-          <label class="corporate-form__field">
-            <span class="corporate-form__label">Name *</span>
-            <input type="text" name="name" data-zoho-field="Name" autocomplete="name" required />
-          </label>
-          <label class="corporate-form__field">
-            <span class="corporate-form__label">Company / Organization Name</span>
-            <input type="text" name="company" data-zoho-field="CompanyOrganizationName" autocomplete="organization" />
-          </label>
-          <label class="corporate-form__field">
-            <span class="corporate-form__label">Event Type *</span>
-            <select name="eventType" data-zoho-field="EventType" required>
-              <option value="" disabled selected>Select an option</option>
-              <option>Corporate Event</option>
-              <option>Team-Building Event</option>
-              <option>Private Celebration</option>
-              <option>Other</option>
-            </select>
-          </label>
-          <label class="corporate-form__field">
-            <span class="corporate-form__label">Contact Number *</span>
-            <input type="tel" name="contact" data-zoho-field="ContactNumber" autocomplete="tel" required />
-          </label>
-          <label class="corporate-form__field">
-            <span class="corporate-form__label">Email Address *</span>
-            <input type="email" name="email" data-zoho-field="EmailAddress" autocomplete="email" required />
-          </label>
-          <label class="corporate-form__field">
-            <span class="corporate-form__label">Preferred Date &amp; Time</span>
-            <input type="datetime-local" name="datetime" data-zoho-field="PreferredDateTime" />
-          </label>
-          <label class="corporate-form__field">
-            <span class="corporate-form__label">Preferred Location (area / cafe / space)</span>
-            <input type="text" name="location" data-zoho-field="PreferredLocation" />
-          </label>
-          <label class="corporate-form__field">
-            <span class="corporate-form__label">Group Size</span>
-            <input type="number" name="groupSize" data-zoho-field="GroupSize" min="1" />
-          </label>
-          <label class="corporate-form__field corporate-form__field--full">
-            <span class="corporate-form__label">What are you looking for?</span>
-            <textarea name="details" data-zoho-field="WhatAreYouLookingFor" rows="3"></textarea>
-          </label>
-          <label class="corporate-form__field corporate-form__field--full">
-            <span class="corporate-form__label">How did you hear about us?</span>
-            <input type="text" name="referral" data-zoho-field="HowDidYouHearAboutUs" />
-          </label>
+      <div class="corporate-modal__header">
+        <h2 id="corporate-modal-title">Plan Your Event with Games Lab</h2>
+      </div>
+      <div class="corporate-modal__body">
+        <form class="corporate-form" novalidate>
+          <div class="corporate-form__grid">
+            <label class="corporate-form__field">
+              <span class="corporate-form__label">Name *</span>
+              <input type="text" name="name" data-zoho-field="Name" autocomplete="name" required />
+            </label>
+            <label class="corporate-form__field">
+              <span class="corporate-form__label">Company / Organization Name</span>
+              <input type="text" name="company" data-zoho-field="CompanyOrganizationName" autocomplete="organization" />
+            </label>
+            <label class="corporate-form__field">
+              <span class="corporate-form__label">Event Type *</span>
+              <select name="eventType" data-zoho-field="EventType" required>
+                <option value="" disabled selected>Select an option</option>
+                <option>Corporate Event</option>
+                <option>Team-Building Event</option>
+                <option>Private Celebration</option>
+                <option>Other</option>
+              </select>
+            </label>
+            <label class="corporate-form__field">
+              <span class="corporate-form__label">Contact Number *</span>
+              <input type="tel" name="contact" data-zoho-field="ContactNumber" autocomplete="tel" required />
+            </label>
+            <label class="corporate-form__field">
+              <span class="corporate-form__label">Email Address *</span>
+              <input type="email" name="email" data-zoho-field="EmailAddress" autocomplete="email" required />
+            </label>
+            <label class="corporate-form__field">
+              <span class="corporate-form__label">Preferred Date &amp; Time</span>
+              <input type="datetime-local" name="datetime" data-zoho-field="PreferredDateTime" />
+            </label>
+            <label class="corporate-form__field">
+              <span class="corporate-form__label">Preferred Location (area / cafe / space)</span>
+              <input type="text" name="location" data-zoho-field="PreferredLocation" />
+            </label>
+            <label class="corporate-form__field">
+              <span class="corporate-form__label">Group Size</span>
+              <input type="number" name="groupSize" data-zoho-field="GroupSize" min="1" />
+            </label>
+            <label class="corporate-form__field corporate-form__field--full">
+              <span class="corporate-form__label">What are you looking for?</span>
+              <textarea name="details" data-zoho-field="WhatAreYouLookingFor" rows="3"></textarea>
+            </label>
+            <label class="corporate-form__field corporate-form__field--full">
+              <span class="corporate-form__label">How did you hear about us?</span>
+              <input type="text" name="referral" data-zoho-field="HowDidYouHearAboutUs" />
+            </label>
+          </div>
+          <div class="corporate-form__actions">
+            <button type="submit" class="book-btn">Submit Enquiry</button>
+          </div>
+          <p class="corporate-form__error" role="alert" hidden>Please fill in all required fields.</p>
+        </form>
+        <div class="corporate-form__success" role="status" hidden>
+          <p>Thank you for enquiring with Games Lab. We will get back to you within 24 hours with next steps, ideas, and availability.</p>
         </div>
-        <div class="corporate-form__actions">
-          <button type="submit" class="book-btn">Submit Enquiry</button>
-        </div>
-        <p class="corporate-form__error" role="alert" hidden>Please fill in all required fields.</p>
-      </form>
-      <div class="corporate-form__success" role="status" hidden>
-        <p>Thank you for enquiring with Games Lab. We will get back to you within 24 hours with next steps, ideas, and availability.</p>
       </div>
     </div>
   </div>
@@ -104,7 +108,7 @@
   const form = modal.querySelector('.corporate-form');
   const success = modal.querySelector('.corporate-form__success');
   const error = modal.querySelector('.corporate-form__error');
-  const content = modal.querySelector('.corporate-modal__content');
+  const content = modal.querySelector('.corporate-modal__body');
   const detailsField = form ? form.querySelector('textarea[name="details"]') : null;
   const submitButton = form ? form.querySelector('button[type="submit"]') : null;
   const zohoForm = document.getElementById('corporate-zoho-proxy');
@@ -123,6 +127,9 @@
     lastFocused = document.activeElement;
     modal.removeAttribute('hidden');
     document.body.classList.add('corporate-modal-open');
+    if (content){
+      content.scrollTop = 0;
+    }
     const firstInput = modal.querySelector('input, select, textarea, button');
     window.setTimeout(() => {
       (firstInput || modal).focus({ preventScroll: true });
@@ -209,6 +216,7 @@
       detailsField.style.height = '';
     }
     if (content){
+      content.scrollTop = 0;
       content.style.overflow = 'auto';
     }
   }
