@@ -224,7 +224,7 @@ Plan Your Event with Games Lab
           <input type="hidden" name="DateTime_date" id="DateTime_date" checktype="c4" value="" />
         </div>
         <p id="DateTime_error" class="zf-errorMessage" style="display:none;">Invalid value</p>
-        <p class="enquiry-field-hint" id="DateTime_date_hint">Format: dd-MMM-yyyy (e.g. 02-Sep-2025)</p>
+        <p class="enquiry-field-hint" id="DateTime_date_hint">Format: dd-mm-yyyy (e.g. 02-09-2025)</p>
       </div>
       <div class="zf-clearBoth"></div>
     </div>
@@ -286,7 +286,7 @@ Plan Your Event with Games Lab
 
   <script src="{{ '/assets/js/enquiry-validation.js' | relative_url }}"></script>
   <script>
-    var dateAndMonthRegexFormateArray = zf_SetDateAndMonthRegexBasedOnDateFormate('dd-MMM-yyyy');
+    var dateAndMonthRegexFormateArray = zf_SetDateAndMonthRegexBasedOnDateFormate('dd-MM-yyyy');
     var zf_DateRegex = new RegExp(dateAndMonthRegexFormateArray[0]);
     var zf_MonthYearRegex = new RegExp(dateAndMonthRegexFormateArray[1]);
     var zf_MandArray = [ 'Name_First', 'Name_Last', 'Dropdown', 'PhoneNumber_countrycode', 'Email'];

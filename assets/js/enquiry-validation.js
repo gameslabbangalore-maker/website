@@ -401,12 +401,6 @@ if (typeof window !== 'undefined' && typeof window.enquirySyncDateTimeParts !== 
 
 if (typeof window !== 'undefined') {
   (function () {
-    var monthAbbr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    var monthLookup = monthAbbr.reduce(function (acc, abbr, index) {
-      acc[abbr.toLowerCase()] = index;
-      return acc;
-    }, {});
-
     function isoToEnquiry(isoValue) {
       if (!isoValue || typeof isoValue !== 'string') {
         return '';
@@ -415,18 +409,15 @@ if (typeof window !== 'undefined') {
       if (parts.length !== 3) {
         return '';
       }
-      var year = parts[0];
-      var monthIndex = parseInt(parts[1], 10);
-      var day = parts[2];
-      if (!year || isNaN(monthIndex) || !day) {
-        return '';
-      }
-      var monthName = monthAbbr[monthIndex - 1];
-      if (!monthName) {
+      var year = parts[0].trim();
+      var month = parts[1].trim();
+      var day = parts[2].trim();
+      if (!year || !month || !day) {
         return '';
       }
       var paddedDay = day.padStart(2, '0');
-      return paddedDay + '-' + monthName + '-' + year;
+      var paddedMonth = month.padStart(2, '0');
+      return paddedDay + '-' + paddedMonth + '-' + year;
     }
 
     function enquiryToIso(enquiryValue) {
@@ -437,21 +428,27 @@ if (typeof window !== 'undefined') {
       if (parts.length !== 3) {
         return '';
       }
-      var day = parts[0];
-      var monthName = parts[1];
-      var year = parts[2];
-      if (!day || !monthName || !year) {
+      var day = parts[0].trim();
+      var month = parts[1].trim();
+      var year = parts[2].trim();
+      if (!day || !month || !year) {
         return '';
       }
-      var lookupKey = monthName.toLowerCase();
-      var monthIndex = Object.prototype.hasOwnProperty.call(monthLookup, lookupKey)
-        ? monthLookup[lookupKey]
-        : -1;
-      if (monthIndex < 0) {
+
+      var dayNumber = parseInt(day, 10);
+      var monthNumber = parseInt(month, 10);
+      if (isNaN(dayNumber) || isNaN(monthNumber)) {
         return '';
       }
-      var paddedDay = day.padStart(2, '0');
-      var paddedMonth = String(monthIndex + 1).padStart(2, '0');
+      if (monthNumber < 1 || monthNumber > 12) {
+        return '';
+      }
+      if (dayNumber < 1 || dayNumber > 31) {
+        return '';
+      }
+
+      var paddedDay = String(dayNumber).padStart(2, '0');
+      var paddedMonth = String(monthNumber).padStart(2, '0');
       return year + '-' + paddedMonth + '-' + paddedDay;
     }
 
