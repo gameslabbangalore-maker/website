@@ -494,7 +494,9 @@
 .enquiry-form .zf-submitColor[disabled],
 .enquiry-form .zf-submitColor[aria-disabled='true'] {
   cursor: not-allowed;
-  opacity: 0.6;
+  background: color-mix(in srgb, var(--enquiry-accent) 38%, var(--enquiry-surface) 62%);
+  color: color-mix(in srgb, var(--enquiry-submit-text) 30%, var(--enquiry-text) 70%);
+  opacity: 1;
   box-shadow: none;
   transform: none;
 }
@@ -512,6 +514,24 @@
 .enquiry-form .zf-submitColor[aria-disabled='true']:focus-visible {
   transform: none;
   box-shadow: none;
+}
+
+.calendar-subscribe {
+  padding: 18px 12px 12px;
+  text-align: center;
+  font-size: clamp(1rem, 2.4vw, 1.35rem);
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.calendar-subscribe a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.calendar-subscribe a:hover,
+.calendar-subscribe a:focus-visible {
+  text-decoration: underline;
 }
 
 body.enquiry-thankyou-open {

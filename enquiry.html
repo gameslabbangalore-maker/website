@@ -303,6 +303,13 @@ Plan Your Event with Games Lab
         return;
       }
 
+      var redirectField = form.querySelector('input[name="zf_redirect_url"]');
+      if (redirectField) {
+        var redirectPath = "{{ '/enquiry/?submitted=1' | relative_url }}";
+        var origin = window.location.origin || (window.location.protocol + '//' + window.location.host);
+        redirectField.value = origin.replace(/\/$/, '') + redirectPath;
+      }
+
       var submitButton = form.querySelector('.zf-submitColor');
       var requiredSelectors = ['#Name_First', '#Name_Last', '#Dropdown', '[name="PhoneNumber_countrycode"]', '#Email'];
       var requiredFields = requiredSelectors.map(function (selector) {
