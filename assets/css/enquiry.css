@@ -1,33 +1,31 @@
 :root {
-  --enquiry-surface: #ffffff;
-  --enquiry-text: #252c3e;
-  --enquiry-muted: #465475;
-  --enquiry-accent: #2eb79f;
-  --enquiry-border: rgba(184, 187, 211, 1);
-  --enquiry-shadow: 0 28px 80px rgba(10, 12, 22, 0.45);
-  --enquiry-input-bg: #ffffff;
+  --enquiry-surface: var(--surface-elevated, #212121);
+  --enquiry-text: var(--text-main, #ffffff);
+  --enquiry-muted: var(--muted, rgba(255, 255, 255, 0.72));
+  --enquiry-accent: var(--accent, #fce029);
+  --enquiry-border: rgba(255, 255, 255, 0.14);
+  --enquiry-shadow: 0 28px 80px rgba(0, 0, 0, 0.6);
+  --enquiry-input-bg: rgba(0, 0, 0, 0.35);
+  --enquiry-submit-text: #000000;
+  --enquiry-accent-soft: rgba(252, 224, 41, 0.35);
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
-    --enquiry-surface: #151827;
-    --enquiry-text: #ecf1ff;
-    --enquiry-muted: #b6c3e6;
-    --enquiry-accent: #ffe974;
-    --enquiry-border: rgba(114, 126, 170, 0.75);
-    --enquiry-shadow: 0 30px 90px rgba(2, 6, 20, 0.65);
-    --enquiry-input-bg: rgba(15, 18, 32, 0.85);
+    --enquiry-border: rgba(0, 0, 0, 0.08);
+    --enquiry-shadow: 0 24px 60px rgba(16, 20, 30, 0.16);
+    --enquiry-input-bg: #ffffff;
+    --enquiry-submit-text: #ffffff;
+    --enquiry-accent-soft: rgba(10, 117, 188, 0.28);
   }
 }
 
 .dark {
-  --enquiry-surface: #151827;
-  --enquiry-text: #ecf1ff;
-  --enquiry-muted: #b6c3e6;
-  --enquiry-accent: #ffe974;
-  --enquiry-border: rgba(114, 126, 170, 0.75);
-  --enquiry-shadow: 0 30px 90px rgba(2, 6, 20, 0.65);
-  --enquiry-input-bg: rgba(15, 18, 32, 0.85);
+  --enquiry-border: rgba(255, 255, 255, 0.14);
+  --enquiry-shadow: 0 28px 80px rgba(0, 0, 0, 0.6);
+  --enquiry-input-bg: rgba(0, 0, 0, 0.35);
+  --enquiry-submit-text: #000000;
+  --enquiry-accent-soft: rgba(252, 224, 41, 0.35);
 }
 
 #corporate-enquiry {
@@ -89,7 +87,8 @@
 }
 
 .enquiry-page .enquiry-lede {
-  margin: 0 0 32px;
+  margin: 0 auto 32px;
+  max-width: 720px;
   font-size: clamp(1.3rem, 3vw, 1.9rem);
   font-weight: 700;
   line-height: 1.3;
@@ -98,7 +97,9 @@
 
 .enquiry-form {
   color: var(--enquiry-text);
-  font: 75%/1.4 Arial, Helvetica, sans-serif;
+  font-family: 'Comfortaa', "Trebuchet MS", Arial, sans-serif;
+  line-height: 1.4;
+  font-size: 1rem;
 }
 
 .enquiry-form * {
@@ -122,8 +123,9 @@
 .enquiry-form .zf-templateWrapper {
   background: var(--enquiry-surface);
   box-shadow: var(--enquiry-shadow);
-  border-radius: 16px;
+  border-radius: 18px;
   overflow: hidden;
+  border: 1px solid var(--enquiry-border);
 }
 
 .enquiry-form .zf-tempHeadBdr {
@@ -134,16 +136,17 @@
 
 .enquiry-form .zf-tempHeadContBdr {
   background: var(--enquiry-surface);
+  background: color-mix(in srgb, var(--enquiry-surface) 92%, black 8%);
   border-bottom: 1px solid var(--enquiry-border);
-  padding: 28px 40px;
-  border-radius: 16px 16px 0 0;
+  padding: clamp(24px, 5vw, 32px) clamp(24px, 6vw, 48px);
+  border-radius: 18px 18px 0 0;
   text-align: center;
 }
 
 .enquiry-form .zf-frmTitle {
   margin: 0;
-  font-size: clamp(2rem, 3vw, 2.4rem);
-  font-weight: 600;
+  font-size: clamp(2rem, 3vw, 2.35rem);
+  font-weight: 700;
   color: var(--enquiry-text);
 }
 
@@ -169,16 +172,34 @@
 }
 
 .enquiry-form .zf-tempFrmWrapper {
-  padding: 16px 40px;
+  padding: clamp(18px, 4vw, 28px) clamp(24px, 6vw, 48px);
   display: block;
+  background: var(--enquiry-surface);
+  background: color-mix(in srgb, var(--enquiry-surface) 96%, black 4%);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.enquiry-form .zf-tempFrmWrapper:first-of-type {
+  border-top: none;
+}
+
+@media (prefers-color-scheme: light) {
+  .enquiry-form .zf-tempFrmWrapper {
+    border-top: 1px solid rgba(0, 0, 0, 0.04);
+  }
+}
+
+.dark .enquiry-form .zf-tempFrmWrapper {
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .enquiry-form .zf-labelName {
   display: block;
-  margin-bottom: 10px;
-  font-size: 1.05rem;
+  margin-bottom: 12px;
+  font-size: 1.02rem;
   font-weight: 600;
   color: var(--enquiry-text);
+  letter-spacing: 0.01em;
 }
 
 .enquiry-form .zf-important {
@@ -195,12 +216,18 @@
 .enquiry-form .zf-form-sBox {
   width: 100%;
   border: 1px solid var(--enquiry-border);
-  border-radius: 8px;
-  padding: 11px 12px;
+  border-radius: 12px;
+  padding: 12px 14px;
   font-size: 1rem;
   color: var(--enquiry-text);
   background: var(--enquiry-input-bg);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.enquiry-form input[type="text"]::placeholder,
+.enquiry-form textarea::placeholder {
+  color: var(--enquiry-muted);
+  opacity: 0.65;
 }
 
 .enquiry-form input[type="text"]:focus,
@@ -208,21 +235,7 @@
 .enquiry-form .zf-form-sBox:focus {
   outline: none;
   border-color: var(--enquiry-accent);
-  box-shadow: 0 0 0 3px rgba(46, 183, 159, 0.25);
-}
-
-@media (prefers-color-scheme: dark) {
-  .enquiry-form input[type="text"]:focus,
-  .enquiry-form textarea:focus,
-  .enquiry-form .zf-form-sBox:focus {
-    box-shadow: 0 0 0 3px rgba(255, 233, 116, 0.35);
-  }
-}
-
-.dark .enquiry-form input[type="text"]:focus,
-.dark .enquiry-form textarea:focus,
-.dark .enquiry-form .zf-form-sBox:focus {
-  box-shadow: 0 0 0 3px rgba(255, 233, 116, 0.35);
+  box-shadow: 0 0 0 3px var(--enquiry-accent-soft);
 }
 
 .enquiry-form textarea {
@@ -303,7 +316,7 @@
   font-size: 1.05rem;
   font-weight: 700;
   background: var(--enquiry-accent);
-  color: #000;
+  color: var(--enquiry-submit-text);
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -311,7 +324,7 @@
 .enquiry-form .zf-submitColor:hover,
 .enquiry-form .zf-submitColor:focus-visible {
   transform: scale(1.02);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 12px 32px var(--enquiry-accent-soft);
   outline: none;
 }
 
