@@ -438,8 +438,8 @@ body:not(.dark) .enquiry-input input[type="datetime-local"]::-webkit-calendar-pi
 }
 
 .enquiry-textarea .enquiry-field-icon {
-  top: 22px;
-  transform: none;
+  top: calc(16px + 0.7em);
+  transform: translateY(-50%);
 }
 
 .enquiry-date-original {
