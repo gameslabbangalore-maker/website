@@ -126,12 +126,12 @@
   const closeButtons = modal.querySelectorAll('[data-modal-close]');
   let lastFocused = null;
   let submissionPending = false;
-  let fetchController = null;
-  let fetchTimeout = null;
   let fallbackTimer = null;
   let scrollPosition = 0;
   const defaultSubmitText = submitButton ? submitButton.textContent : '';
   const defaultErrorText = error ? error.textContent : '';
+  let proxyHasLoadedOnce = false;
+  let awaitingProxy = false;
 
   function openModal(){
     if (!modal.hasAttribute('hidden')) return;
@@ -196,7 +196,7 @@
     if (!detailsField || !content) return;
     detailsField.style.height = '';
     if (!window.matchMedia('(min-width: 769px)').matches){
-      content.style.overflow = 'auto';
+      content.style.overflow = 'visible';
       return;
     }
 
@@ -222,14 +222,6 @@
 
   function resetForm(){
     if (!form) return;
-    if (fetchController){
-      try { fetchController.abort(); } catch (err) {}
-      fetchController = null;
-    }
-    if (fetchTimeout){
-      window.clearTimeout(fetchTimeout);
-      fetchTimeout = null;
-    }
     clearFallbackWatch();
     form.reset();
     if (error){
@@ -240,12 +232,13 @@
     form.removeAttribute('hidden');
     setSubmitting(false);
     submissionPending = false;
+    awaitingProxy = false;
     if (detailsField){
       detailsField.style.height = '';
     }
     if (content){
       content.scrollTop = 0;
-      content.style.overflow = 'auto';
+      content.style.overflow = 'visible';
     }
   }
 
@@ -285,35 +278,9 @@
     return (field.value || '').trim();
   }
 
-  function postToZoho(entries){
-    if (!window.fetch || !endpoint){
-      return Promise.reject(new Error('unavailable'));
-    }
-    const payload = new URLSearchParams();
-    entries.forEach(([key, value]) => {
-      payload.append(key, value);
-    });
-    const controller = 'AbortController' in window ? new AbortController() : null;
-    const options = { method: 'POST', body: payload, mode: 'no-cors' };
-    if (controller){
-      options.signal = controller.signal;
-      fetchController = controller;
-      fetchTimeout = window.setTimeout(() => {
-        fetchTimeout = null;
-        try { controller.abort(); } catch (err) {}
-      }, 15000);
-    }
-    return fetch(endpoint, options).finally(() => {
-      if (fetchTimeout){
-        window.clearTimeout(fetchTimeout);
-        fetchTimeout = null;
-      }
-      fetchController = null;
-    });
-  }
-
   function submitViaProxy(entries){
-    if (!zohoForm || !zohoTarget) return false;
+    if (!zohoForm || !zohoTarget || !endpoint) return false;
+    zohoForm.setAttribute('action', endpoint);
     while (zohoForm.firstChild){
       zohoForm.removeChild(zohoForm.firstChild);
     }
@@ -325,6 +292,7 @@
       zohoForm.appendChild(input);
     });
     startFallbackWatch();
+    awaitingProxy = true;
     zohoForm.submit();
     return true;
   }
@@ -332,6 +300,7 @@
   function showSuccess(){
     clearFallbackWatch();
     submissionPending = false;
+    awaitingProxy = false;
     if (form) form.setAttribute('hidden', '');
     if (success) success.removeAttribute('hidden');
     setSubmitting(false);
@@ -341,6 +310,7 @@
   function showError(message){
     clearFallbackWatch();
     submissionPending = false;
+    awaitingProxy = false;
     setSubmitting(false);
     if (error){
       error.textContent = message || defaultErrorText;
@@ -359,8 +329,8 @@
     clearFallbackWatch();
     fallbackTimer = window.setTimeout(() => {
       if (!submissionPending) return;
-      showSuccess();
-    }, 8000);
+      showError('We could not confirm your submission. Please try again or email corporate@gameslab.co.in.');
+    }, 15000);
   }
 
   function clearFallbackWatch(){
@@ -398,26 +368,24 @@
       }
 
       const entries = buildEntries();
+      const proxied = submitViaProxy(entries);
+      if (!proxied){
+        showError('We could not connect to the enquiry service. Please try again later or reach us at corporate@gameslab.co.in.');
+        return;
+      }
       submissionPending = true;
       setSubmitting(true);
-
-      postToZoho(entries)
-        .then(() => {
-          showSuccess();
-        })
-        .catch(() => {
-          if (!submissionPending) return;
-          const fallbackWorked = submitViaProxy(entries);
-          if (!fallbackWorked){
-            showError('We could not connect to the enquiry service. Please try again later or reach us at corporate@gameslab.co.in.');
-          }
-        });
     });
   }
 
   if (zohoTarget){
     zohoTarget.addEventListener('load', () => {
-      if (!submissionPending) return;
+      if (!proxyHasLoadedOnce){
+        proxyHasLoadedOnce = true;
+        if (!awaitingProxy) return;
+      }
+      if (!submissionPending || !awaitingProxy) return;
+      awaitingProxy = false;
       showSuccess();
     });
   }
