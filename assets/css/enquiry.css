@@ -1,31 +1,31 @@
 :root {
-  --enquiry-surface: var(--surface-elevated, #212121);
+  --enquiry-surface: var(--card, #212121);
   --enquiry-text: var(--text-main, #ffffff);
   --enquiry-muted: var(--muted, rgba(255, 255, 255, 0.72));
   --enquiry-accent: var(--accent, #fce029);
   --enquiry-border: rgba(255, 255, 255, 0.14);
   --enquiry-shadow: 0 28px 80px rgba(0, 0, 0, 0.6);
-  --enquiry-input-bg: rgba(0, 0, 0, 0.35);
+  --enquiry-input-bg: color-mix(in srgb, var(--enquiry-surface) 82%, transparent);
   --enquiry-submit-text: #000000;
-  --enquiry-accent-soft: rgba(252, 224, 41, 0.35);
+  --enquiry-accent-soft: color-mix(in srgb, var(--enquiry-accent) 32%, transparent);
 }
 
 @media (prefers-color-scheme: light) {
   :root {
     --enquiry-border: rgba(0, 0, 0, 0.08);
     --enquiry-shadow: 0 24px 60px rgba(16, 20, 30, 0.16);
-    --enquiry-input-bg: #ffffff;
+    --enquiry-input-bg: color-mix(in srgb, var(--enquiry-surface) 92%, white 8%);
     --enquiry-submit-text: #ffffff;
-    --enquiry-accent-soft: rgba(10, 117, 188, 0.28);
+    --enquiry-accent-soft: color-mix(in srgb, var(--enquiry-accent) 30%, transparent);
   }
 }
 
 .dark {
-  --enquiry-border: rgba(255, 255, 255, 0.14);
+  --enquiry-border: rgba(255, 255, 255, 0.12);
   --enquiry-shadow: 0 28px 80px rgba(0, 0, 0, 0.6);
-  --enquiry-input-bg: rgba(0, 0, 0, 0.35);
+  --enquiry-input-bg: color-mix(in srgb, var(--enquiry-surface) 78%, black 22%);
   --enquiry-submit-text: #000000;
-  --enquiry-accent-soft: rgba(252, 224, 41, 0.35);
+  --enquiry-accent-soft: color-mix(in srgb, var(--enquiry-accent) 34%, transparent);
 }
 
 #corporate-enquiry {
@@ -174,9 +174,8 @@
 .enquiry-form .zf-tempFrmWrapper {
   padding: clamp(18px, 4vw, 28px) clamp(24px, 6vw, 48px);
   display: block;
-  background: var(--enquiry-surface);
-  background: color-mix(in srgb, var(--enquiry-surface) 96%, black 4%);
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  background: color-mix(in srgb, var(--enquiry-surface) 96%, transparent);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .enquiry-form .zf-tempFrmWrapper:first-of-type {
@@ -185,12 +184,12 @@
 
 @media (prefers-color-scheme: light) {
   .enquiry-form .zf-tempFrmWrapper {
-    border-top: 1px solid rgba(0, 0, 0, 0.04);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
   }
 }
 
 .dark .enquiry-form .zf-tempFrmWrapper {
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .enquiry-form .zf-labelName {
