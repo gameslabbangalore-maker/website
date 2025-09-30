@@ -1,5 +1,8 @@
 /* Zoho validation helpers (embedded as provided) */
 function zf_ValidateAndSubmit() {
+  if (typeof window !== 'undefined' && typeof window.enquirySyncDateTimeParts === 'function') {
+    window.enquirySyncDateTimeParts();
+  }
   if (zf_CheckMandatory()) {
     if (zf_ValidCheck()) {
       if (typeof isSalesIQIntegrationEnabled !== 'undefined' && isSalesIQIntegrationEnabled) {
@@ -392,6 +395,9 @@ function zf_SetDateAndMonthRegexBasedOnDateFormate(dateFormat) {
   return dateAndMonthRegexFormateArray;
 }
 
+if (typeof window !== 'undefined' && typeof window.enquirySyncDateTimeParts !== 'function') {
+  window.enquirySyncDateTimeParts = function () {};
+}
 
 document.addEventListener('DOMContentLoaded', function () {
   var form = document.getElementById('form');
@@ -402,6 +408,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var datetimeField = document.getElementById('PreferredDateTime');
   var datetimeWrapper = datetimeField ? datetimeField.closest('.enquiry-input--datetime') : null;
   if (!datetimeField || !datetimeWrapper) {
+    window.enquirySyncDateTimeParts = function () {};
     return;
   }
 
@@ -410,6 +417,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var minuteSelect = form['DateTime_minutes'];
   var meridiemSelect = form['DateTime_meridiem'];
   if (!dateInput || !hourSelect || !minuteSelect || !meridiemSelect) {
+    window.enquirySyncDateTimeParts = function () {};
     return;
   }
 
@@ -549,6 +557,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
   datetimeField.addEventListener('input', updatePartsFromNative);
   datetimeField.addEventListener('change', updatePartsFromNative);
+
+  dateInput.addEventListener('change', syncNativeFromParts);
+  hourSelect.addEventListener('change', syncNativeFromParts);
+  minuteSelect.addEventListener('change', syncNativeFromParts);
+  meridiemSelect.addEventListener('change', syncNativeFromParts);
+
+  window.enquirySyncDateTimeParts = function () {
+    updatePartsFromNative();
+  };
 
   form.addEventListener('submit', function () {
     updatePartsFromNative();
