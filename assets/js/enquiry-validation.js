@@ -453,19 +453,19 @@ if (typeof window !== 'undefined') {
     }
 
     function syncDateValue() {
-      var hiddenInput = document.getElementById('DateTime_date');
+      var hiddenInput = document.getElementById('Date');
       if (!hiddenInput) {
         return '';
       }
-      var dateInput = document.getElementById('DateTime_date_picker');
+      var dateInput = document.getElementById('Date_picker');
       var formatted = isoToEnquiry(dateInput ? dateInput.value : '');
       hiddenInput.value = formatted;
       return formatted;
     }
 
     function initDatePickerSync() {
-      var dateInput = document.getElementById('DateTime_date_picker');
-      var hiddenInput = document.getElementById('DateTime_date');
+      var dateInput = document.getElementById('Date_picker');
+      var hiddenInput = document.getElementById('Date');
       if (!dateInput || !hiddenInput) {
         window.enquirySyncDateTimeParts = function () {};
         return;

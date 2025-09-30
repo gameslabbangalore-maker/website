@@ -207,7 +207,7 @@ Plan Your Event with Games Lab
       <div class="zf-clearBoth"></div>
     </div>
     <div class="zf-tempFrmWrapper zf-date enquiry-field enquiry-field--date">
-      <label class="zf-labelName" for="DateTime_date_picker">Preferred Date</label>
+      <label class="zf-labelName" for="Date_picker">Preferred Date</label>
       <div class="zf-tempContDiv">
         <div class="enquiry-input enquiry-input--date">
           <span class="enquiry-field-icon" aria-hidden="true">
@@ -217,14 +217,14 @@ Plan Your Event with Games Lab
           </span>
           <input
             type="date"
-            id="DateTime_date_picker"
+            id="Date_picker"
             class="enquiry-date-picker"
-            aria-describedby="DateTime_date_hint"
+            aria-describedby="Date_hint"
           />
-          <input type="hidden" name="DateTime_date" id="DateTime_date" checktype="c4" value="" />
+          <input type="hidden" name="Date" id="Date" checktype="c4" value="" />
         </div>
-        <p id="DateTime_error" class="zf-errorMessage" style="display:none;">Invalid value</p>
-        <p class="enquiry-field-hint" id="DateTime_date_hint">Format: dd-mm-yyyy (e.g. 02-09-2025)</p>
+        <p id="Date_error" class="zf-errorMessage" style="display:none;">Invalid value</p>
+        <p class="enquiry-field-hint" id="Date_hint">Format: dd-mm-yyyy (e.g. 02-09-2025)</p>
       </div>
       <div class="zf-clearBoth"></div>
     </div>
@@ -290,7 +290,7 @@ Plan Your Event with Games Lab
     var zf_DateRegex = new RegExp(dateAndMonthRegexFormateArray[0]);
     var zf_MonthYearRegex = new RegExp(dateAndMonthRegexFormateArray[1]);
     var zf_MandArray = [ 'Name_First', 'Name_Last', 'Dropdown', 'PhoneNumber_countrycode', 'Email'];
-    var zf_FieldArray = [ 'Name_First', 'Name_Last', 'SingleLine', 'Dropdown', 'PhoneNumber_countrycode', 'Email', 'Number', 'DateTime_date', 'SingleLine1', 'MultiLine', 'SingleLine2'];
+    var zf_FieldArray = [ 'Name_First', 'Name_Last', 'SingleLine', 'Dropdown', 'PhoneNumber_countrycode', 'Email', 'Number', 'Date', 'SingleLine1', 'MultiLine', 'SingleLine2'];
     var isSalesIQIntegrationEnabled = false;
     var salesIQFieldsArray = [];
   </script>
