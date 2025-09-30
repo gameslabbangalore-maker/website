@@ -147,7 +147,8 @@
   margin: 0;
   font-size: clamp(2rem, 3vw, 2.35rem);
   font-weight: 700;
-  color: var(--enquiry-text);
+  color: var(--enquiry-accent);
+  font-style: normal;
 }
 
 .enquiry-form .zf-frmDesc {
@@ -303,6 +304,10 @@
   padding: 0;
 }
 
+.enquiry-form .zf-templateWrapper li {
+  list-style: none;
+}
+
 .enquiry-icon-sprite {
   position: absolute;
   width: 0;
@@ -321,7 +326,7 @@
   gap: 12px;
   border: 1px solid var(--enquiry-border);
   border-radius: 999px;
-  padding: 12px 18px 12px 54px;
+  padding: 12px 18px 12px 48px;
   background: var(--enquiry-input-bg);
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
@@ -347,34 +352,16 @@
   padding-right: 24px;
 }
 
-.enquiry-input--datetime::after {
-  content: attr(data-placeholder);
-  position: absolute;
-  left: calc(18px + 22px + 12px);
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--enquiry-muted);
-  pointer-events: none;
-  font-size: 0.95rem;
-  opacity: 1;
-  transition: opacity 0.2s ease;
-}
-
-.enquiry-input--datetime.has-value::after,
-.enquiry-input--datetime:focus-within::after {
-  opacity: 0;
-}
-
 .enquiry-field-icon {
   position: absolute;
-  left: 18px;
+  left: 16px;
   top: 50%;
   transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   color: var(--enquiry-muted);
   pointer-events: none;
 }
@@ -404,7 +391,7 @@
   align-items: flex-start;
   border: 1px solid var(--enquiry-border);
   border-radius: 16px;
-  padding: 16px 18px 16px 54px;
+  padding: 16px 18px 16px 48px;
   background: var(--enquiry-input-bg);
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
@@ -499,7 +486,7 @@
   }
 
   .enquiry-input {
-    padding: 10px 16px;
+    padding: 10px 16px 10px 46px;
   }
 
   .enquiry-input--select {
@@ -510,12 +497,7 @@
     right: 18px;
   }
 
-  .enquiry-input--datetime::after {
-    left: calc(16px + 22px + 10px);
-    font-size: 0.9rem;
-  }
-
   .enquiry-textarea {
-    padding: 14px 16px;
+    padding: 14px 16px 14px 46px;
   }
 }
