@@ -347,8 +347,67 @@
   pointer-events: none;
 }
 
-.enquiry-input--datetime {
-  padding-right: 24px;
+.enquiry-datetime {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 16px;
+  border: 1px solid var(--enquiry-border);
+  border-radius: 999px;
+  padding: 12px 18px 12px 48px;
+  background: var(--enquiry-input-bg);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.enquiry-datetime-fields {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.enquiry-datetime-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 86px;
+  margin: 0;
+  float: none !important;
+  flex: 0 0 auto;
+}
+
+.enquiry-datetime-fields .zf-subDate.enquiry-datetime-field {
+  flex: 1 1 200px;
+}
+
+.enquiry-datetime-field input,
+.enquiry-datetime-field select {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  color: var(--enquiry-text);
+  min-width: 0;
+}
+
+.enquiry-datetime-field input {
+  min-width: 150px;
+}
+
+.enquiry-datetime-field select {
+  padding-right: 18px;
+  cursor: pointer;
+}
+
+.enquiry-datetime-field label {
+  font-size: 0.75rem;
+  color: var(--enquiry-muted);
+  padding: 0;
+  margin: 0;
+  text-align: left;
 }
 
 .enquiry-field-icon {
@@ -365,26 +424,31 @@
   pointer-events: none;
 }
 
-.enquiry-input select {
+.enquiry-input select,
+.enquiry-datetime select {
   padding-right: 24px;
   cursor: pointer;
 }
 
-.enquiry-input select option {
+.enquiry-input select option,
+.enquiry-datetime select option {
   background-color: var(--enquiry-surface);
   color: var(--enquiry-text);
 }
 
-.dark .enquiry-input select option {
+.dark .enquiry-input select option,
+.dark .enquiry-datetime select option {
   color: var(--enquiry-text);
 }
 
-.enquiry-input select {
+.enquiry-input select,
+.enquiry-datetime select {
   background-color: transparent;
   color-scheme: light;
 }
 
-.dark .enquiry-input select {
+.dark .enquiry-input select,
+.dark .enquiry-datetime select {
   color-scheme: dark;
 }
 
@@ -426,35 +490,18 @@
   transform: translateY(-50%);
 }
 
-.enquiry-date-original {
-  display: none;
-}
-
 .enquiry-input:focus-within,
-.enquiry-textarea:focus-within {
+.enquiry-textarea:focus-within,
+.enquiry-datetime:focus-within {
   border-color: var(--enquiry-accent);
   box-shadow: 0 0 0 3px var(--enquiry-accent-soft);
   background: color-mix(in srgb, var(--enquiry-surface) 92%, var(--enquiry-accent) 8%);
 }
 
 .enquiry-input:focus-within .enquiry-field-icon,
-.enquiry-textarea:focus-within .enquiry-field-icon {
+.enquiry-textarea:focus-within .enquiry-field-icon,
+.enquiry-datetime:focus-within .enquiry-field-icon {
   color: var(--enquiry-accent);
-}
-
-.enquiry-form .zf-date .zf-tempContDiv {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
-}
-
-.enquiry-form .zf-subDate {
-  flex: 1 1 220px;
-}
-
-.enquiry-form .zf-tempContDiv select.zf-form-sBox {
-  min-width: 90px;
 }
 
 .enquiry-form .zf-errorMessage {

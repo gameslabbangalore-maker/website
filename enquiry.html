@@ -207,23 +207,21 @@ Plan Your Event with Games Lab
       <div class="zf-clearBoth"></div>
     </div>
     <div class="zf-tempFrmWrapper zf-date enquiry-field enquiry-field--datetime">
-      <label class="zf-labelName" for="PreferredDateTime">Preferred Date &amp; Time</label>
+      <label class="zf-labelName" for="DateTime_date">Preferred Date &amp; Time</label>
       <div class="zf-tempContDiv">
-        <div class="enquiry-input enquiry-input--datetime">
+        <div class="enquiry-datetime">
           <span class="enquiry-field-icon" aria-hidden="true">
             <svg class="enquiry-field-icon-svg">
               <use href="#icon-calendar"></use>
             </svg>
           </span>
-          <input type="text" id="PreferredDateTime" name="PreferredDateTime" class="enquiry-datetime" inputmode="text" autocomplete="off" placeholder="02-Sep-2025 10:50 PM" />
-        </div>
-        <div class="enquiry-date-original" aria-hidden="true">
-          <span class="zf-subDate">
-            <input type="text" class="zf-hasDatepicker" maxlength="25" checktype="c4" name="DateTime_date" value="" placeholder="" />
-            <label>dd-MMM-yyyy</label>
-          </span>
-          <span>
-            <select class="zf-form-sBox" name="DateTime_hours" checktype="c1">
+          <div class="enquiry-datetime-fields">
+            <span class="zf-subDate enquiry-datetime-field">
+              <input type="text" class="zf-hasDatepicker" maxlength="25" checktype="c4" name="DateTime_date" id="DateTime_date" value="" placeholder="" />
+              <label>dd-MMM-yyyy</label>
+            </span>
+            <span class="enquiry-datetime-field">
+              <select class="zf-form-sBox" name="DateTime_hours" checktype="c1">
               <option value=""></option>
               <option value="01">01</option>
               <option value="02">02</option>
@@ -239,9 +237,9 @@ Plan Your Event with Games Lab
               <option value="12">12</option>
             </select>
             <label>HH</label>
-          </span>
-          <span>
-            <select class="zf-form-sBox" name="DateTime_minutes" checktype="c1">
+            </span>
+            <span class="enquiry-datetime-field">
+              <select class="zf-form-sBox" name="DateTime_minutes" checktype="c1">
               <option value=""></option>
               <option value="00">00</option>
               <option value="01">01</option>
@@ -305,16 +303,16 @@ Plan Your Event with Games Lab
               <option value="59">59</option>
             </select>
             <label>MM</label>
-          </span>
-          <span>
-            <select class="zf-form-sBox" name="DateTime_meridiem" checktype="c1">
+            </span>
+            <span class="enquiry-datetime-field">
+              <select class="zf-form-sBox" name="DateTime_meridiem" checktype="c1">
               <option value=""></option>
               <option>AM</option>
               <option>PM</option>
             </select>
             <label>AM / PM</label>
-          </span>
-          <div class="zf-clearBoth"></div>
+            </span>
+          </div>
         </div>
         <p id="DateTime_error" class="zf-errorMessage" style="display:none;">Invalid value</p>
       </div>
