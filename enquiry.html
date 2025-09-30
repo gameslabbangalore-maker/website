@@ -93,9 +93,8 @@ accept-charset='UTF-8' enctype='multipart/form-data' id='form'>
                   <use href="#icon-person"></use>
                 </svg>
               </span>
-              <input type="text" maxlength="255" name="Name_First" id="Name_First" fieldType="7" placeholder="First name" aria-describedby="hint-name" />
+              <input type="text" maxlength="255" name="Name_First" id="Name_First" fieldType="7" placeholder="First name" />
             </div>
-            <label class="enquiry-sub-label" for="Name_First">First name</label>
           </span>
           <span class="enquiry-input-wrapper">
             <div class="enquiry-input">
@@ -104,13 +103,11 @@ accept-charset='UTF-8' enctype='multipart/form-data' id='form'>
                   <use href="#icon-person"></use>
                 </svg>
               </span>
-              <input type="text" maxlength="255" name="Name_Last" id="Name_Last" fieldType="7" placeholder="Last name" aria-describedby="hint-name" />
+              <input type="text" maxlength="255" name="Name_Last" id="Name_Last" fieldType="7" placeholder="Last name" />
             </div>
-            <label class="enquiry-sub-label" for="Name_Last">Last name</label>
           </span>
           <div class="zf-clearBoth"></div>
         </div>
-        <p class="enquiry-field-hint" id="hint-name">Tell us who we should contact.</p>
         <p id="Name_error" class="zf-errorMessage" style="display:none;">Invalid value</p>
       </div>
       <div class="zf-clearBoth"></div>
@@ -124,9 +121,8 @@ accept-charset='UTF-8' enctype='multipart/form-data' id='form'>
               <use href="#icon-building"></use>
             </svg>
           </span>
-          <input type="text" name="SingleLine" id="SingleLine" checktype="c1" value="" maxlength="255" fieldType="1" placeholder="e.g. Acme Corp" aria-describedby="hint-company" />
+          <input type="text" name="SingleLine" id="SingleLine" checktype="c1" value="" maxlength="255" fieldType="1" placeholder="e.g. Acme Corp" />
         </div>
-        <p class="enquiry-field-hint" id="hint-company">Your organisation, club, or team name.</p>
         <p id="SingleLine_error" class="zf-errorMessage" style="display: none;">Invalid value</p>
       </div>
       <div class="zf-clearBoth"></div>
@@ -143,14 +139,13 @@ accept-charset='UTF-8' enctype='multipart/form-data' id='form'>
               <use href="#icon-celebrate"></use>
             </svg>
           </span>
-          <select class="zf-form-sBox" name="Dropdown" id="Dropdown" checktype="c1" aria-describedby="hint-event">
+          <select class="zf-form-sBox" name="Dropdown" id="Dropdown" checktype="c1">
             <option value="-Select-" selected>-Select-</option>
             <option value="Corporate Event">Corporate Event</option>
             <option value="Team Event">Team Event</option>
             <option value="Private Celebration">Private Celebration</option>
           </select>
         </div>
-        <p class="enquiry-field-hint" id="hint-event">Choose the style of gathering you&rsquo;re planning.</p>
         <p id="Dropdown_error" class="zf-errorMessage" style="display:none;">Invalid value</p>
       </div>
       <div class="zf-clearBoth"></div>
@@ -169,13 +164,11 @@ accept-charset='UTF-8' enctype='multipart/form-data' id='form'>
                   <use href="#icon-phone"></use>
                 </svg>
               </span>
-              <input type="tel" compname="PhoneNumber" name="PhoneNumber_countrycode" maxlength="20" checktype="c7" value="" phoneFormat="1" isCountryCodeEnabled="false" fieldType="11" id="international_PhoneNumber_countrycode" valType="number" phoneFormatType="1" placeholder="e.g. +91 98765 43210" aria-describedby="hint-phone" />
+              <input type="tel" compname="PhoneNumber" name="PhoneNumber_countrycode" maxlength="20" checktype="c7" value="" phoneFormat="1" isCountryCodeEnabled="false" fieldType="11" id="international_PhoneNumber_countrycode" valType="number" phoneFormatType="1" placeholder="e.g. +91 98765 43210" />
             </div>
-            <label class="enquiry-sub-label" for="international_PhoneNumber_countrycode">Number</label>
           </span>
           <div class="zf-clearBoth"></div>
         </div>
-        <p class="enquiry-field-hint" id="hint-phone">We&rsquo;ll reach out here if we need quick details.</p>
         <p id="PhoneNumber_error" class="zf-errorMessage" style="display:none;">Invalid value</p>
       </div>
       <div class="zf-clearBoth"></div>
@@ -192,9 +185,8 @@ accept-charset='UTF-8' enctype='multipart/form-data' id='form'>
               <use href="#icon-mail"></use>
             </svg>
           </span>
-          <input type="email" name="Email" id="Email" checktype="c5" value="" maxlength="255" fieldType="9" placeholder="you@example.com" aria-describedby="hint-email" />
+          <input type="email" name="Email" id="Email" checktype="c5" value="" maxlength="255" fieldType="9" placeholder="you@example.com" />
         </div>
-        <p class="enquiry-field-hint" id="hint-email">Proposals and confirmations will arrive in your inbox.</p>
         <p id="Email_error" class="zf-errorMessage" style="display: none;">Invalid value</p>
       </div>
       <div class="zf-clearBoth"></div>
@@ -208,9 +200,8 @@ accept-charset='UTF-8' enctype='multipart/form-data' id='form'>
               <use href="#icon-group"></use>
             </svg>
           </span>
-          <input type="text" name="Number" id="Number" checktype="c2" value="" maxlength="18" fieldType="3" placeholder="e.g. 40" aria-describedby="hint-group" />
+          <input type="text" name="Number" id="Number" checktype="c2" value="" maxlength="18" fieldType="3" placeholder="e.g. 40" />
         </div>
-        <p class="enquiry-field-hint" id="hint-group">Share an estimate so we can tailor recommendations.</p>
         <p id="Number_error" class="zf-errorMessage" style="display: none;">Invalid value</p>
       </div>
       <div class="zf-clearBoth"></div>
@@ -224,9 +215,8 @@ accept-charset='UTF-8' enctype='multipart/form-data' id='form'>
               <use href="#icon-calendar"></use>
             </svg>
           </span>
-          <input type="datetime-local" id="PreferredDateTime" name="PreferredDateTime" class="enquiry-datetime" aria-describedby="hint-datetime" step="900" />
+          <input type="datetime-local" id="PreferredDateTime" name="PreferredDateTime" class="enquiry-datetime" step="900" />
         </div>
-        <p class="enquiry-field-hint" id="hint-datetime">Pick a tentative schedule; you can adjust it with us later.</p>
         <div class="enquiry-date-original" aria-hidden="true">
           <span class="zf-subDate">
             <input type="text" class="zf-hasDatepicker" maxlength="25" checktype="c4" name="DateTime_date" value="" placeholder="" />
@@ -339,9 +329,8 @@ accept-charset='UTF-8' enctype='multipart/form-data' id='form'>
               <use href="#icon-location"></use>
             </svg>
           </span>
-          <input type="text" name="SingleLine1" id="SingleLine1" checktype="c1" value="" maxlength="255" fieldType="1" placeholder="e.g. Indiranagar, Bengaluru" aria-describedby="hint-location" />
+          <input type="text" name="SingleLine1" id="SingleLine1" checktype="c1" value="" maxlength="255" fieldType="1" placeholder="e.g. Indiranagar, Bengaluru" />
         </div>
-        <p class="enquiry-field-hint" id="hint-location">Share the venue or neighbourhood you have in mind.</p>
         <p id="SingleLine1_error" class="zf-errorMessage" style="display: none;">Invalid value</p>
       </div>
       <div class="zf-clearBoth"></div>
@@ -355,9 +344,8 @@ accept-charset='UTF-8' enctype='multipart/form-data' id='form'>
               <use href="#icon-idea"></use>
             </svg>
           </span>
-          <textarea name="MultiLine" id="MultiLine" checktype="c1" maxlength="65535" placeholder="Tell us about the experience you&rsquo;re after" aria-describedby="hint-details"></textarea>
+          <textarea name="MultiLine" id="MultiLine" checktype="c1" maxlength="65535" placeholder="Tell us about the experience you&rsquo;re after"></textarea>
         </div>
-        <p class="enquiry-field-hint" id="hint-details">Describe the games, format, or vibe you&rsquo;re imagining.</p>
         <p id="MultiLine_error" class="zf-errorMessage" style="display: none;">Invalid value</p>
       </div>
       <div class="zf-clearBoth"></div>
@@ -371,16 +359,20 @@ accept-charset='UTF-8' enctype='multipart/form-data' id='form'>
               <use href="#icon-megaphone"></use>
             </svg>
           </span>
-          <input type="text" name="SingleLine2" id="SingleLine2" checktype="c1" value="" maxlength="255" fieldType="1" placeholder="e.g. Instagram, colleague, walk-in" aria-describedby="hint-hear" />
+          <input type="text" name="SingleLine2" id="SingleLine2" checktype="c1" value="" maxlength="255" fieldType="1" placeholder="e.g. Instagram, colleague, walk-in" />
         </div>
-        <p class="enquiry-field-hint" id="hint-hear">Let us know how you discovered Games Lab.</p>
         <p id="SingleLine2_error" class="zf-errorMessage" style="display: none;">Invalid value</p>
       </div>
       <div class="zf-clearBoth"></div>
     </div>
   </ul>
 </div>
-<ul><li class="zf-fmFooter"><button class="zf-submitColor">Submit</button></li></ul></div></form></div>
+<ul>
+  <li class="zf-fmFooter"><button class="zf-submitColor">Submit</button></li>
+</ul>
+</div>
+</form>
+</div>
     </div>
   </main>
 
