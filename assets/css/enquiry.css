@@ -210,36 +210,56 @@
   display: block;
 }
 
+.enquiry-form input,
+.enquiry-form select,
+.enquiry-form textarea {
+  font-family: inherit;
+  color: var(--enquiry-text);
+}
+
 .enquiry-form input[type="text"],
-.enquiry-form textarea,
+.enquiry-form input[type="email"],
+.enquiry-form input[type="tel"],
+.enquiry-form input[type="datetime-local"],
 .enquiry-form .zf-form-sBox {
   width: 100%;
-  border: 1px solid var(--enquiry-border);
-  border-radius: 12px;
-  padding: 12px 14px;
+  border: none;
+  padding: 0;
+  background: transparent;
   font-size: 1rem;
-  color: var(--enquiry-text);
-  background: var(--enquiry-input-bg);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  color: inherit;
+  line-height: 1.4;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
-.enquiry-form input[type="text"]::placeholder,
-.enquiry-form textarea::placeholder {
-  color: var(--enquiry-muted);
-  opacity: 0.65;
-}
-
-.enquiry-form input[type="text"]:focus,
-.enquiry-form textarea:focus,
-.enquiry-form .zf-form-sBox:focus {
-  outline: none;
-  border-color: var(--enquiry-accent);
-  box-shadow: 0 0 0 3px var(--enquiry-accent-soft);
+.enquiry-input input,
+.enquiry-input select,
+.enquiry-textarea textarea {
+  flex: 1 1 auto;
 }
 
 .enquiry-form textarea {
-  min-height: 120px;
+  width: 100%;
+  border: none;
+  padding: 0;
+  background: transparent;
+  font-size: 1rem;
+  color: inherit;
+  line-height: 1.5;
   resize: vertical;
+}
+
+.enquiry-form input::placeholder,
+.enquiry-form textarea::placeholder {
+  color: var(--enquiry-muted);
+  opacity: 0.68;
+}
+
+.enquiry-input input:focus,
+.enquiry-input select:focus,
+.enquiry-textarea textarea:focus {
+  outline: none;
 }
 
 .enquiry-form .zf-nameWrapper {
@@ -275,6 +295,137 @@
 .enquiry-form .zf-tempContDiv label {
   font-size: 0.9rem;
   color: var(--enquiry-muted);
+}
+
+.enquiry-icon-sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.enquiry-field {
+  position: relative;
+}
+
+.enquiry-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--enquiry-border);
+  border-radius: 999px;
+  padding: 12px 18px;
+  background: var(--enquiry-input-bg);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.enquiry-input--select {
+  padding-right: 44px;
+}
+
+.enquiry-input--select::after {
+  content: '';
+  position: absolute;
+  right: 22px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border: solid var(--enquiry-muted);
+  border-width: 0 1.5px 1.5px 0;
+  transform: translateY(-50%) rotate(45deg);
+  pointer-events: none;
+}
+
+.enquiry-input--datetime {
+  padding-right: 24px;
+}
+
+.enquiry-input--datetime::after {
+  content: attr(data-placeholder);
+  position: absolute;
+  left: calc(18px + 22px + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--enquiry-muted);
+  pointer-events: none;
+  font-size: 0.95rem;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.enquiry-input--datetime.has-value::after,
+.enquiry-input--datetime:focus-within::after {
+  opacity: 0;
+}
+
+.enquiry-field-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  color: var(--enquiry-muted);
+  flex: 0 0 auto;
+}
+
+.enquiry-input select {
+  padding-right: 24px;
+  cursor: pointer;
+}
+
+.enquiry-field-icon-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.enquiry-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.enquiry-sub-label {
+  font-size: 0.85rem;
+  color: var(--enquiry-muted);
+}
+
+.enquiry-field-hint {
+  margin: 10px 0 0;
+  font-size: 0.9rem;
+  color: var(--enquiry-muted);
+  text-align: left;
+}
+
+.enquiry-textarea {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border: 1px solid var(--enquiry-border);
+  border-radius: 20px;
+  padding: 16px 18px;
+  background: var(--enquiry-input-bg);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.enquiry-textarea textarea {
+  min-height: 140px;
+}
+
+.enquiry-date-original {
+  display: none;
+}
+
+.enquiry-input:focus-within,
+.enquiry-textarea:focus-within {
+  border-color: var(--enquiry-accent);
+  box-shadow: 0 0 0 3px var(--enquiry-accent-soft);
+  background: color-mix(in srgb, var(--enquiry-surface) 92%, var(--enquiry-accent) 8%);
+}
+
+.enquiry-input:focus-within .enquiry-field-icon,
+.enquiry-textarea:focus-within .enquiry-field-icon {
+  color: var(--enquiry-accent);
 }
 
 .enquiry-form .zf-date .zf-tempContDiv {
@@ -344,5 +495,26 @@
 
   .enquiry-form .zf-tempContDiv select.zf-form-sBox {
     width: 100%;
+  }
+
+  .enquiry-input {
+    padding: 10px 16px;
+  }
+
+  .enquiry-input--select {
+    padding-right: 38px;
+  }
+
+  .enquiry-input--select::after {
+    right: 18px;
+  }
+
+  .enquiry-input--datetime::after {
+    left: calc(16px + 22px + 10px);
+    font-size: 0.9rem;
+  }
+
+  .enquiry-textarea {
+    padding: 14px 16px;
   }
 }

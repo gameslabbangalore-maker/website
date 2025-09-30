@@ -391,3 +391,174 @@ function zf_SetDateAndMonthRegexBasedOnDateFormate(dateFormat) {
   dateAndMonthRegexFormateArray.push(monthYearFormatRegExp);
   return dateAndMonthRegexFormateArray;
 }
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  var form = document.getElementById('form');
+  if (!form) {
+    return;
+  }
+
+  var datetimeField = document.getElementById('PreferredDateTime');
+  var datetimeWrapper = datetimeField ? datetimeField.closest('.enquiry-input--datetime') : null;
+  if (!datetimeField || !datetimeWrapper) {
+    return;
+  }
+
+  var dateInput = form['DateTime_date'];
+  var hourSelect = form['DateTime_hours'];
+  var minuteSelect = form['DateTime_minutes'];
+  var meridiemSelect = form['DateTime_meridiem'];
+  if (!dateInput || !hourSelect || !minuteSelect || !meridiemSelect) {
+    return;
+  }
+
+  var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  function clearHiddenParts() {
+    dateInput.value = '';
+    hourSelect.value = '';
+    minuteSelect.value = '';
+    meridiemSelect.value = '';
+  }
+
+  function pad(value) {
+    return value.toString().padStart(2, '0');
+  }
+
+  function setWrapperState() {
+    datetimeWrapper.classList.toggle('has-value', Boolean(datetimeField.value));
+  }
+
+  function formatZohoDateFromIso(isoDate) {
+    if (!isoDate) {
+      return '';
+    }
+    var parts = isoDate.split('-');
+    if (parts.length !== 3) {
+      return '';
+    }
+    var year = parts[0];
+    var monthIndex = parseInt(parts[1], 10) - 1;
+    var day = parseInt(parts[2], 10);
+    if (Number.isNaN(monthIndex) || monthIndex < 0 || monthIndex > 11 || Number.isNaN(day)) {
+      return '';
+    }
+    return pad(day) + '-' + monthNames[monthIndex] + '-' + year;
+  }
+
+  function parseZohoDate(dateValue) {
+    if (!dateValue) {
+      return null;
+    }
+    var match = dateValue.trim().match(/^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/);
+    if (!match) {
+      return null;
+    }
+    var day = pad(parseInt(match[1], 10));
+    var monthName = match[2].charAt(0).toUpperCase() + match[2].slice(1).toLowerCase();
+    var monthIndex = monthNames.indexOf(monthName);
+    if (monthIndex === -1) {
+      return null;
+    }
+    return {
+      year: match[3],
+      month: pad(monthIndex + 1),
+      day: day
+    };
+  }
+
+  function updatePartsFromNative() {
+    var value = datetimeField.value;
+    if (!value) {
+      clearHiddenParts();
+      setWrapperState();
+      return;
+    }
+
+    var segments = value.split('T');
+    if (segments.length !== 2) {
+      clearHiddenParts();
+      setWrapperState();
+      return;
+    }
+    var isoDate = segments[0];
+    var timePart = segments[1];
+    var formattedDate = formatZohoDateFromIso(isoDate);
+    if (!formattedDate) {
+      clearHiddenParts();
+      setWrapperState();
+      return;
+    }
+    var timePieces = timePart.split(':');
+    if (timePieces.length < 2) {
+      clearHiddenParts();
+      setWrapperState();
+      return;
+    }
+    var hours = parseInt(timePieces[0], 10);
+    var minutes = parseInt(timePieces[1], 10);
+    if (Number.isNaN(hours) || Number.isNaN(minutes)) {
+      clearHiddenParts();
+      setWrapperState();
+      return;
+    }
+
+    var meridiem = hours >= 12 ? 'PM' : 'AM';
+    var hour12 = hours % 12;
+    if (hour12 === 0) {
+      hour12 = 12;
+    }
+
+    dateInput.value = formattedDate;
+    hourSelect.value = pad(hour12);
+    minuteSelect.value = pad(minutes);
+    meridiemSelect.value = meridiem;
+    setWrapperState();
+  }
+
+  function syncNativeFromParts() {
+    var parsedDate = parseZohoDate(dateInput.value);
+    if (!parsedDate) {
+      datetimeField.value = '';
+      setWrapperState();
+      return;
+    }
+
+    var hourVal = parseInt(hourSelect.value, 10);
+    var minuteVal = parseInt(minuteSelect.value, 10);
+    var meridiemVal = meridiemSelect.value;
+
+    if (Number.isNaN(hourVal) || Number.isNaN(minuteVal) || (meridiemVal !== 'AM' && meridiemVal !== 'PM')) {
+      datetimeField.value = '';
+      setWrapperState();
+      return;
+    }
+
+    if (meridiemVal === 'PM' && hourVal < 12) {
+      hourVal += 12;
+    }
+    if (meridiemVal === 'AM' && hourVal === 12) {
+      hourVal = 0;
+    }
+
+    var isoValue = parsedDate.year + '-' + parsedDate.month + '-' + parsedDate.day + 'T' + pad(hourVal) + ':' + pad(minuteVal);
+    datetimeField.value = isoValue;
+    setWrapperState();
+  }
+
+  datetimeField.addEventListener('input', updatePartsFromNative);
+  datetimeField.addEventListener('change', updatePartsFromNative);
+
+  form.addEventListener('submit', function () {
+    updatePartsFromNative();
+  });
+
+  form.addEventListener('reset', function () {
+    datetimeField.value = '';
+    updatePartsFromNative();
+  });
+
+  syncNativeFromParts();
+  setWrapperState();
+});
