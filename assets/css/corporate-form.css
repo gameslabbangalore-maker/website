@@ -1,0 +1,455 @@
+:root {
+  --cf-bg: #ffffff;
+  --cf-fg: #252c3e;
+  --cf-muted: #465475;
+  --cf-accent: #2eb79f;
+  --cf-border: rgba(184, 187, 211, 1);
+  --cf-overlay: rgba(14, 18, 33, 0.78);
+  --cf-shadow: 0 28px 80px rgba(10, 12, 22, 0.45);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cf-bg: #151827;
+    --cf-fg: #ecf1ff;
+    --cf-muted: #b6c3e6;
+    --cf-accent: #ffe974;
+    --cf-border: rgba(114, 126, 170, 0.75);
+    --cf-overlay: rgba(3, 4, 12, 0.82);
+    --cf-shadow: 0 30px 90px rgba(2, 6, 20, 0.65);
+  }
+}
+
+.dark {
+  --cf-bg: #151827;
+  --cf-fg: #ecf1ff;
+  --cf-muted: #b6c3e6;
+  --cf-accent: #ffe974;
+  --cf-border: rgba(114, 126, 170, 0.75);
+  --cf-overlay: rgba(3, 4, 12, 0.82);
+  --cf-shadow: 0 30px 90px rgba(2, 6, 20, 0.65);
+}
+
+body.corporate-form-lock {
+  overflow: hidden;
+  touch-action: none;
+}
+
+#corporate-enquiry {
+  padding: 48px 18px 52px;
+  background: transparent;
+  color: var(--text-main);
+}
+
+#corporate-enquiry .enquiry-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  text-align: center;
+}
+
+#corporate-enquiry .enquiry-text {
+  margin: 0;
+  font-size: clamp(1.05rem, 2.2vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+#corporate-enquiry .enquiry-nowrap {
+  white-space: nowrap;
+}
+
+#corporate-enquiry .btn-enquire {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  font-size: 1rem;
+  width: auto;
+}
+
+@media (max-width: 768px) {
+  #corporate-enquiry {
+    padding: 32px 12px 44px;
+  }
+
+  #corporate-enquiry .enquiry-inner {
+    gap: 18px;
+  }
+
+  #corporate-enquiry .enquiry-nowrap {
+    white-space: normal;
+  }
+}
+
+.corporate-form-modal[hidden] {
+  display: none;
+}
+
+.corporate-form-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 110000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.corporate-form-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--cf-overlay);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.corporate-form-dialog {
+  position: relative;
+  width: min(760px, 100%);
+  max-height: calc(100vh - 32px);
+  background: var(--cf-bg);
+  color: var(--cf-fg);
+  border-radius: 20px;
+  box-shadow: var(--cf-shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.corporate-form-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.6rem;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+.corporate-form-close:hover,
+.corporate-form-close:focus-visible {
+  transform: scale(1.05);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+}
+
+.corporate-form-scroll {
+  overflow-y: auto;
+  padding: 48px 28px 36px;
+}
+
+@media (max-width: 600px) {
+  .corporate-form-dialog {
+    max-height: calc(100vh - 16px);
+  }
+
+  .corporate-form-scroll {
+    padding: 60px 18px 28px;
+  }
+
+  .corporate-form-close {
+    top: 10px;
+    right: 10px;
+  }
+}
+
+.corporate-form-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.corporate-form {
+  color: var(--cf-fg);
+  font: 75%/1.4 Arial, Helvetica, sans-serif;
+}
+
+.corporate-form * {
+  box-sizing: border-box;
+}
+
+.corporate-form input,
+.corporate-form textarea,
+.corporate-form select,
+.corporate-form button {
+  font-family: inherit;
+}
+
+.corporate-form a {
+  color: #3a6cae;
+  text-decoration: none;
+}
+
+.corporate-form a:hover {
+  text-decoration: underline;
+}
+
+.corporate-form .zf-templateWidth {
+  margin: 0 auto;
+  padding: 0;
+  max-width: 720px;
+  width: 100%;
+}
+
+.corporate-form .zf-templateWrapper {
+  background: var(--cf-bg);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(10, 12, 22, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.corporate-form .zf-tempHeadBdr {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.corporate-form .zf-tempHeadContBdr {
+  background: transparent;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  margin: 0;
+  padding: 32px 36px 18px;
+}
+
+.corporate-form .zf-frmTitle {
+  color: var(--cf-fg);
+  margin: 0;
+  font-size: 2.1rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.corporate-form .zf-frmDesc {
+  color: var(--cf-muted);
+  font-size: 1.05rem;
+  margin: 10px auto 0;
+  text-align: center;
+}
+
+.corporate-form .zf-subContWrap {
+  padding: 28px 36px 10px;
+}
+
+.corporate-form .zf-tempFrmWrapper {
+  margin: 0 0 20px;
+  display: block;
+}
+
+.corporate-form .zf-labelName {
+  display: block;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--cf-fg);
+  margin-bottom: 8px;
+}
+
+.corporate-form .zf-important {
+  color: #ff3b56 !important;
+  font-weight: 700;
+  margin-left: 4px;
+}
+
+.corporate-form .zf-tempContDiv {
+  width: 100%;
+}
+
+.corporate-form .zf-tempContDiv span {
+  display: block;
+  width: 100%;
+}
+
+.corporate-form input[type="text"],
+.corporate-form textarea,
+.corporate-form .zf-form-sBox {
+  width: 100%;
+  background: #fff;
+  border: 1px solid var(--cf-border);
+  border-radius: 6px;
+  padding: 11px 12px;
+  font-size: 1rem;
+  color: var(--cf-fg);
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.corporate-form textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+@media (prefers-color-scheme: dark) {
+  .corporate-form input[type="text"],
+  .corporate-form textarea,
+  .corporate-form .zf-form-sBox {
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.dark .corporate-form input[type="text"],
+.dark .corporate-form textarea,
+.dark .corporate-form .zf-form-sBox {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.corporate-form input[type="text"]:focus,
+.corporate-form textarea:focus,
+.corporate-form .zf-form-sBox:focus {
+  border-color: var(--cf-accent);
+  box-shadow: 0 0 0 2px rgba(46, 183, 159, 0.25);
+  outline: none;
+}
+
+.corporate-form .zf-nameWrapper {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.corporate-form .zf-nameWrapper span {
+  flex: 1 1 220px;
+}
+
+.corporate-form .zf-tempContDiv .zf-symbols {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 6px;
+  font-weight: 600;
+  color: var(--cf-muted);
+}
+
+.corporate-form .zf-phonefld .zf-phwrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.corporate-form .zf-phonefld .zf-phwrapper span {
+  flex: 1 1 260px;
+}
+
+.corporate-form .zf-date .zf-tempContDiv {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.corporate-form .zf-date .zf-tempContDiv span {
+  flex: 1 1 120px;
+}
+
+.corporate-form .zf-date .zf-subDate {
+  flex: 1 1 240px;
+}
+
+.corporate-form .zf-errorMessage {
+  display: none;
+  font-size: 0.95rem;
+  color: #f41033;
+  margin-top: 8px;
+}
+
+.corporate-form .zf-fmFooter {
+  list-style: none;
+  margin: 0;
+  padding: 20px 0 32px;
+  text-align: center;
+}
+
+.corporate-form .zf-submitColor {
+  color: #fff;
+  border: none;
+  background: var(--cf-accent);
+  border-radius: 999px;
+  min-width: 140px;
+  padding: 12px 32px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.corporate-form .zf-submitColor:hover,
+.corporate-form .zf-submitColor:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(46, 183, 159, 0.25);
+  outline: none;
+}
+
+.corporate-form-success {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.corporate-form-success[hidden] {
+  display: none;
+}
+
+.corporate-form-success h3 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--cf-fg);
+}
+
+.corporate-form-success p {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--cf-muted);
+  max-width: 420px;
+}
+
+.corporate-form-success .book-btn {
+  padding: 10px 24px;
+}
+
+@media (max-width: 600px) {
+  .corporate-form .zf-tempHeadContBdr {
+    padding: 28px 20px 16px;
+  }
+
+  .corporate-form .zf-frmTitle {
+    font-size: 1.8rem;
+  }
+
+  .corporate-form .zf-subContWrap {
+    padding: 24px 20px 8px;
+  }
+
+  .corporate-form .zf-tempFrmWrapper {
+    margin-bottom: 18px;
+  }
+
+  .corporate-form .zf-date .zf-tempContDiv {
+    gap: 10px;
+  }
+
+  .corporate-form .zf-date .zf-tempContDiv span {
+    flex: 1 1 100px;
+  }
+
+  .corporate-form .zf-date .zf-subDate {
+    flex: 1 1 100%;
+  }
+
+  .corporate-form .zf-phonefld .zf-phwrapper {
+    gap: 10px;
+  }
+}
