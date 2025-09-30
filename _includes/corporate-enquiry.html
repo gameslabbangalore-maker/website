@@ -20,25 +20,70 @@
         <h2 id="corporate-modal-title">Plan Your Event with Games Lab</h2>
       </div>
       <div class="corporate-modal__body">
-        <div class="corporate-modal__frame">
-          <iframe
-            title="Corporate Event Enquiry"
-            loading="lazy"
-            frameborder="0"
-            allowtransparency="true"
-            allow="geolocation"
-            data-src-primary="https://forms.zohopublic.com/infogame1/form/CorporateEventEnquiry/formperma/U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI/formEmbed?zf_rszfm=1"
-            data-src-fallback="https://forms.zohopublic.in/infogame1/form/CorporateEventEnquiry/formperma/U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI/formEmbed?zf_rszfm=1"
-          ></iframe>
-        </div>
-        <div class="corporate-modal__fallback" hidden>
-          <p>We couldn’t load the enquiry form in this window.</p>
-          <button type="button" class="book-btn corporate-modal__fallback-btn" data-modal-open-tab>
-            Open form in a new tab
-          </button>
-        </div>
+        <form id="corporate-enquiry-form" class="corporate-form" novalidate>
+          <div class="corporate-form__grid">
+            <label class="corporate-form__field" for="corporate-name">
+              <span class="corporate-form__label">Name <span aria-hidden="true">*</span></span>
+              <input id="corporate-name" name="name" type="text" inputmode="text" autocomplete="name" required data-zoho="Name_First,Name_Last" data-zoho-type="name" placeholder="Enter your name" />
+            </label>
+            <label class="corporate-form__field" for="corporate-company">
+              <span class="corporate-form__label">Company / Organization Name</span>
+              <input id="corporate-company" name="company" type="text" inputmode="text" autocomplete="organization" data-zoho="Company_Organization_Name" placeholder="Optional if private event" />
+            </label>
+            <label class="corporate-form__field" for="corporate-event-type">
+              <span class="corporate-form__label">Event Type <span aria-hidden="true">*</span></span>
+              <select id="corporate-event-type" name="eventType" required data-zoho="Event_Type">
+                <option value="" disabled selected>Select an option</option>
+                <option value="Corporate Event">Corporate Event</option>
+                <option value="Team-Building Event">Team-Building Event</option>
+                <option value="Private Celebration">Private Celebration</option>
+                <option value="Other">Other</option>
+              </select>
+            </label>
+            <label class="corporate-form__field" for="corporate-phone">
+              <span class="corporate-form__label">Contact Number <span aria-hidden="true">*</span></span>
+              <input id="corporate-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required data-zoho="Contact_Number" placeholder="Your phone number" />
+            </label>
+            <label class="corporate-form__field" for="corporate-email">
+              <span class="corporate-form__label">Email Address <span aria-hidden="true">*</span></span>
+              <input id="corporate-email" name="email" type="email" inputmode="email" autocomplete="email" required data-zoho="Email" placeholder="you@example.com" />
+            </label>
+            <label class="corporate-form__field" for="corporate-datetime">
+              <span class="corporate-form__label">Preferred Date &amp; Time</span>
+              <input id="corporate-datetime" name="datetime" type="datetime-local" data-zoho="Preferred_Date_Time" data-zoho-type="datetime" />
+            </label>
+            <label class="corporate-form__field" for="corporate-location">
+              <span class="corporate-form__label">Preferred Location (area / cafe / space)</span>
+              <input id="corporate-location" name="location" type="text" data-zoho="Preferred_Location" placeholder="Tell us where" />
+            </label>
+            <label class="corporate-form__field" for="corporate-group">
+              <span class="corporate-form__label">Group Size</span>
+              <input id="corporate-group" name="group" type="number" inputmode="numeric" min="1" step="1" data-zoho="Group_Size" placeholder="Approximate number of guests" />
+            </label>
+            <label class="corporate-form__field corporate-form__field--textarea" for="corporate-details">
+              <span class="corporate-form__label">What are you looking for?</span>
+              <textarea id="corporate-details" name="details" rows="4" data-zoho="What_are_you_looking_for" placeholder="Share any other details"></textarea>
+            </label>
+            <label class="corporate-form__field" for="corporate-referral">
+              <span class="corporate-form__label">How did you hear about us?</span>
+              <input id="corporate-referral" name="referral" type="text" data-zoho="How_did_you_hear_about_us" placeholder="Friend, social media, etc." />
+            </label>
+          </div>
+          <div class="corporate-form__actions">
+            <button type="submit" class="book-btn corporate-form__submit">Submit Enquiry</button>
+            <p class="corporate-form__hint">All required fields are marked with an asterisk (*).</p>
+          </div>
+          <p class="corporate-form__status" role="status" aria-live="polite" hidden></p>
+        </form>
+        <form id="corporate-enquiry-zoho" class="corporate-form__relay" action="https://forms.zohopublic.in/infogame1/form/CorporateEventEnquiry/formperma/U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI/formSubmit" method="POST" target="corporate-enquiry-target" accept-charset="UTF-8">
+          <input type="hidden" name="zf_referrer_name" value="Games Lab Corporate Enquiry" />
+          <input type="hidden" name="zf_redirect_url" value="" />
+          <input type="hidden" name="zc_gad" value="" />
+          <input type="hidden" name="zf_lang" value="en" />
+        </form>
+        <iframe name="corporate-enquiry-target" class="corporate-form__relay-frame" hidden></iframe>
         <p class="corporate-modal__note">
-          Having trouble? <a class="corporate-modal__note-link" href="https://forms.zohopublic.in/infogame1/form/CorporateEventEnquiry/formperma/U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI" target="_blank" rel="noopener">Open the form in a new tab</a>.
+          Prefer a full page? <a class="corporate-modal__note-link" href="https://forms.zohopublic.in/infogame1/form/CorporateEventEnquiry/formperma/U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI" target="_blank" rel="noopener">Open the Zoho form in a new tab</a>.
         </p>
       </div>
     </div>
@@ -51,39 +96,41 @@
   if (!modal) return;
 
   const html = document.documentElement;
-  const content = modal.querySelector('.corporate-modal__body');
-  const frame = modal.querySelector('iframe');
-  const fallbackBlock = modal.querySelector('.corporate-modal__fallback');
-  const fallbackButton = modal.querySelector('[data-modal-open-tab]');
-  const directLink = modal.querySelector('.corporate-modal__note-link');
+  const body = document.body;
+  const form = modal.querySelector('#corporate-enquiry-form');
+  const zohoForm = modal.querySelector('#corporate-enquiry-zoho');
+  const relayFrame = modal.querySelector('.corporate-form__relay-frame');
+  const statusBlock = modal.querySelector('.corporate-form__status');
+  const submitButton = form ? form.querySelector('.corporate-form__submit') : null;
   const triggers = document.querySelectorAll('[data-modal-target="corporate-enquiry-modal"]');
   const closeButtons = modal.querySelectorAll('[data-modal-close]');
   let lastFocused = null;
   let scrollPosition = 0;
-  let frameLoaded = false;
-  let loadTimer = null;
+  let submitting = false;
+  let relayTimeout = null;
 
   function openModal(){
     if (!modal.hasAttribute('hidden')) return;
     lastFocused = document.activeElement;
-    scrollPosition = window.pageYOffset || document.documentElement.scrollTop || 0;
+    scrollPosition = window.pageYOffset || html.scrollTop || 0;
     modal.removeAttribute('hidden');
     html.classList.add('corporate-modal-open');
-    document.body.classList.add('corporate-modal-open');
-    document.body.style.top = `-${scrollPosition}px`;
-    if (content){
-      content.scrollTop = 0;
-    }
-    if (fallbackBlock){
-      fallbackBlock.hidden = true;
-    }
-    if (frame && !frameLoaded){
-      startFrameLoad();
+    body.classList.add('corporate-modal-open');
+   body.style.top = `-${scrollPosition}px`;
+   if (statusBlock){
+     resetStatus();
+   }
+    toggleSubmitting(false);
+    if (form){
+      form.reset();
+      form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
     }
     window.setTimeout(() => {
-      const firstInput = modal.querySelector('iframe, button, [href], input, select, textarea');
-      (firstInput || modal).focus({ preventScroll: true });
-    }, 10);
+      const firstInput = modal.querySelector('input, select, textarea, button');
+      if (firstInput && typeof firstInput.focus === 'function'){
+        firstInput.focus({ preventScroll: true });
+      }
+    }, 20);
     modal.addEventListener('keydown', handleKeydown);
   }
 
@@ -91,11 +138,15 @@
     if (modal.hasAttribute('hidden')) return;
     modal.setAttribute('hidden', '');
     html.classList.remove('corporate-modal-open');
-    document.body.classList.remove('corporate-modal-open');
-    document.body.style.removeProperty('top');
-    modal.removeEventListener('keydown', handleKeydown);
+    body.classList.remove('corporate-modal-open');
+    body.style.removeProperty('top');
     window.scrollTo(0, scrollPosition);
-    cancelFrameTimer();
+    modal.removeEventListener('keydown', handleKeydown);
+    if (relayTimeout){
+      window.clearTimeout(relayTimeout);
+      relayTimeout = null;
+    }
+    toggleSubmitting(false);
     if (lastFocused && typeof lastFocused.focus === 'function'){
       lastFocused.focus({ preventScroll: true });
     }
@@ -111,8 +162,8 @@
   }
 
   function trapFocus(event){
-    const focusable = Array.from(modal.querySelectorAll('button, [href], input, select, textarea, iframe, [tabindex]:not([tabindex="-1"])'))
-      .filter(el => !el.hasAttribute('hidden') && !el.closest('[hidden]') && !el.disabled);
+    const focusable = Array.from(modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+      .filter(el => !el.disabled && !el.closest('[hidden]'));
     if (!focusable.length) return;
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
@@ -125,69 +176,174 @@
     }
   }
 
-  function startFrameLoad(){
-    if (!frame) return;
-    const primary = frame.getAttribute('data-src-primary');
-    const fallback = frame.getAttribute('data-src-fallback');
-    const sources = [primary, fallback].filter(Boolean);
-    let currentIndex = -1;
+  function resetStatus(){
+    if (!statusBlock) return;
+    statusBlock.textContent = '';
+    statusBlock.hidden = true;
+    statusBlock.classList.remove('is-error', 'is-success', 'is-notice');
+  }
 
-    function tryNext(){
-      currentIndex += 1;
-      if (currentIndex >= sources.length){
-        showFallback();
+  function setStatus(message, tone){
+    if (!statusBlock) return;
+    statusBlock.textContent = message;
+    statusBlock.hidden = false;
+    statusBlock.classList.remove('is-error', 'is-success', 'is-notice');
+    if (tone){
+      statusBlock.classList.add(`is-${tone}`);
+    }
+  }
+
+  function toggleSubmitting(state){
+    submitting = state;
+    if (!submitButton) return;
+    submitButton.disabled = state;
+    submitButton.classList.toggle('is-loading', state);
+  }
+
+  function splitName(value){
+    const parts = value.trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return { first: '', last: '' };
+    if (parts.length === 1){
+      return { first: parts[0], last: '' };
+    }
+    const first = parts.shift();
+    const last = parts.join(' ');
+    return { first, last };
+  }
+
+  function formatDateTime(value){
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())){
+      return value;
+    }
+    const pad = num => String(num).padStart(2, '0');
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+  }
+
+  function buildPayload(){
+    if (!form) return null;
+    const payload = new Map();
+    const controls = Array.from(form.querySelectorAll('[data-zoho]'));
+    controls.forEach(control => {
+      const zoho = (control.getAttribute('data-zoho') || '')
+        .split(',')
+        .map(part => part.trim())
+        .filter(Boolean);
+      if (!zoho.length) return;
+      let value = '';
+      if (control instanceof HTMLInputElement || control instanceof HTMLTextAreaElement){
+        if (control.type === 'checkbox' || control.type === 'radio'){
+          if (!control.checked) return;
+          value = control.value;
+        } else {
+          value = control.value.trim();
+        }
+      } else if (control instanceof HTMLSelectElement){
+        value = control.value;
+      }
+      if (!value) return;
+      if (control.getAttribute('data-zoho-type') === 'name'){
+        const parts = splitName(value);
+        if (zoho[0]) payload.set(zoho[0], parts.first);
+        if (zoho[1]) payload.set(zoho[1], parts.last);
+      } else if (control.getAttribute('data-zoho-type') === 'datetime'){
+        payload.set(zoho[0], formatDateTime(value));
+      } else {
+        payload.set(zoho[0], value);
+      }
+    });
+    return payload;
+  }
+
+  function validateForm(){
+    if (!form) return false;
+    let valid = true;
+    let firstInvalid = null;
+    const requiredFields = form.querySelectorAll('[required]');
+    requiredFields.forEach(field => {
+      field.classList.remove('is-invalid');
+      field.removeAttribute('aria-invalid');
+      const value = field.value && field.value.trim ? field.value.trim() : field.value;
+      if (!value){
+        valid = false;
+        field.classList.add('is-invalid');
+        field.setAttribute('aria-invalid', 'true');
+        if (!firstInvalid) firstInvalid = field;
+      }
+    });
+    if (!valid){
+      setStatus('Please complete all required fields before submitting.', 'error');
+      if (firstInvalid && typeof firstInvalid.focus === 'function'){
+        firstInvalid.focus({ preventScroll: false });
+      }
+    }
+    return valid;
+  }
+
+  function submitToZoho(){
+    if (!form || !zohoForm || !relayFrame) return;
+    const payload = buildPayload();
+    if (!payload) return;
+    // remove previous dynamic fields
+    zohoForm.querySelectorAll('[data-dynamic-field]').forEach(node => node.remove());
+    payload.forEach((value, key) => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = value;
+      input.setAttribute('data-dynamic-field', '');
+      zohoForm.appendChild(input);
+    });
+    toggleSubmitting(true);
+    setStatus('Submitting your enquiry…', 'notice');
+
+    const handleLoad = () => {
+      window.clearTimeout(relayTimeout);
+      relayTimeout = null;
+      relayFrame.removeEventListener('load', handleLoad);
+      toggleSubmitting(false);
+      setStatus('Thank you for enquiring with Games Lab. We will get back to you within 24 hours with next steps, ideas, and availability.', 'success');
+      form.reset();
+    };
+
+    relayFrame.addEventListener('load', handleLoad, { once: true });
+    relayTimeout = window.setTimeout(() => {
+      relayFrame.removeEventListener('load', handleLoad);
+      toggleSubmitting(false);
+      setStatus('We could not confirm your submission. Please open the Zoho form in a new tab to complete your enquiry.', 'error');
+    }, 12000);
+
+    zohoForm.submit();
+  }
+
+  if (form){
+    form.addEventListener('input', event => {
+      const target = event.target;
+      if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement)){
         return;
       }
-      if (frame.getAttribute('src') === sources[currentIndex]){
-        scheduleFallback(tryNext);
+      if (target.hasAttribute('required')){
+        if (target.value && target.value.trim()){
+          target.classList.remove('is-invalid');
+          target.removeAttribute('aria-invalid');
+        }
+      }
+    });
+
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      if (submitting) return;
+      resetStatus();
+      if (!validateForm()){
         return;
       }
-      frame.removeAttribute('hidden');
-      frame.setAttribute('src', sources[currentIndex]);
-      scheduleFallback(tryNext);
-    }
-
-    frame.addEventListener('load', () => {
-      frameLoaded = true;
-      cancelFrameTimer();
-      if (fallbackBlock){
-        fallbackBlock.hidden = true;
-      }
-    }, { once: true });
-
-    tryNext();
-  }
-
-  function scheduleFallback(callback){
-    cancelFrameTimer();
-    loadTimer = window.setTimeout(() => {
-      if (!frameLoaded){
-        callback();
-      }
-    }, 3500);
-  }
-
-  function cancelFrameTimer(){
-    if (loadTimer){
-      window.clearTimeout(loadTimer);
-      loadTimer = null;
-    }
-  }
-
-  function showFallback(){
-    cancelFrameTimer();
-    if (frame){
-      frame.removeAttribute('src');
-      frame.setAttribute('hidden', '');
-    }
-    if (fallbackBlock){
-      fallbackBlock.hidden = false;
-    }
-  }
-
-  if (fallbackButton && directLink){
-    fallbackButton.addEventListener('click', () => {
-      window.open(directLink.href, '_blank', 'noopener');
+      submitToZoho();
     });
   }
 
