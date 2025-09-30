@@ -22,16 +22,23 @@
       <div class="corporate-modal__body">
         <div class="corporate-modal__frame">
           <iframe
-            src="https://forms.zohopublic.in/infogame1/form/CorporateEventEnquiry/formperma/U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI/formEmbed?zf_rszfm=1"
             title="Corporate Event Enquiry"
             loading="lazy"
             frameborder="0"
             allowtransparency="true"
             allow="geolocation"
+            data-src-primary="https://forms.zohopublic.com/infogame1/form/CorporateEventEnquiry/formperma/U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI/formEmbed?zf_rszfm=1"
+            data-src-fallback="https://forms.zohopublic.in/infogame1/form/CorporateEventEnquiry/formperma/U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI/formEmbed?zf_rszfm=1"
           ></iframe>
         </div>
+        <div class="corporate-modal__fallback" hidden>
+          <p>We couldn’t load the enquiry form in this window.</p>
+          <button type="button" class="book-btn corporate-modal__fallback-btn" data-modal-open-tab>
+            Open form in a new tab
+          </button>
+        </div>
         <p class="corporate-modal__note">
-          Having trouble? <a href="https://forms.zohopublic.in/infogame1/form/CorporateEventEnquiry/formperma/U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI" target="_blank" rel="noopener">Open the form in a new tab</a>.
+          Having trouble? <a class="corporate-modal__note-link" href="https://forms.zohopublic.in/infogame1/form/CorporateEventEnquiry/formperma/U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI" target="_blank" rel="noopener">Open the form in a new tab</a>.
         </p>
       </div>
     </div>
@@ -45,10 +52,16 @@
 
   const html = document.documentElement;
   const content = modal.querySelector('.corporate-modal__body');
+  const frame = modal.querySelector('iframe');
+  const fallbackBlock = modal.querySelector('.corporate-modal__fallback');
+  const fallbackButton = modal.querySelector('[data-modal-open-tab]');
+  const directLink = modal.querySelector('.corporate-modal__note-link');
   const triggers = document.querySelectorAll('[data-modal-target="corporate-enquiry-modal"]');
   const closeButtons = modal.querySelectorAll('[data-modal-close]');
   let lastFocused = null;
   let scrollPosition = 0;
+  let frameLoaded = false;
+  let loadTimer = null;
 
   function openModal(){
     if (!modal.hasAttribute('hidden')) return;
@@ -60,6 +73,12 @@
     document.body.style.top = `-${scrollPosition}px`;
     if (content){
       content.scrollTop = 0;
+    }
+    if (fallbackBlock){
+      fallbackBlock.hidden = true;
+    }
+    if (frame && !frameLoaded){
+      startFrameLoad();
     }
     window.setTimeout(() => {
       const firstInput = modal.querySelector('iframe, button, [href], input, select, textarea');
@@ -76,6 +95,7 @@
     document.body.style.removeProperty('top');
     modal.removeEventListener('keydown', handleKeydown);
     window.scrollTo(0, scrollPosition);
+    cancelFrameTimer();
     if (lastFocused && typeof lastFocused.focus === 'function'){
       lastFocused.focus({ preventScroll: true });
     }
@@ -103,6 +123,72 @@
       event.preventDefault();
       first.focus();
     }
+  }
+
+  function startFrameLoad(){
+    if (!frame) return;
+    const primary = frame.getAttribute('data-src-primary');
+    const fallback = frame.getAttribute('data-src-fallback');
+    const sources = [primary, fallback].filter(Boolean);
+    let currentIndex = -1;
+
+    function tryNext(){
+      currentIndex += 1;
+      if (currentIndex >= sources.length){
+        showFallback();
+        return;
+      }
+      if (frame.getAttribute('src') === sources[currentIndex]){
+        scheduleFallback(tryNext);
+        return;
+      }
+      frame.removeAttribute('hidden');
+      frame.setAttribute('src', sources[currentIndex]);
+      scheduleFallback(tryNext);
+    }
+
+    frame.addEventListener('load', () => {
+      frameLoaded = true;
+      cancelFrameTimer();
+      if (fallbackBlock){
+        fallbackBlock.hidden = true;
+      }
+    }, { once: true });
+
+    tryNext();
+  }
+
+  function scheduleFallback(callback){
+    cancelFrameTimer();
+    loadTimer = window.setTimeout(() => {
+      if (!frameLoaded){
+        callback();
+      }
+    }, 3500);
+  }
+
+  function cancelFrameTimer(){
+    if (loadTimer){
+      window.clearTimeout(loadTimer);
+      loadTimer = null;
+    }
+  }
+
+  function showFallback(){
+    cancelFrameTimer();
+    if (frame){
+      frame.removeAttribute('src');
+      frame.setAttribute('hidden', '');
+    }
+    if (fallbackBlock){
+      fallbackBlock.hidden = false;
+    }
+  }
+
+  if (fallbackButton && directLink){
+    fallbackButton.addEventListener('click', () => {
+      window.open(directLink.href, '_blank', 'noopener');
+    });
   }
 
   triggers.forEach(button => {
