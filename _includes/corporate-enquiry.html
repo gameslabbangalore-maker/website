@@ -20,98 +20,23 @@
         <h2 id="corporate-modal-title">Plan Your Event with Games Lab</h2>
       </div>
       <div class="corporate-modal__body">
-        <form
-          class="corporate-form"
-          novalidate
-          data-zoho-endpoint="https://forms.zohopublic.in/infogame1/form/CorporateEventEnquiry/formperma/U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI/submit"
-          data-zoho-token="U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI"
-        >
-          <div class="corporate-form__grid">
-            <label class="corporate-form__field">
-              <span class="corporate-form__label">Name *</span>
-              <input
-                type="text"
-                name="name"
-                data-zoho-field="Name"
-                data-zoho-split="Name_First,Name_Last"
-                autocomplete="name"
-                required
-              />
-            </label>
-              <label class="corporate-form__field">
-                <span class="corporate-form__label">Company / Organization Name</span>
-                <input type="text" name="company" data-zoho-field="SingleLine" autocomplete="organization" />
-              </label>
-            <label class="corporate-form__field">
-              <span class="corporate-form__label">Event Type *</span>
-              <select name="eventType" data-zoho-field="Dropdown" required>
-                <option value="" disabled selected>Select an option</option>
-                <option value="Corporate Event">Corporate Event</option>
-                <option value="Team-Building Event">Team-Building Event</option>
-                <option value="Private Celebration">Private Celebration</option>
-                <option value="Other">Other</option>
-              </select>
-            </label>
-            <label class="corporate-form__field">
-              <span class="corporate-form__label">Contact Number *</span>
-              <input type="tel" name="contact" data-zoho-field="PhoneNumber" autocomplete="tel" required />
-            </label>
-            <label class="corporate-form__field">
-              <span class="corporate-form__label">Email Address *</span>
-              <input type="email" name="email" data-zoho-field="Email" autocomplete="email" required />
-            </label>
-            <label class="corporate-form__field">
-              <span class="corporate-form__label">Preferred Date &amp; Time</span>
-              <input type="datetime-local" name="datetime" data-zoho-field="DateTime" />
-            </label>
-            <label class="corporate-form__field">
-              <span class="corporate-form__label">Preferred Location (area / cafe / space)</span>
-              <input type="text" name="location" data-zoho-field="SingleLine1" />
-            </label>
-            <label class="corporate-form__field">
-              <span class="corporate-form__label">Group Size</span>
-              <input type="number" name="groupSize" data-zoho-field="Number" min="1" />
-            </label>
-            <label class="corporate-form__field corporate-form__field--full">
-              <span class="corporate-form__label">What are you looking for?</span>
-              <textarea name="details" data-zoho-field="MultiLine" rows="3"></textarea>
-            </label>
-            <label class="corporate-form__field corporate-form__field--full">
-              <span class="corporate-form__label">How did you hear about us?</span>
-              <input type="text" name="referral" data-zoho-field="SingleLine2" />
-            </label>
-          </div>
-          <div class="corporate-form__actions">
-            <button type="submit" class="book-btn">Submit Enquiry</button>
-          </div>
-          <p class="corporate-form__error" role="alert" hidden>Please fill in all required fields.</p>
-        </form>
-        <div class="corporate-form__success" role="status" hidden>
-          <p>Thank you for enquiring with Games Lab. We will get back to you within 24 hours with next steps, ideas, and availability.</p>
+        <div class="corporate-modal__frame">
+          <iframe
+            src="https://forms.zohopublic.in/infogame1/form/CorporateEventEnquiry/formperma/U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI/formEmbed?zf_rszfm=1"
+            title="Corporate Event Enquiry"
+            loading="lazy"
+            frameborder="0"
+            allowtransparency="true"
+            allow="geolocation"
+          ></iframe>
         </div>
+        <p class="corporate-modal__note">
+          Having trouble? <a href="https://forms.zohopublic.in/infogame1/form/CorporateEventEnquiry/formperma/U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI" target="_blank" rel="noopener">Open the form in a new tab</a>.
+        </p>
       </div>
     </div>
   </div>
 </div>
-
-<form
-  id="corporate-zoho-proxy"
-  class="corporate-zoho-proxy"
-  action="https://forms.zohopublic.in/infogame1/form/CorporateEventEnquiry/formperma/U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI/submit"
-  method="POST"
-  target="corporate-zoho-target"
-  accept-charset="UTF-8"
-  enctype="multipart/form-data"
-  hidden
-  aria-hidden="true"
-></form>
-<iframe
-  name="corporate-zoho-target"
-  id="corporate-zoho-target"
-  title="Corporate enquiry submission"
-  hidden
-  aria-hidden="true"
-></iframe>
 
 <script>
 (function(){
@@ -119,29 +44,11 @@
   if (!modal) return;
 
   const html = document.documentElement;
-  const form = modal.querySelector('.corporate-form');
-  const success = modal.querySelector('.corporate-form__success');
-  const error = modal.querySelector('.corporate-form__error');
   const content = modal.querySelector('.corporate-modal__body');
-  const detailsField = form ? form.querySelector('textarea[name="details"]') : null;
-  const submitButton = form ? form.querySelector('button[type="submit"]') : null;
-  const zohoForm = document.getElementById('corporate-zoho-proxy');
-  const zohoTarget = document.getElementById('corporate-zoho-target');
-  const zohoFields = form ? Array.from(form.querySelectorAll('[data-zoho-field]')) : [];
-  const zohoStatic = form ? Array.from(form.querySelectorAll('[data-zoho-static]')) : [];
-  const endpoint = form ? form.getAttribute('data-zoho-endpoint') : '';
-  const zohoToken = form ? form.getAttribute('data-zoho-token') : '';
-  const zohoFormId = form ? form.getAttribute('data-zoho-form-id') : '';
   const triggers = document.querySelectorAll('[data-modal-target="corporate-enquiry-modal"]');
   const closeButtons = modal.querySelectorAll('[data-modal-close]');
   let lastFocused = null;
-  let submissionPending = false;
-  let fallbackTimer = null;
   let scrollPosition = 0;
-  const defaultSubmitText = submitButton ? submitButton.textContent : '';
-  const defaultErrorText = error ? error.textContent : '';
-  let proxyHasLoadedOnce = false;
-  let awaitingProxy = false;
 
   function openModal(){
     if (!modal.hasAttribute('hidden')) return;
@@ -154,13 +61,11 @@
     if (content){
       content.scrollTop = 0;
     }
-    const firstInput = modal.querySelector('input, select, textarea, button');
     window.setTimeout(() => {
+      const firstInput = modal.querySelector('iframe, button, [href], input, select, textarea');
       (firstInput || modal).focus({ preventScroll: true });
-      adjustTextareaHeight();
     }, 10);
     modal.addEventListener('keydown', handleKeydown);
-    window.addEventListener('resize', handleResize);
   }
 
   function closeModal(){
@@ -170,12 +75,10 @@
     document.body.classList.remove('corporate-modal-open');
     document.body.style.removeProperty('top');
     modal.removeEventListener('keydown', handleKeydown);
-    window.removeEventListener('resize', handleResize);
     window.scrollTo(0, scrollPosition);
     if (lastFocused && typeof lastFocused.focus === 'function'){
       lastFocused.focus({ preventScroll: true });
     }
-    resetForm();
   }
 
   function handleKeydown(event){
@@ -188,7 +91,7 @@
   }
 
   function trapFocus(event){
-    const focusable = Array.from(modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+    const focusable = Array.from(modal.querySelectorAll('button, [href], input, select, textarea, iframe, [tabindex]:not([tabindex="-1"])'))
       .filter(el => !el.hasAttribute('hidden') && !el.closest('[hidden]') && !el.disabled);
     if (!focusable.length) return;
     const first = focusable[0];
@@ -202,361 +105,18 @@
     }
   }
 
-  function adjustTextareaHeight(){
-    if (!detailsField || !content) return;
-    detailsField.style.height = '';
-    if (!window.matchMedia('(min-width: 769px)').matches){
-      content.style.overflow = 'visible';
-      return;
-    }
-
-    requestAnimationFrame(() => {
-      const overflow = content.scrollHeight - content.clientHeight;
-      if (overflow > 0){
-        const currentHeight = detailsField.offsetHeight;
-        const targetHeight = Math.max(72, currentHeight - overflow - 12);
-        if (targetHeight < currentHeight){
-          detailsField.style.height = `${targetHeight}px`;
-        }
-      }
-      const remainingOverflow = content.scrollHeight - content.clientHeight;
-      content.style.overflow = remainingOverflow > 0 ? 'auto' : 'visible';
-    });
-  }
-
-  function handleResize(){
-    if (!modal.hasAttribute('hidden')){
-      adjustTextareaHeight();
-    }
-  }
-
-  function resetForm(){
-    if (!form) return;
-    clearFallbackWatch();
-    form.reset();
-    if (error){
-      error.textContent = defaultErrorText;
-      error.setAttribute('hidden', '');
-    }
-    if (success) success.setAttribute('hidden', '');
-    form.removeAttribute('hidden');
-    setSubmitting(false);
-    submissionPending = false;
-    awaitingProxy = false;
-    if (detailsField){
-      detailsField.style.height = '';
-    }
-    if (content){
-      content.scrollTop = 0;
-      content.style.overflow = 'visible';
-    }
-  }
-
-  function buildEntries(){
-    const entries = new Map();
-    const requiredNames = new Set();
-    const hiddenFields = {
-      zf_referrer_name: document.title || 'Games Lab Corporate Enquiry',
-      zf_redirect_url: '',
-      zf_source: window.location.href,
-      zc_gad: '',
-      zf_fieldsmode: '1'
-    };
-    if (zohoToken){
-      hiddenFields.zf_token = zohoToken;
-      hiddenFields.formLinkId = zohoToken;
-    }
-    if (zohoFormId){
-      hiddenFields.zf_formId = zohoFormId;
-    }
-
-    function pushEntry(name, value, isRequired){
-      if (!name) return;
-      const resolved = value == null ? '' : String(value);
-      entries.set(name, resolved);
-      if (isRequired) requiredNames.add(name);
-    }
-
-    zohoFields.forEach(field => {
-      const primaryNames = parseZohoNames(field.getAttribute('data-zoho-field'));
-      const additionalNames = parseZohoNames(field.getAttribute('data-zoho-split'));
-      const defaults = parseZohoDefaults(field.getAttribute('data-zoho-defaults'));
-      const value = getFieldValue(field);
-
-      primaryNames.forEach(name => {
-        pushEntry(name, value, field.required);
-      });
-
-      if (additionalNames.length){
-        const fragments = splitName(value);
-        additionalNames.forEach((name, index) => {
-          let fragmentValue = value;
-          if (index === 0){
-            fragmentValue = fragments.first;
-          } else if (index === 1){
-            fragmentValue = fragments.last;
-          }
-          pushEntry(name, fragmentValue, field.required);
-        });
-      }
-
-      defaults.forEach(([name, defaultValue]) => {
-        if (!entries.has(name) || !entries.get(name)){
-          pushEntry(name, defaultValue, field.required && !!defaultValue);
-        }
-      });
-    });
-
-    zohoStatic.forEach(staticField => {
-      const names = parseZohoNames(staticField.getAttribute('data-zoho-static'));
-      const value = staticField.value != null ? staticField.value : staticField.getAttribute('data-zoho-value') || '';
-      names.forEach(name => pushEntry(name, value, false));
-    });
-
-    if (!entries.has('zf_fieldsreq') && requiredNames.size){
-      pushEntry('zf_fieldsreq', Array.from(requiredNames).join(','), false);
-    }
-
-    Object.keys(hiddenFields).forEach(key => {
-      if (!entries.has(key)){
-        pushEntry(key, hiddenFields[key] || '', false);
-      }
-    });
-
-    return Array.from(entries.entries());
-  }
-
-  function getFieldValue(field){
-    if (!field) return '';
-    if (field.type === 'checkbox'){
-      return field.checked ? (field.value || 'on').trim() : '';
-    }
-    if (field.type === 'select-multiple'){
-      return Array.from(field.selectedOptions || [])
-        .map(option => (option.value || '').trim())
-        .filter(Boolean)
-        .join(', ');
-    }
-    if (field.type === 'datetime-local'){
-      return formatZohoDateTime(field.value);
-    }
-    return (field.value || '').trim();
-  }
-
-  function parseZohoNames(value){
-    if (!value) return [];
-    return value
-      .split(',')
-      .map(name => name.trim())
-      .filter(Boolean);
-  }
-
-  function parseZohoDefaults(value){
-    if (!value) return [];
-    return value
-      .split(';')
-      .map(entry => entry.trim())
-      .filter(Boolean)
-      .map(entry => {
-        const [name, ...rest] = entry.split('=');
-        const joined = rest.join('=').trim();
-        return [name.trim(), joined];
-      })
-      .filter(([name]) => !!name);
-  }
-
-  function splitName(value){
-    const parts = (value || '')
-      .split(/\s+/)
-      .map(part => part.trim())
-      .filter(Boolean);
-    if (!parts.length){
-      return { first: '', last: '', full: '' };
-    }
-    if (parts.length === 1){
-      return { first: parts[0], last: parts[0], full: parts[0] };
-    }
-    const [first, ...rest] = parts;
-    const last = rest.join(' ') || first;
-    return { first, last, full: [first, last].filter(Boolean).join(' ') };
-  }
-
-  function formatZohoDateTime(value){
-    if (!value) return '';
-    const [datePart, timePart] = value.split('T');
-    if (!datePart || !timePart) return '';
-    const [year, month, day] = datePart.split('-').map(part => parseInt(part, 10));
-    const [hourStr, minuteStr] = timePart.split(':');
-    if (!year || !month || !day || typeof hourStr === 'undefined') return '';
-    let hours = parseInt(hourStr, 10);
-    const minutes = parseInt(minuteStr || '0', 10);
-    if (Number.isNaN(hours) || Number.isNaN(minutes)) return '';
-    const meridiem = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    if (hours === 0) hours = 12;
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const monthName = monthNames[month - 1];
-    if (!monthName) return '';
-    const pad = num => String(num).padStart(2, '0');
-    return `${pad(day)}-${monthName}-${year} ${pad(hours)}:${pad(minutes)} ${meridiem}`;
-  }
-
-  function createFormData(entries){
-    const formData = new FormData();
-    entries.forEach(([key, value]) => {
-      if (typeof value === 'undefined' || value === null) return;
-      formData.append(key, value);
-    });
-    return formData;
-  }
-
-  async function submitViaFetch(entries){
-    if (!endpoint) return { ok: false };
-    const attempt = async (mode = 'cors') => {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        mode,
-        credentials: 'omit',
-        body: createFormData(entries)
-      });
-      if (response.ok) return { ok: true };
-      if (response.type === 'opaque') return { ok: true, assumed: true };
-      const text = await response.text().catch(() => '');
-      return { ok: false, status: response.status, body: text };
-    };
-
-    try {
-      return await attempt('cors');
-    } catch (error){
-      try {
-        const fallback = await attempt('no-cors');
-        if (fallback.ok) return fallback;
-        return { ok: false, error };
-      } catch (secondaryError){
-        return { ok: false, error: secondaryError };
-      }
-    }
-  }
-
-  function submitViaProxy(entries){
-    if (!zohoForm || !zohoTarget || !endpoint) return false;
-    zohoForm.setAttribute('action', endpoint);
-    while (zohoForm.firstChild){
-      zohoForm.removeChild(zohoForm.firstChild);
-    }
-    entries.forEach(([key, value]) => {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = key;
-      input.value = value;
-      zohoForm.appendChild(input);
-    });
-    startFallbackWatch();
-    awaitingProxy = true;
-    submissionPending = true;
-    zohoForm.submit();
-    return true;
-  }
-
-  function showSuccess(){
-    clearFallbackWatch();
-    submissionPending = false;
-    awaitingProxy = false;
-    if (form) form.setAttribute('hidden', '');
-    if (success) success.removeAttribute('hidden');
-    setSubmitting(false);
-    adjustTextareaHeight();
-  }
-
-  function showError(message){
-    clearFallbackWatch();
-    submissionPending = false;
-    awaitingProxy = false;
-    setSubmitting(false);
-    if (error){
-      error.textContent = message || defaultErrorText;
-      error.removeAttribute('hidden');
-    }
-  }
-
-  function setSubmitting(state){
-    if (!submitButton) return;
-    submitButton.disabled = state;
-    submitButton.classList.toggle('is-loading', state);
-    submitButton.textContent = state ? 'Submitting…' : defaultSubmitText;
-  }
-
-  function startFallbackWatch(){
-    clearFallbackWatch();
-    fallbackTimer = window.setTimeout(() => {
-      if (!submissionPending) return;
-      showError('We could not confirm your submission. Please try again or email corporate@gameslab.co.in.');
-    }, 15000);
-  }
-
-  function clearFallbackWatch(){
-    if (fallbackTimer){
-      window.clearTimeout(fallbackTimer);
-      fallbackTimer = null;
-    }
-  }
-
-  triggers.forEach(btn => {
-    btn.addEventListener('click', openModal);
+  triggers.forEach(button => {
+    button.addEventListener('click', openModal);
   });
 
-  closeButtons.forEach(btn => {
-    btn.addEventListener('click', closeModal);
+  closeButtons.forEach(button => {
+    button.addEventListener('click', closeModal);
   });
 
   modal.addEventListener('click', event => {
-    if (event.target.classList.contains('corporate-modal__backdrop')){
+    if (event.target && event.target.hasAttribute('data-modal-close')){
       closeModal();
     }
   });
-
-  if (form){
-    form.addEventListener('submit', async event => {
-      event.preventDefault();
-      if (!form.checkValidity()){
-        if (error) error.removeAttribute('hidden');
-        form.reportValidity();
-        return;
-      }
-      if (error){
-        error.textContent = defaultErrorText;
-        error.setAttribute('hidden', '');
-      }
-
-      const entries = buildEntries();
-      setSubmitting(true);
-      const response = await submitViaFetch(entries);
-      if (response && response.ok){
-        showSuccess();
-        return;
-      }
-
-      const proxied = submitViaProxy(entries);
-      if (!proxied){
-        const fallbackMessage = response && response.status
-          ? `We could not send your enquiry (status ${response.status}). Please try again or email corporate@gameslab.co.in.`
-          : 'We could not connect to the enquiry service. Please try again later or reach us at corporate@gameslab.co.in.';
-        showError(fallbackMessage);
-        return;
-      }
-    });
-  }
-
-  if (zohoTarget){
-    zohoTarget.addEventListener('load', () => {
-      if (!proxyHasLoadedOnce){
-        proxyHasLoadedOnce = true;
-        if (!awaitingProxy) return;
-      }
-      if (!submissionPending || !awaitingProxy) return;
-      awaitingProxy = false;
-      showSuccess();
-    });
-  }
 })();
 </script>
