@@ -1,149 +1,159 @@
 (function () {
-  const doc = document;
-  const modal = doc.getElementById('corporate-enquiry-modal');
-  if (!modal) {
-    return;
-  }
-
-  const trigger = doc.getElementById('corporate-enquiry-trigger');
-  const form = doc.getElementById('corporate-enquiry-form');
-  const formContainer = modal.querySelector('[data-form-container]');
-  const successPanel = doc.getElementById('corporate-form-success');
-  const iframeTarget = doc.getElementById('corporate-form-target');
-  const dialog = modal.querySelector('.corporate-form-dialog');
-  const closeControls = modal.querySelectorAll('[data-corporate-form-close]');
-  const overlay = modal.querySelector('.corporate-form-overlay');
-
-  let lastFocusedElement = null;
-  let isOpen = false;
-  let submissionInFlight = false;
-  let initialIframeLoad = true;
-
-  if (dialog && !dialog.hasAttribute('tabindex')) {
-    dialog.setAttribute('tabindex', '-1');
-  }
-
-  const getFocusable = () => {
-    if (!dialog) {
-      return [];
-    }
-    return Array.from(
-      dialog.querySelectorAll(
-        'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])'
-      )
-    ).filter((el) => el.offsetParent !== null || el === document.activeElement);
-  };
-
-  const openModal = () => {
-    if (isOpen) return;
-    modal.hidden = false;
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('corporate-form-lock');
-    modal.classList.add('is-open');
-    isOpen = true;
-    lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-
-    if (formContainer) {
-      formContainer.hidden = false;
-    }
-    if (successPanel) {
-      successPanel.hidden = true;
-    }
-
-    requestAnimationFrame(() => {
-      if (dialog) {
-        dialog.focus({ preventScroll: true });
-      }
-    });
-  };
-
-  const closeModal = () => {
-    if (!isOpen) return;
-    modal.hidden = true;
-    modal.setAttribute('aria-hidden', 'true');
-    modal.classList.remove('is-open');
-    document.body.classList.remove('corporate-form-lock');
-    isOpen = false;
-    submissionInFlight = false;
-
-    if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
-      lastFocusedElement.focus({ preventScroll: true });
-    }
-  };
-
-  const handleKeydown = (event) => {
-    if (!isOpen) return;
-
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      closeModal();
+  const init = () => {
+    const doc = document;
+    const modal = doc.getElementById('corporate-enquiry-modal');
+    if (!modal) {
       return;
     }
 
-    if (event.key !== 'Tab') {
-      return;
+    const trigger = doc.getElementById('corporate-enquiry-trigger');
+    const form = doc.getElementById('corporate-enquiry-form');
+    const formContainer = modal.querySelector('[data-form-container]');
+    const successPanel = doc.getElementById('corporate-form-success');
+    const iframeTarget = doc.getElementById('corporate-form-target');
+    const dialog = modal.querySelector('.corporate-form-dialog');
+    const closeControls = modal.querySelectorAll('[data-corporate-form-close]');
+    const overlay = modal.querySelector('.corporate-form-overlay');
+
+    let lastFocusedElement = null;
+    let isOpen = false;
+    let submissionInFlight = false;
+    let initialIframeLoad = true;
+
+    if (dialog && !dialog.hasAttribute('tabindex')) {
+      dialog.setAttribute('tabindex', '-1');
     }
 
-    const focusable = getFocusable();
-    if (!focusable.length) {
-      event.preventDefault();
-      return;
-    }
-
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
-  };
-
-  const handleOverlayClick = (event) => {
-    if (overlay && event.target === overlay) {
-      closeModal();
-    }
-  };
-
-  if (trigger) {
-    trigger.addEventListener('click', openModal);
-  }
-
-  closeControls.forEach((button) => {
-    button.addEventListener('click', closeModal);
-  });
-
-  modal.addEventListener('click', handleOverlayClick);
-  document.addEventListener('keydown', handleKeydown);
-
-  if (form) {
-    form.addEventListener('submit', () => {
-      submissionInFlight = true;
-    });
-  }
-
-  if (iframeTarget) {
-    iframeTarget.addEventListener('load', () => {
-      if (initialIframeLoad) {
-        initialIframeLoad = false;
-        return;
+    const getFocusable = () => {
+      if (!dialog) {
+        return [];
       }
-      if (!submissionInFlight) {
-        return;
-      }
-      submissionInFlight = false;
+      return Array.from(
+        dialog.querySelectorAll(
+          'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((el) => el.offsetParent !== null || el === document.activeElement);
+    };
+
+    const openModal = () => {
+      if (isOpen) return;
+      modal.hidden = false;
+      modal.removeAttribute('hidden');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('corporate-form-lock');
+      modal.classList.add('is-open');
+      isOpen = true;
+      lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
       if (formContainer) {
-        formContainer.hidden = true;
+        formContainer.hidden = false;
       }
       if (successPanel) {
-        successPanel.hidden = false;
+        successPanel.hidden = true;
       }
-      const successClose = successPanel?.querySelector('[data-corporate-form-close]');
-      successClose?.focus();
+
+      requestAnimationFrame(() => {
+        if (dialog) {
+          dialog.focus({ preventScroll: true });
+        }
+      });
+    };
+
+    const closeModal = () => {
+      if (!isOpen) return;
+      modal.hidden = true;
+      modal.setAttribute('hidden', '');
+      modal.setAttribute('aria-hidden', 'true');
+      modal.classList.remove('is-open');
+      document.body.classList.remove('corporate-form-lock');
+      isOpen = false;
+      submissionInFlight = false;
+
+      if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+        lastFocusedElement.focus({ preventScroll: true });
+      }
+    };
+
+    const handleKeydown = (event) => {
+      if (!isOpen) return;
+
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeModal();
+        return;
+      }
+
+      if (event.key !== 'Tab') {
+        return;
+      }
+
+      const focusable = getFocusable();
+      if (!focusable.length) {
+        event.preventDefault();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    const handleOverlayClick = (event) => {
+      if (overlay && event.target === overlay) {
+        closeModal();
+      }
+    };
+
+    if (trigger) {
+      trigger.addEventListener('click', openModal);
+    }
+
+    closeControls.forEach((button) => {
+      button.addEventListener('click', closeModal);
     });
+
+    modal.addEventListener('click', handleOverlayClick);
+    document.addEventListener('keydown', handleKeydown);
+
+    if (form) {
+      form.addEventListener('submit', () => {
+        submissionInFlight = true;
+      });
+    }
+
+    if (iframeTarget) {
+      iframeTarget.addEventListener('load', () => {
+        if (initialIframeLoad) {
+          initialIframeLoad = false;
+          return;
+        }
+        if (!submissionInFlight) {
+          return;
+        }
+        submissionInFlight = false;
+        if (formContainer) {
+          formContainer.hidden = true;
+        }
+        if (successPanel) {
+          successPanel.hidden = false;
+        }
+        const successClose = successPanel?.querySelector('[data-corporate-form-close]');
+        successClose?.focus();
+      });
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
   }
 })();
 
