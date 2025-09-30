@@ -128,7 +128,8 @@ content="
     .corporate-enquiry__copy{font-size:1.05rem;white-space:normal}
   }
 
-  body.corporate-modal-open{overflow:hidden}
+  html.corporate-modal-open{overflow:hidden;overscroll-behavior:contain}
+  body.corporate-modal-open{overflow:hidden;position:fixed;width:100%;left:0;right:0;overscroll-behavior:contain}
   .corporate-modal[hidden]{display:none}
   .corporate-modal{position:fixed;inset:0;z-index:10020;display:flex;align-items:center;justify-content:center;color:#fff;padding:32px 18px}
   .corporate-modal__backdrop{position:absolute;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
