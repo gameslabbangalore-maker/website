@@ -26,7 +26,7 @@ content="
   connect-src 'self'
               https://*.elfsight.com
               https://*.elfsightcdn.com;
-  frame-src https://www.youtube.com https://player.vimeo.com https://*.elfsight.com https://*.elfsightcdn.com;
+  frame-src https://www.youtube.com https://player.vimeo.com https://*.elfsight.com https://*.elfsightcdn.com https://forms.zohopublic.in;
   object-src 'none';
   base-uri 'self';
 ">
@@ -52,10 +52,11 @@ content="
 <link rel="preconnect" href="https://service-reviews-ultimate.elfsight.com" crossorigin>
 
 <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ '/assets/css/enquiry.css' | relative_url }}">
 <!-- === INLINE STYLES (copied exactly from your original) === -->
 <style>
   :root {
-    --bg:#181818; --card:#212121; --muted:#d0d0d0; --accent:#fce029; --datebox:#303030; --text-main:#fff;
+    --bg:#181818; --card:#212121; --muted:#d0d0d0; --accent:#fce029; --datebox:#303030; --text-main:#fff; --surface-elevated:#1b1d29;
     --topbar-height-desktop:58px; --topbar-height-mobile:48px;
     --animated-height-desktop:150px; --animated-height-mobile:80px;
     --line-height-desktop:1.4; --line-height-mobile:1.5;
@@ -138,7 +139,7 @@ content="
   .time{margin:0;font-size:13.5px;color:var(--muted);display:none}
   .event-tagline{font-size:14.5px;color:var(--muted)}
   .card-footer{padding:12px 14px 18px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-  .book-btn{background:var(--accent);color:#000;padding:10px 16px;border-radius:999px;font-weight:700;text-decoration:none;display:inline-block}
+  .book-btn{background:var(--accent);color:#000;padding:10px 16px;border-radius:999px;font-weight:700;text-decoration:none;display:inline-block;border:none;cursor:pointer;font-family:inherit;line-height:1.2;font-size:1rem}
   .book-btn:hover{background:#ffe974}
 
   .sk-card{width:340px;background:var(--card);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 6px 22px rgba(0,0,0,.8)}
@@ -183,7 +184,7 @@ content="
   }
 
   @media (prefers-color-scheme: light){
-    :root{--bg:#f5f5f5;--card:#fff;--muted:#444;--accent:#0a75bc;--datebox:#ececec;--text-main:#181818}
+    :root{--bg:#f5f5f5;--card:#fff;--muted:#444;--accent:#0a75bc;--datebox:#ececec;--text-main:#181818;--surface-elevated:#ffffff}
     body{background:var(--bg);color:var(--text-main)}
     .animated-text{color:#000}
     .topbar,.topbar-bleed{background:rgba(255,255,255,.1);color:#181818}
