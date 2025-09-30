@@ -37,19 +37,13 @@
 <script type="text/javascript">
 (function() {
   try {
-    if (document.readyState === 'complete') {
-      onloadActions_316948();
-    } else {
-      window.addEventListener('load', function() {
-        onloadActions_316948();
-      }, false);
-    }
-
-    function onloadActions_316948(){
-      constructDiv_316948();
-    }
+    whenReady(constructDiv_316948);
+    window.addEventListener('load', constructDiv_316948, { once: true });
 
     function constructDiv_316948(){
+      if(document.getElementById('formsLightBox_316948')){
+        return;
+      }
       var iframeDiv = document.createElement('div');
       iframeDiv.setAttribute('id','U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI_316948');
       iframeDiv.setAttribute('class','zf_main_id_316948');
@@ -83,11 +77,27 @@
     }
 
     function showZForm_316948(){
-      var iframe = document.getElementById('U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI_316948').getElementsByTagName('iframe')[0];
-      if(iframe === undefined || iframe.length === 0){
-        loadZForm_316948();
+      var iframeHost = document.getElementById('U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI_316948');
+      if(!iframeHost){
+        constructDiv_316948();
+        iframeHost = document.getElementById('U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI_316948');
       }
-      document.getElementById('formsLightBox_316948').style.display = 'block';
+      if(!iframeHost){
+        return;
+      }
+
+      var iframe = iframeHost.getElementsByTagName('iframe')[0];
+      if(!iframe){
+        loadZForm_316948();
+        iframe = iframeHost.getElementsByTagName('iframe')[0];
+      }
+
+      var lightbox = document.getElementById('formsLightBox_316948');
+      if(!lightbox){
+        return;
+      }
+
+      lightbox.style.display = 'block';
       document.body.style.overflow = 'hidden';
       document.body.classList.add('enquiry-modal-open');
       setTimeout(function() {
@@ -99,13 +109,18 @@
 
     function deleteZForm_316948() {
       var divCont = document.getElementById('formsLightBox_316948');
-      divCont.style.display='none';
+      if(divCont){
+        divCont.style.display='none';
+      }
       document.body.style.overflow = '';
       document.body.classList.remove('enquiry-modal-open');
 
-      var iframe = document.getElementById('U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI_316948').getElementsByTagName('iframe')[0];
-      if (iframe) {
-        iframe.remove();
+      var iframeHost = document.getElementById('U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI_316948');
+      if(iframeHost){
+        var iframe = iframeHost.getElementsByTagName('iframe')[0];
+        if (iframe) {
+          iframe.remove();
+        }
       }
     }
 
@@ -203,9 +218,22 @@
       }catch(e){}
       return zf_src;
     }
-    var buttonElem = document.getElementById('zf_button_316948');
-    buttonElem.style.display = 'block';
-    buttonElem.addEventListener('click', showZForm_316948);
+    whenReady(function(){
+      var buttonElem = document.getElementById('zf_button_316948');
+      if(!buttonElem){
+        return;
+      }
+      buttonElem.style.display = 'block';
+      buttonElem.addEventListener('click', showZForm_316948);
+    });
+
+    function whenReady(callback){
+      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        callback();
+      } else {
+        document.addEventListener('DOMContentLoaded', callback, { once: true });
+      }
+    }
   }catch(e){}
 })();
 </script>
