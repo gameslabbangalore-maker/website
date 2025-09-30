@@ -47,8 +47,9 @@
               <select name="eventType" data-zoho-field="Dropdown" required>
                 <option value="" disabled selected>Select an option</option>
                 <option value="Corporate Event">Corporate Event</option>
-                <option value="Team Event">Team-Building Event</option>
+                <option value="Team-Building Event">Team-Building Event</option>
                 <option value="Private Celebration">Private Celebration</option>
+                <option value="Other">Other</option>
               </select>
             </label>
             <label class="corporate-form__field">
@@ -127,8 +128,10 @@
   const zohoForm = document.getElementById('corporate-zoho-proxy');
   const zohoTarget = document.getElementById('corporate-zoho-target');
   const zohoFields = form ? Array.from(form.querySelectorAll('[data-zoho-field]')) : [];
+  const zohoStatic = form ? Array.from(form.querySelectorAll('[data-zoho-static]')) : [];
   const endpoint = form ? form.getAttribute('data-zoho-endpoint') : '';
   const zohoToken = form ? form.getAttribute('data-zoho-token') : '';
+  const zohoFormId = form ? form.getAttribute('data-zoho-form-id') : '';
   const triggers = document.querySelectorAll('[data-modal-target="corporate-enquiry-modal"]');
   const closeButtons = modal.querySelectorAll('[data-modal-close]');
   let lastFocused = null;
@@ -250,7 +253,7 @@
   }
 
   function buildEntries(){
-    const entries = [];
+    const entries = new Map();
     const requiredNames = new Set();
     const hiddenFields = {
       zf_referrer_name: document.title || 'Games Lab Corporate Enquiry',
@@ -263,41 +266,64 @@
       hiddenFields.zf_token = zohoToken;
       hiddenFields.formLinkId = zohoToken;
     }
+    if (zohoFormId){
+      hiddenFields.zf_formId = zohoFormId;
+    }
+
+    function pushEntry(name, value, isRequired){
+      if (!name) return;
+      const resolved = value == null ? '' : String(value);
+      entries.set(name, resolved);
+      if (isRequired) requiredNames.add(name);
+    }
 
     zohoFields.forEach(field => {
       const primaryNames = parseZohoNames(field.getAttribute('data-zoho-field'));
-      if (!primaryNames.length) return;
       const additionalNames = parseZohoNames(field.getAttribute('data-zoho-split'));
+      const defaults = parseZohoDefaults(field.getAttribute('data-zoho-defaults'));
       const value = getFieldValue(field);
 
+      primaryNames.forEach(name => {
+        pushEntry(name, value, field.required);
+      });
+
       if (additionalNames.length){
-        const { first, last } = splitName(value);
-        primaryNames.forEach(name => {
-          entries.push([name, value]);
-          if (field.required) requiredNames.add(name);
-        });
+        const fragments = splitName(value);
         additionalNames.forEach((name, index) => {
-          const nameValue = index === 0 ? first : index === 1 ? last : value;
-          entries.push([name, nameValue]);
-          if (field.required) requiredNames.add(name);
-        });
-      } else {
-        primaryNames.forEach(name => {
-          entries.push([name, value]);
-          if (field.required) requiredNames.add(name);
+          let fragmentValue = value;
+          if (index === 0){
+            fragmentValue = fragments.first;
+          } else if (index === 1){
+            fragmentValue = fragments.last;
+          }
+          pushEntry(name, fragmentValue, field.required);
         });
       }
+
+      defaults.forEach(([name, defaultValue]) => {
+        if (!entries.has(name) || !entries.get(name)){
+          pushEntry(name, defaultValue, field.required && !!defaultValue);
+        }
+      });
     });
 
-    if (!hiddenFields.zf_fieldsreq && requiredNames.size){
-      hiddenFields.zf_fieldsreq = Array.from(requiredNames).join(',');
+    zohoStatic.forEach(staticField => {
+      const names = parseZohoNames(staticField.getAttribute('data-zoho-static'));
+      const value = staticField.value != null ? staticField.value : staticField.getAttribute('data-zoho-value') || '';
+      names.forEach(name => pushEntry(name, value, false));
+    });
+
+    if (!entries.has('zf_fieldsreq') && requiredNames.size){
+      pushEntry('zf_fieldsreq', Array.from(requiredNames).join(','), false);
     }
 
     Object.keys(hiddenFields).forEach(key => {
-      entries.unshift([key, hiddenFields[key] || '']);
+      if (!entries.has(key)){
+        pushEntry(key, hiddenFields[key] || '', false);
+      }
     });
 
-    return entries;
+    return Array.from(entries.entries());
   }
 
   function getFieldValue(field){
@@ -325,19 +351,34 @@
       .filter(Boolean);
   }
 
+  function parseZohoDefaults(value){
+    if (!value) return [];
+    return value
+      .split(';')
+      .map(entry => entry.trim())
+      .filter(Boolean)
+      .map(entry => {
+        const [name, ...rest] = entry.split('=');
+        const joined = rest.join('=').trim();
+        return [name.trim(), joined];
+      })
+      .filter(([name]) => !!name);
+  }
+
   function splitName(value){
     const parts = (value || '')
       .split(/\s+/)
       .map(part => part.trim())
       .filter(Boolean);
     if (!parts.length){
-      return { first: '', last: '' };
+      return { first: '', last: '', full: '' };
     }
     if (parts.length === 1){
-      return { first: parts[0], last: parts[0] };
+      return { first: parts[0], last: parts[0], full: parts[0] };
     }
     const [first, ...rest] = parts;
-    return { first, last: rest.join(' ') || first };
+    const last = rest.join(' ') || first;
+    return { first, last, full: [first, last].filter(Boolean).join(' ') };
   }
 
   function formatZohoDateTime(value){
@@ -360,6 +401,43 @@
     return `${pad(day)}-${monthName}-${year} ${pad(hours)}:${pad(minutes)} ${meridiem}`;
   }
 
+  function createFormData(entries){
+    const formData = new FormData();
+    entries.forEach(([key, value]) => {
+      if (typeof value === 'undefined' || value === null) return;
+      formData.append(key, value);
+    });
+    return formData;
+  }
+
+  async function submitViaFetch(entries){
+    if (!endpoint) return { ok: false };
+    const attempt = async (mode = 'cors') => {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        mode,
+        credentials: 'omit',
+        body: createFormData(entries)
+      });
+      if (response.ok) return { ok: true };
+      if (response.type === 'opaque') return { ok: true, assumed: true };
+      const text = await response.text().catch(() => '');
+      return { ok: false, status: response.status, body: text };
+    };
+
+    try {
+      return await attempt('cors');
+    } catch (error){
+      try {
+        const fallback = await attempt('no-cors');
+        if (fallback.ok) return fallback;
+        return { ok: false, error };
+      } catch (secondaryError){
+        return { ok: false, error: secondaryError };
+      }
+    }
+  }
+
   function submitViaProxy(entries){
     if (!zohoForm || !zohoTarget || !endpoint) return false;
     zohoForm.setAttribute('action', endpoint);
@@ -375,6 +453,7 @@
     });
     startFallbackWatch();
     awaitingProxy = true;
+    submissionPending = true;
     zohoForm.submit();
     return true;
   }
@@ -437,7 +516,7 @@
   });
 
   if (form){
-    form.addEventListener('submit', event => {
+    form.addEventListener('submit', async event => {
       event.preventDefault();
       if (!form.checkValidity()){
         if (error) error.removeAttribute('hidden');
@@ -450,13 +529,21 @@
       }
 
       const entries = buildEntries();
-      const proxied = submitViaProxy(entries);
-      if (!proxied){
-        showError('We could not connect to the enquiry service. Please try again later or reach us at corporate@gameslab.co.in.');
+      setSubmitting(true);
+      const response = await submitViaFetch(entries);
+      if (response && response.ok){
+        showSuccess();
         return;
       }
-      submissionPending = true;
-      setSubmitting(true);
+
+      const proxied = submitViaProxy(entries);
+      if (!proxied){
+        const fallbackMessage = response && response.status
+          ? `We could not send your enquiry (status ${response.status}). Please try again or email corporate@gameslab.co.in.`
+          : 'We could not connect to the enquiry service. Please try again later or reach us at corporate@gameslab.co.in.';
+        showError(fallbackMessage);
+        return;
+      }
     });
   }
 
