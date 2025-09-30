@@ -421,7 +421,7 @@ document.addEventListener('DOMContentLoaded', function () {
     return;
   }
 
-  var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 
   function clearHiddenParts() {
     dateInput.value = '';
@@ -464,7 +464,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return null;
     }
     var day = pad(parseInt(match[1], 10));
-    var monthName = match[2].charAt(0).toUpperCase() + match[2].slice(1).toLowerCase();
+    var monthName = match[2].toUpperCase();
     var monthIndex = monthNames.indexOf(monthName);
     if (monthIndex === -1) {
       return null;
