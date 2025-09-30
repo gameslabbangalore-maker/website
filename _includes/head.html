@@ -153,77 +153,25 @@ content="
   @keyframes skshimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
 
   #corporate-enquiry{padding:56px 18px 80px;background:transparent;color:var(--text-main)}
-  #corporate-enquiry .enquiry-inner{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:28px;align-items:center;text-align:center}
-  #corporate-enquiry .enquiry-text{margin:0;font-size:clamp(1.1rem,2.4vw,1.55rem);font-weight:700;line-height:1.45}
-  #corporate-enquiry .enquiry-nowrap{display:inline}
-  #corporate-enquiry .corporate-form{width:100%}
-  #corporate-enquiry .zf-templateWidth{max-width:780px;margin:0 auto;width:100%}
-  #corporate-enquiry .zf-templateWrapper{background:rgba(33,33,33,.86);border-radius:18px;border:1px solid rgba(255,255,255,.08);box-shadow:0 28px 60px rgba(0,0,0,.55);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);overflow:hidden}
-  #corporate-enquiry .zf-tempHeadBdr{margin:0;padding:0;list-style:none}
-  #corporate-enquiry .zf-tempHeadContBdr{background:transparent;border-bottom:1px solid rgba(255,255,255,.08);margin:0;padding:34px 42px}
-  #corporate-enquiry .zf-frmTitle{margin:0;font-size:clamp(1.45rem,2.8vw,2.1rem);font-weight:700;color:var(--text-main)}
-  #corporate-enquiry .zf-frmDesc{margin:10px 0 0;color:var(--muted);font-size:1rem}
-  #corporate-enquiry .zf-subContWrap{padding:0}
-  #corporate-enquiry .zf-subContWrap>ul{list-style:none;margin:0;padding:0}
-  #corporate-enquiry .zf-tempFrmWrapper{padding:22px 42px;box-sizing:border-box}
-  #corporate-enquiry li + li .zf-tempFrmWrapper{border-top:1px solid rgba(255,255,255,.05)}
-  #corporate-enquiry .zf-labelName{display:block;font-size:1rem;font-weight:600;color:var(--text-main);text-align:left}
-  #corporate-enquiry .zf-tempContDiv{margin-top:10px}
-  #corporate-enquiry .zf-nameWrapper{display:flex;flex-wrap:wrap;gap:16px}
-  #corporate-enquiry .zf-nameWrapper span{flex:1 1 min(260px,calc(50% - 8px))}
-  #corporate-enquiry .zf-tempContDiv span{display:block;width:100%}
-  #corporate-enquiry .zf-tempContDiv span label{display:block;margin-top:6px;font-size:.82rem;color:rgba(255,255,255,.65);text-align:left}
-  #corporate-enquiry input[type=text],
-  #corporate-enquiry input[type=email],
-  #corporate-enquiry input[type=number],
-  #corporate-enquiry textarea,
-  #corporate-enquiry select{width:100%;background:rgba(12,12,12,.35);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 14px;color:var(--text-main);font-family:inherit;font-size:1rem;line-height:1.3;transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}
-  #corporate-enquiry input[type=text]::placeholder,
-  #corporate-enquiry input[type=email]::placeholder,
-  #corporate-enquiry input[type=number]::placeholder,
-  #corporate-enquiry textarea::placeholder{color:rgba(255,255,255,.55)}
-  #corporate-enquiry select{appearance:none;background-image:url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="20" height="12" viewBox="0 0 20 12" fill="none"%3E%3Cpath d="M2 2l8 8 8-8" stroke="%23FCE029" stroke-width="2" stroke-linecap="round"/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 14px center;padding-right:42px;cursor:pointer}
-  #corporate-enquiry input:focus,
-  #corporate-enquiry textarea:focus,
-  #corporate-enquiry select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(252,224,41,.28);background:rgba(12,12,12,.55)}
-  #corporate-enquiry input[type=number]{-moz-appearance:textfield}
-  #corporate-enquiry input[type=number]::-webkit-outer-spin-button,
-  #corporate-enquiry input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-  #corporate-enquiry textarea{min-height:120px;resize:vertical}
-  #corporate-enquiry .zf-phonefld .zf-phNumber span{flex:1 1 100%}
-  #corporate-enquiry .zf-tempFrmWrapper.zf-date .zf-tempContDiv{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start}
-  #corporate-enquiry .zf-tempFrmWrapper.zf-date .zf-tempContDiv span{flex:1 1 120px;min-width:110px}
-  #corporate-enquiry .zf-tempFrmWrapper.zf-date .zf-tempContDiv .zf-subDate{flex:1 1 200px;min-width:200px}
-  #corporate-enquiry .zf-tempFrmWrapper.zf-date .zf-symbols{flex:0 0 auto;align-self:center;color:rgba(255,255,255,.6);padding-top:0;font-weight:600}
-  #corporate-enquiry .zf-errorMessage{margin:10px 0 0;color:#ff6b8b;font-size:.85rem}
-  #corporate-enquiry .zf-fmFooter{margin:0;padding:32px 42px 44px;text-align:center;list-style:none;background:rgba(0,0,0,.2);border-top:1px solid rgba(255,255,255,.05)}
-  #corporate-enquiry .zf-submitColor{min-width:180px;box-shadow:0 12px 22px rgba(252,224,41,.25)}
-
-  @media (max-width:900px){
-    #corporate-enquiry .zf-tempFrmWrapper{padding:20px 28px}
-    #corporate-enquiry .zf-tempHeadContBdr{padding:28px}
-    #corporate-enquiry .zf-fmFooter{padding:28px 28px 36px}
-  }
-
-  @media (max-width:768px){
-    #corporate-enquiry{padding:48px 16px 64px}
-    #corporate-enquiry .enquiry-inner{gap:24px}
-    #corporate-enquiry .enquiry-text{font-size:clamp(1rem,4.8vw,1.3rem)}
-    #corporate-enquiry .enquiry-nowrap{white-space:nowrap}
-    #corporate-enquiry .zf-tempFrmWrapper{padding:18px 20px}
-    #corporate-enquiry .zf-tempHeadContBdr{padding:24px 20px}
-    #corporate-enquiry .zf-tempFrmWrapper.zf-date .zf-tempContDiv{gap:10px}
-    #corporate-enquiry .zf-tempFrmWrapper.zf-date .zf-tempContDiv span{flex:1 1 calc(50% - 6px);min-width:120px}
-    #corporate-enquiry .zf-tempFrmWrapper.zf-date .zf-tempContDiv .zf-subDate{flex:1 1 100%;min-width:100%}
-    #corporate-enquiry .zf-tempFrmWrapper.zf-date .zf-symbols{display:none}
-    #corporate-enquiry .zf-fmFooter{padding:24px 20px 32px}
-  }
-
-  @media (max-width:520px){
-    #corporate-enquiry .zf-templateWrapper{border-radius:14px}
-    #corporate-enquiry .zf-nameWrapper span{flex:1 1 100%}
-    #corporate-enquiry .zf-tempFrmWrapper{padding:16px 18px}
-  }
+  #corporate-enquiry .enquiry-inner{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:24px;align-items:center;text-align:center}
+  #corporate-enquiry .enquiry-text{margin:0;font-size:clamp(1.1rem,2.2vw,1.55rem);font-weight:700;line-height:1.45}
+  #corporate-enquiry .enquiry-nowrap{white-space:nowrap}
+  #corporate-enquiry .enquiry-button{display:inline-flex;align-items:center;justify-content:center;padding:10px 22px;font-size:1rem;width:auto}
+  @media (max-width:768px){#corporate-enquiry{padding:40px 12px 56px}#corporate-enquiry .enquiry-inner{gap:20px}#corporate-enquiry .enquiry-nowrap{white-space:normal}#corporate-enquiry .enquiry-button{width:auto}}
+  .zf_lB_Dimmer_316948{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;opacity:.8;z-index:10000000}
+  .zf_lB_Wrapper_316948{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10000001}
+  .zf_lB_Container_316948{position:relative;background:#fff;margin:0;padding:0;border:7px solid transparent;max-height:calc(100% - 60px);width:70vw;height:640px;display:flex;flex-direction:column;box-shadow:0 34px 80px rgba(0,0,0,.45);border-radius:14px;overflow:hidden;outline:none}
+  .zf_main_id_316948{height:100%;display:flex;overflow-y:auto;overflow-x:hidden}
+  .zf_main_id_316948 iframe{border:0;min-width:100%;min-height:100%}
+  .zf_lb_closeform_316948{position:absolute;top:-18px;right:-18px;width:40px;height:40px;border-radius:50%;background:#2f2e2e;border:2px solid #d9d9d9;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center}
+  .zf_lb_closeform_316948:before,.zf_lb_closeform_316948:after{content:"";position:absolute;width:2px;height:20px;background:#f7f7f7;border-radius:1px}
+  .zf_lb_closeform_316948:before{transform:rotate(45deg)}
+  .zf_lb_closeform_316948:after{transform:rotate(-45deg)}
+  .zf_lb_closeform_316948:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  @media (max-width:1024px){.zf_lB_Container_316948{width:min(720px,90vw)}}
+  @media (max-width:800px){.zf_lB_Container_316948{width:min(650px,92vw)}}
+  @media (max-width:600px){.zf_lB_Container_316948{width:min(450px,96vw);height:520px}}
+  @media (max-width:480px){.zf_lB_Container_316948{width:min(360px,96vw);height:480px}}
 
   .mobile-info{display:none}
   .card-date{display:none}
