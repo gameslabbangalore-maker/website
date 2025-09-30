@@ -206,115 +206,25 @@ Plan Your Event with Games Lab
       </div>
       <div class="zf-clearBoth"></div>
     </div>
-    <div class="zf-tempFrmWrapper zf-date enquiry-field enquiry-field--datetime">
-      <label class="zf-labelName" for="DateTime_date">Preferred Date &amp; Time</label>
+    <div class="zf-tempFrmWrapper zf-date enquiry-field enquiry-field--date">
+      <label class="zf-labelName" for="DateTime_date_picker">Preferred Date</label>
       <div class="zf-tempContDiv">
-        <div class="enquiry-datetime">
+        <div class="enquiry-input enquiry-input--date">
           <span class="enquiry-field-icon" aria-hidden="true">
             <svg class="enquiry-field-icon-svg">
               <use href="#icon-calendar"></use>
             </svg>
           </span>
-          <div class="enquiry-datetime-fields">
-            <span class="zf-subDate enquiry-datetime-field">
-              <input type="text" class="zf-hasDatepicker" maxlength="25" checktype="c4" name="DateTime_date" id="DateTime_date" value="" placeholder="" />
-              <label>dd-MMM-yyyy</label>
-            </span>
-            <span class="enquiry-datetime-field">
-              <select class="zf-form-sBox" name="DateTime_hours" checktype="c1">
-              <option value=""></option>
-              <option value="01">01</option>
-              <option value="02">02</option>
-              <option value="03">03</option>
-              <option value="04">04</option>
-              <option value="05">05</option>
-              <option value="06">06</option>
-              <option value="07">07</option>
-              <option value="08">08</option>
-              <option value="09">09</option>
-              <option value="10">10</option>
-              <option value="11">11</option>
-              <option value="12">12</option>
-            </select>
-            <label>HH</label>
-            </span>
-            <span class="enquiry-datetime-field">
-              <select class="zf-form-sBox" name="DateTime_minutes" checktype="c1">
-              <option value=""></option>
-              <option value="00">00</option>
-              <option value="01">01</option>
-              <option value="02">02</option>
-              <option value="03">03</option>
-              <option value="04">04</option>
-              <option value="05">05</option>
-              <option value="06">06</option>
-              <option value="07">07</option>
-              <option value="08">08</option>
-              <option value="09">09</option>
-              <option value="10">10</option>
-              <option value="11">11</option>
-              <option value="12">12</option>
-              <option value="13">13</option>
-              <option value="14">14</option>
-              <option value="15">15</option>
-              <option value="16">16</option>
-              <option value="17">17</option>
-              <option value="18">18</option>
-              <option value="19">19</option>
-              <option value="20">20</option>
-              <option value="21">21</option>
-              <option value="22">22</option>
-              <option value="23">23</option>
-              <option value="24">24</option>
-              <option value="25">25</option>
-              <option value="26">26</option>
-              <option value="27">27</option>
-              <option value="28">28</option>
-              <option value="29">29</option>
-              <option value="30">30</option>
-              <option value="31">31</option>
-              <option value="32">32</option>
-              <option value="33">33</option>
-              <option value="34">34</option>
-              <option value="35">35</option>
-              <option value="36">36</option>
-              <option value="37">37</option>
-              <option value="38">38</option>
-              <option value="39">39</option>
-              <option value="40">40</option>
-              <option value="41">41</option>
-              <option value="42">42</option>
-              <option value="43">43</option>
-              <option value="44">44</option>
-              <option value="45">45</option>
-              <option value="46">46</option>
-              <option value="47">47</option>
-              <option value="48">48</option>
-              <option value="49">49</option>
-              <option value="50">50</option>
-              <option value="51">51</option>
-              <option value="52">52</option>
-              <option value="53">53</option>
-              <option value="54">54</option>
-              <option value="55">55</option>
-              <option value="56">56</option>
-              <option value="57">57</option>
-              <option value="58">58</option>
-              <option value="59">59</option>
-            </select>
-            <label>MM</label>
-            </span>
-            <span class="enquiry-datetime-field">
-              <select class="zf-form-sBox" name="DateTime_meridiem" checktype="c1">
-              <option value=""></option>
-              <option>AM</option>
-              <option>PM</option>
-            </select>
-            <label>AM / PM</label>
-            </span>
-          </div>
+          <input
+            type="date"
+            id="DateTime_date_picker"
+            class="enquiry-date-picker"
+            aria-describedby="DateTime_date_hint"
+          />
+          <input type="hidden" name="DateTime_date" id="DateTime_date" checktype="c4" value="" />
         </div>
         <p id="DateTime_error" class="zf-errorMessage" style="display:none;">Invalid value</p>
+        <p class="enquiry-field-hint" id="DateTime_date_hint">Format: dd-MMM-yyyy (e.g. 02-Sep-2025)</p>
       </div>
       <div class="zf-clearBoth"></div>
     </div>
@@ -380,7 +290,7 @@ Plan Your Event with Games Lab
     var zf_DateRegex = new RegExp(dateAndMonthRegexFormateArray[0]);
     var zf_MonthYearRegex = new RegExp(dateAndMonthRegexFormateArray[1]);
     var zf_MandArray = [ 'Name_First', 'Name_Last', 'Dropdown', 'PhoneNumber_countrycode', 'Email'];
-    var zf_FieldArray = [ 'Name_First', 'Name_Last', 'SingleLine', 'Dropdown', 'PhoneNumber_countrycode', 'Email', 'Number', 'DateTime_date', 'DateTime_hours', 'DateTime_minutes', 'DateTime_meridiem', 'SingleLine1', 'MultiLine', 'SingleLine2'];
+    var zf_FieldArray = [ 'Name_First', 'Name_Last', 'SingleLine', 'Dropdown', 'PhoneNumber_countrycode', 'Email', 'Number', 'DateTime_date', 'SingleLine1', 'MultiLine', 'SingleLine2'];
     var isSalesIQIntegrationEnabled = false;
     var salesIQFieldsArray = [];
   </script>

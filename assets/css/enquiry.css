@@ -221,6 +221,7 @@
 .enquiry-form input[type="text"],
 .enquiry-form input[type="email"],
 .enquiry-form input[type="tel"],
+.enquiry-form input[type="date"],
 .enquiry-form .zf-form-sBox {
   width: 100%;
   border: none;
@@ -347,67 +348,32 @@
   pointer-events: none;
 }
 
-.enquiry-datetime {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  flex-wrap: wrap;
-  gap: 16px;
-  border: 1px solid var(--enquiry-border);
-  border-radius: 999px;
-  padding: 12px 18px 12px 48px;
-  background: var(--enquiry-input-bg);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+.enquiry-input--date {
+  padding-right: 28px;
 }
 
-.enquiry-datetime-fields {
-  display: flex;
-  flex: 1 1 auto;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
-}
-
-.enquiry-datetime-field {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 86px;
-  margin: 0;
-  float: none !important;
-  flex: 0 0 auto;
-}
-
-.enquiry-datetime-fields .zf-subDate.enquiry-datetime-field {
-  flex: 1 1 200px;
-}
-
-.enquiry-datetime-field input,
-.enquiry-datetime-field select {
-  border: none;
-  background: transparent;
-  padding: 0;
-  font: inherit;
-  color: var(--enquiry-text);
+.enquiry-input--date input[type="date"] {
   min-width: 0;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  appearance: auto;
+  -webkit-appearance: auto;
 }
 
-.enquiry-datetime-field input {
-  min-width: 150px;
-}
-
-.enquiry-datetime-field select {
-  padding-right: 18px;
+.enquiry-input--date input[type="date"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
+  filter: opacity(0.7);
 }
 
-.enquiry-datetime-field label {
-  font-size: 0.75rem;
+.dark .enquiry-input--date input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
+}
+
+.enquiry-field-hint {
+  margin-top: 8px;
+  font-size: 0.85rem;
   color: var(--enquiry-muted);
-  padding: 0;
-  margin: 0;
-  text-align: left;
 }
 
 .enquiry-field-icon {
@@ -424,31 +390,26 @@
   pointer-events: none;
 }
 
-.enquiry-input select,
-.enquiry-datetime select {
+.enquiry-input select {
   padding-right: 24px;
   cursor: pointer;
 }
 
-.enquiry-input select option,
-.enquiry-datetime select option {
+.enquiry-input select option {
   background-color: var(--enquiry-surface);
   color: var(--enquiry-text);
 }
 
-.dark .enquiry-input select option,
-.dark .enquiry-datetime select option {
+.dark .enquiry-input select option {
   color: var(--enquiry-text);
 }
 
-.enquiry-input select,
-.enquiry-datetime select {
+.enquiry-input select {
   background-color: transparent;
   color-scheme: light;
 }
 
-.dark .enquiry-input select,
-.dark .enquiry-datetime select {
+.dark .enquiry-input select {
   color-scheme: dark;
 }
 
@@ -491,16 +452,14 @@
 }
 
 .enquiry-input:focus-within,
-.enquiry-textarea:focus-within,
-.enquiry-datetime:focus-within {
+.enquiry-textarea:focus-within {
   border-color: var(--enquiry-accent);
   box-shadow: 0 0 0 3px var(--enquiry-accent-soft);
   background: color-mix(in srgb, var(--enquiry-surface) 92%, var(--enquiry-accent) 8%);
 }
 
 .enquiry-input:focus-within .enquiry-field-icon,
-.enquiry-textarea:focus-within .enquiry-field-icon,
-.enquiry-datetime:focus-within .enquiry-field-icon {
+.enquiry-textarea:focus-within .enquiry-field-icon {
   color: var(--enquiry-accent);
 }
 
@@ -549,8 +508,7 @@
   }
 
   .enquiry-form .zf-nameWrapper span,
-  .enquiry-form .zf-phonefld .zf-phwrapper span,
-  .enquiry-form .zf-subDate {
+  .enquiry-form .zf-phonefld .zf-phwrapper span {
     flex: 1 1 100%;
   }
 

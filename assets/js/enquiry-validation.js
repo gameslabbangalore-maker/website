@@ -398,3 +398,104 @@ function zf_SetDateAndMonthRegexBasedOnDateFormate(dateFormat) {
 if (typeof window !== 'undefined' && typeof window.enquirySyncDateTimeParts !== 'function') {
   window.enquirySyncDateTimeParts = function () {};
 }
+
+if (typeof window !== 'undefined') {
+  (function () {
+    var monthAbbr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    var monthLookup = monthAbbr.reduce(function (acc, abbr, index) {
+      acc[abbr.toLowerCase()] = index;
+      return acc;
+    }, {});
+
+    function isoToEnquiry(isoValue) {
+      if (!isoValue || typeof isoValue !== 'string') {
+        return '';
+      }
+      var parts = isoValue.split('-');
+      if (parts.length !== 3) {
+        return '';
+      }
+      var year = parts[0];
+      var monthIndex = parseInt(parts[1], 10);
+      var day = parts[2];
+      if (!year || isNaN(monthIndex) || !day) {
+        return '';
+      }
+      var monthName = monthAbbr[monthIndex - 1];
+      if (!monthName) {
+        return '';
+      }
+      var paddedDay = day.padStart(2, '0');
+      return paddedDay + '-' + monthName + '-' + year;
+    }
+
+    function enquiryToIso(enquiryValue) {
+      if (!enquiryValue || typeof enquiryValue !== 'string') {
+        return '';
+      }
+      var parts = enquiryValue.split('-');
+      if (parts.length !== 3) {
+        return '';
+      }
+      var day = parts[0];
+      var monthName = parts[1];
+      var year = parts[2];
+      if (!day || !monthName || !year) {
+        return '';
+      }
+      var lookupKey = monthName.toLowerCase();
+      var monthIndex = Object.prototype.hasOwnProperty.call(monthLookup, lookupKey)
+        ? monthLookup[lookupKey]
+        : -1;
+      if (monthIndex < 0) {
+        return '';
+      }
+      var paddedDay = day.padStart(2, '0');
+      var paddedMonth = String(monthIndex + 1).padStart(2, '0');
+      return year + '-' + paddedMonth + '-' + paddedDay;
+    }
+
+    function syncDateValue() {
+      var hiddenInput = document.getElementById('DateTime_date');
+      if (!hiddenInput) {
+        return '';
+      }
+      var dateInput = document.getElementById('DateTime_date_picker');
+      var formatted = isoToEnquiry(dateInput ? dateInput.value : '');
+      hiddenInput.value = formatted;
+      return formatted;
+    }
+
+    function initDatePickerSync() {
+      var dateInput = document.getElementById('DateTime_date_picker');
+      var hiddenInput = document.getElementById('DateTime_date');
+      if (!dateInput || !hiddenInput) {
+        window.enquirySyncDateTimeParts = function () {};
+        return;
+      }
+
+      if (!dateInput.value && hiddenInput.value) {
+        var isoValue = enquiryToIso(hiddenInput.value);
+        if (isoValue) {
+          dateInput.value = isoValue;
+        }
+      }
+
+      var handleInputChange = function () {
+        syncDateValue();
+      };
+
+      dateInput.addEventListener('change', handleInputChange);
+      dateInput.addEventListener('input', handleInputChange);
+
+      window.enquirySyncDateTimeParts = syncDateValue;
+      syncDateValue();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initDatePickerSync);
+    } else {
+      initDatePickerSync();
+    }
+  }());
+}
