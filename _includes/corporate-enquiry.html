@@ -21,15 +21,15 @@
         <div class="corporate-form__grid">
           <label class="corporate-form__field">
             <span class="corporate-form__label">Name *</span>
-            <input type="text" name="name" autocomplete="name" required />
+            <input type="text" name="name" data-zoho-field="Name" autocomplete="name" required />
           </label>
           <label class="corporate-form__field">
             <span class="corporate-form__label">Company / Organization Name</span>
-            <input type="text" name="company" autocomplete="organization" />
+            <input type="text" name="company" data-zoho-field="CompanyOrganizationName" autocomplete="organization" />
           </label>
           <label class="corporate-form__field">
             <span class="corporate-form__label">Event Type *</span>
-            <select name="eventType" required>
+            <select name="eventType" data-zoho-field="EventType" required>
               <option value="" disabled selected>Select an option</option>
               <option>Corporate Event</option>
               <option>Team-Building Event</option>
@@ -39,31 +39,31 @@
           </label>
           <label class="corporate-form__field">
             <span class="corporate-form__label">Contact Number *</span>
-            <input type="tel" name="contact" autocomplete="tel" required />
+            <input type="tel" name="contact" data-zoho-field="ContactNumber" autocomplete="tel" required />
           </label>
           <label class="corporate-form__field">
             <span class="corporate-form__label">Email Address *</span>
-            <input type="email" name="email" autocomplete="email" required />
+            <input type="email" name="email" data-zoho-field="EmailAddress" autocomplete="email" required />
           </label>
           <label class="corporate-form__field">
             <span class="corporate-form__label">Preferred Date &amp; Time</span>
-            <input type="datetime-local" name="datetime" />
+            <input type="datetime-local" name="datetime" data-zoho-field="PreferredDateTime" />
           </label>
           <label class="corporate-form__field">
             <span class="corporate-form__label">Preferred Location (area / cafe / space)</span>
-            <input type="text" name="location" />
+            <input type="text" name="location" data-zoho-field="PreferredLocation" />
           </label>
           <label class="corporate-form__field">
             <span class="corporate-form__label">Group Size</span>
-            <input type="number" name="groupSize" min="1" />
+            <input type="number" name="groupSize" data-zoho-field="GroupSize" min="1" />
           </label>
           <label class="corporate-form__field corporate-form__field--full">
             <span class="corporate-form__label">What are you looking for?</span>
-            <textarea name="details" rows="3"></textarea>
+            <textarea name="details" data-zoho-field="WhatAreYouLookingFor" rows="3"></textarea>
           </label>
           <label class="corporate-form__field corporate-form__field--full">
             <span class="corporate-form__label">How did you hear about us?</span>
-            <input type="text" name="referral" />
+            <input type="text" name="referral" data-zoho-field="HowDidYouHearAboutUs" />
           </label>
         </div>
         <div class="corporate-form__actions">
@@ -78,6 +78,24 @@
   </div>
 </div>
 
+<form
+  id="corporate-zoho-proxy"
+  class="corporate-zoho-proxy"
+  action="https://forms.zohopublic.in/infogame1/form/CorporateEventEnquiry/formperma/U6qIOzComB_KEFFu44Sy3mp57NtCr0-1qvUt-kVjCrI/submit"
+  method="POST"
+  target="corporate-zoho-target"
+  accept-charset="UTF-8"
+  hidden
+  aria-hidden="true"
+></form>
+<iframe
+  name="corporate-zoho-target"
+  id="corporate-zoho-target"
+  title="Corporate enquiry submission"
+  hidden
+  aria-hidden="true"
+></iframe>
+
 <script>
 (function(){
   const modal = document.getElementById('corporate-enquiry-modal');
@@ -88,9 +106,17 @@
   const error = modal.querySelector('.corporate-form__error');
   const content = modal.querySelector('.corporate-modal__content');
   const detailsField = form ? form.querySelector('textarea[name="details"]') : null;
+  const submitButton = form ? form.querySelector('button[type="submit"]') : null;
+  const zohoForm = document.getElementById('corporate-zoho-proxy');
+  const zohoTarget = document.getElementById('corporate-zoho-target');
+  const zohoFields = form ? Array.from(form.querySelectorAll('[data-zoho-field]')) : [];
   const triggers = document.querySelectorAll('[data-modal-target="corporate-enquiry-modal"]');
   const closeButtons = modal.querySelectorAll('[data-modal-close]');
   let lastFocused = null;
+  let iframeInitialized = false;
+  let submissionPending = false;
+  const defaultSubmitText = submitButton ? submitButton.textContent : '';
+  const defaultErrorText = error ? error.textContent : '';
 
   function openModal(){
     if (!modal.hasAttribute('hidden')) return;
@@ -175,7 +201,10 @@
     form.reset();
     if (error) error.setAttribute('hidden', '');
     if (success) success.setAttribute('hidden', '');
+    if (error && defaultErrorText) error.textContent = defaultErrorText;
     form.removeAttribute('hidden');
+    setSubmitting(false);
+    submissionPending = false;
     if (detailsField){
       detailsField.style.height = '';
     }
@@ -215,30 +244,72 @@
         form.reportValidity();
         return;
       }
-      if (error) error.setAttribute('hidden', '');
+      if (error){
+        error.textContent = defaultErrorText;
+        error.setAttribute('hidden', '');
+      }
+      if (!zohoForm || !zohoTarget){
+        if (error){
+          error.textContent = 'We could not connect to the enquiry service. Please try again later or reach us at corporate@gameslab.co.in.';
+          error.removeAttribute('hidden');
+        }
+        return;
+      }
 
-      const name = getValue('name');
-      const company = getValue('company');
-      const eventType = getValue('eventType');
-      const contact = getValue('contact');
-      const email = getValue('email');
-      const datetime = getValue('datetime');
-      const location = getValue('location');
-      const groupSize = getValue('groupSize');
-      const details = getValue('details');
-      const referral = getValue('referral');
+      while (zohoForm.firstChild){
+        zohoForm.removeChild(zohoForm.firstChild);
+      }
 
-      const bodyTemplate = `Hello ${name || 'there'},\n\nThank you for reaching out to Games Lab about your upcoming event. We’re excited to explore how we can host a fun and engaging experience for your team! 🎉\n\nHere’s what you shared with us:\n\nCompany/Organization: ${company || 'N/A'}\n\nEvent Type: ${eventType || 'N/A'}\n\nContact Number: ${contact || 'N/A'}\n\nEmail Address: ${email || 'N/A'}\n\nPreferred Date/Time: ${datetime || 'N/A'}\n\nPreferred Location: ${location || 'N/A'}\n\nGroup Size: ${groupSize || 'N/A'}\n\nDetails: ${details || 'N/A'}\n\nHow did you hear about us?: ${referral || 'N/A'}\n\nOur team will review your enquiry and get back to you within 24 hours with next steps, ideas, and availability.\n\nIn the meantime, feel free to check out our upcoming events: gameslab.co.in\n\nLooking forward to creating something memorable with you!\n\nWarm regards,\nTeam Games Lab\n📧 corporate@gameslab.co.in | 📞 +91-76760 99857`;
+      const hiddenFields = {
+        zf_referrer_name: document.title || 'Games Lab Corporate Enquiry',
+        zf_redirect_url: '',
+        zf_source: window.location.href
+      };
 
-      const subject = encodeURIComponent('Thank you for enquiring with Games Lab');
-      const body = encodeURIComponent(bodyTemplate);
-      const mailto = `mailto:corporate@gameslab.co.in?subject=${subject}&body=${body}`;
-      window.location.href = mailto;
+      Object.keys(hiddenFields).forEach(key => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = hiddenFields[key];
+        zohoForm.appendChild(input);
+      });
 
+      zohoFields.forEach(field => {
+        const zohoName = field.getAttribute('data-zoho-field');
+        if (!zohoName) return;
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = zohoName;
+        input.value = getValue(field.name) || '';
+        zohoForm.appendChild(input);
+      });
+
+      submissionPending = true;
+      setSubmitting(true);
+      zohoForm.submit();
+    });
+  }
+
+  if (zohoTarget){
+    zohoTarget.addEventListener('load', function(){
+      if (!iframeInitialized){
+        iframeInitialized = true;
+        return;
+      }
+      if (!submissionPending) return;
+      submissionPending = false;
       if (form) form.setAttribute('hidden', '');
       if (success) success.removeAttribute('hidden');
+      setSubmitting(false);
       adjustTextareaHeight();
     });
+  }
+
+  function setSubmitting(state){
+    if (!submitButton) return;
+    submitButton.disabled = state;
+    submitButton.classList.toggle('is-loading', state);
+    submitButton.textContent = state ? 'Submitting…' : defaultSubmitText;
   }
 })();
 </script>
