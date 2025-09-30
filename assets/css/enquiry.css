@@ -491,9 +491,103 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.enquiry-form .zf-submitColor[disabled],
+.enquiry-form .zf-submitColor[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
+  transform: none;
+}
+
 .enquiry-form .zf-submitColor:hover,
 .enquiry-form .zf-submitColor:focus-visible {
   transform: scale(1.02);
+  box-shadow: 0 12px 32px var(--enquiry-accent-soft);
+  outline: none;
+}
+
+.enquiry-form .zf-submitColor[disabled]:hover,
+.enquiry-form .zf-submitColor[disabled]:focus-visible,
+.enquiry-form .zf-submitColor[aria-disabled='true']:hover,
+.enquiry-form .zf-submitColor[aria-disabled='true']:focus-visible {
+  transform: none;
+  box-shadow: none;
+}
+
+body.enquiry-thankyou-open {
+  overflow: hidden;
+}
+
+.enquiry-thankyou {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(6, 7, 9, 0.72);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 1000;
+}
+
+.enquiry-thankyou[aria-hidden='false'] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.enquiry-thankyou__content {
+  background: color-mix(in srgb, var(--enquiry-surface) 94%, black 6%);
+  color: var(--enquiry-text);
+  border-radius: 24px;
+  box-shadow: var(--enquiry-shadow);
+  border: 1px solid var(--enquiry-border);
+  padding: clamp(28px, 4vw, 40px);
+  max-width: 420px;
+  text-align: center;
+  outline: none;
+}
+
+.enquiry-thankyou__title {
+  margin: 0 0 12px;
+  font-size: clamp(1.5rem, 3vw, 1.9rem);
+  font-weight: 700;
+  color: var(--enquiry-accent);
+}
+
+.enquiry-thankyou__message {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.enquiry-thankyou__note {
+  margin: 0 0 24px;
+  color: var(--enquiry-muted);
+  font-size: 0.95rem;
+}
+
+.enquiry-thankyou__primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: 999px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  background: var(--enquiry-accent);
+  color: var(--enquiry-submit-text);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.enquiry-thankyou__primary:hover,
+.enquiry-thankyou__primary:focus-visible {
+  transform: translateY(-1px);
   box-shadow: 0 12px 32px var(--enquiry-accent-soft);
   outline: none;
 }

@@ -70,7 +70,7 @@ method='POST'
 onSubmit='javascript:document.charset="UTF-8"; return zf_ValidateAndSubmit();'
 accept-charset='UTF-8' enctype='multipart/form-data' id='form'>
 <input type="hidden" name="zf_referrer_name" value=""><!-- To Track referrals , place the referrer name within the " " in the above hidden input field -->
-<input type="hidden" name="zf_redirect_url" value=""><!-- To redirect to a specific page after record submission , place the respective url within the " " in the above hidden input field -->
+<input type="hidden" name="zf_redirect_url" value="{{ '/enquiry/?submitted=1' | absolute_url }}"><!-- To redirect to a specific page after record submission , place the respective url within the " " in the above hidden input field -->
 <input type="hidden" name="zc_gad" value=""><!-- If GCLID is enabled in Zoho CRM Integration, click details of AdWords Ads will be pushed to Zoho CRM -->
 <div class="zf-templateWrapper"><ul class="zf-tempHeadBdr"><li class="zf-tempHeadContBdr"><h2 class="zf-frmTitle">
 Plan Your Event with Games Lab
@@ -275,7 +275,14 @@ Plan Your Event with Games Lab
 </ul>
 </div>
 </form>
-</div>
+      <div class="enquiry-thankyou" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="enquiry-thankyou__content" tabindex="-1">
+          <h2 class="enquiry-thankyou__title">Woohoo—got it! 🎉</h2>
+          <p class="enquiry-thankyou__message">Your enquiry is in. We&rsquo;ll get back to you within 24 hours.</p>
+          <p class="enquiry-thankyou__note">You&rsquo;ll be redirected to the homepage in 5 seconds.</p>
+          <button type="button" class="enquiry-thankyou__primary">Go now</button>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -285,9 +292,116 @@ Plan Your Event with Games Lab
     var zf_DateRegex = new RegExp(dateAndMonthRegexFormateArray[0]);
     var zf_MonthYearRegex = new RegExp(dateAndMonthRegexFormateArray[1]);
     var zf_MandArray = [ 'Name_First', 'Name_Last', 'Dropdown', 'PhoneNumber_countrycode', 'Email'];
-    var zf_FieldArray = [ 'Name_First', 'Name_Last', 'SingleLine', 'Dropdown', 'PhoneNumber_countrycode', 'Email', 'Number', 'Date', 'SingleLine1', 'MultiLine', 'SingleLine2'];
+    var zf_FieldArray = [ 'Name_First', 'Name_Last', 'SingleLine', 'Dropdown', 'PhoneNumber_countrycode', 'Email', 'Number', 'SingleLine3', 'SingleLine1', 'MultiLine', 'SingleLine2'];
     var isSalesIQIntegrationEnabled = false;
     var salesIQFieldsArray = [];
+  </script>
+  <script>
+    (function () {
+      var form = document.getElementById('form');
+      if (!form) {
+        return;
+      }
+
+      var submitButton = form.querySelector('.zf-submitColor');
+      var requiredSelectors = ['#Name_First', '#Name_Last', '#Dropdown', '[name="PhoneNumber_countrycode"]', '#Email'];
+      var requiredFields = requiredSelectors.map(function (selector) {
+        return form.querySelector(selector);
+      });
+
+      function isFieldValid(field) {
+        if (!field) {
+          return false;
+        }
+
+        if (field.tagName && field.tagName.toLowerCase() === 'select') {
+          return field.value && field.value !== '-Select-';
+        }
+
+        if (field.type === 'email') {
+          var value = field.value.trim();
+          return value.length > 0 && field.checkValidity();
+        }
+
+        return field.value.trim().length > 0;
+      }
+
+      function updateSubmitState() {
+        if (!submitButton) {
+          return;
+        }
+
+        var allValid = requiredFields.every(isFieldValid);
+
+        if (allValid) {
+          submitButton.disabled = false;
+          submitButton.removeAttribute('aria-disabled');
+        } else {
+          submitButton.disabled = true;
+          submitButton.setAttribute('aria-disabled', 'true');
+        }
+      }
+
+      requiredFields.forEach(function (field) {
+        if (!field) {
+          return;
+        }
+
+        field.addEventListener('input', updateSubmitState);
+        field.addEventListener('change', updateSubmitState);
+        field.addEventListener('blur', updateSubmitState);
+      });
+
+      window.addEventListener('pageshow', updateSubmitState);
+      updateSubmitState();
+
+      form.addEventListener('submit', function (event) {
+        if (submitButton && submitButton.disabled) {
+          event.preventDefault();
+        }
+      });
+
+      var thankyou = document.querySelector('.enquiry-thankyou');
+      if (!thankyou) {
+        return;
+      }
+
+      var redirectHome = function () {
+        window.location.href = "{{ '/' | relative_url }}";
+      };
+
+      function showThankyou() {
+        thankyou.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('enquiry-thankyou-open');
+
+        var content = thankyou.querySelector('.enquiry-thankyou__content');
+        if (content) {
+          content.focus();
+        }
+
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState(null, '', window.location.pathname + window.location.hash);
+        }
+
+        var redirectTimer = window.setTimeout(redirectHome, 5000);
+        var goNowButton = thankyou.querySelector('.enquiry-thankyou__primary');
+        if (goNowButton) {
+          goNowButton.addEventListener('click', function () {
+            window.clearTimeout(redirectTimer);
+            redirectHome();
+          });
+        }
+      }
+
+      if (typeof URLSearchParams === 'function') {
+        var params = new URLSearchParams(window.location.search);
+        if (params.get('submitted') === '1') {
+          showThankyou();
+        }
+      } else if (window.location.search.indexOf('submitted=1') !== -1) {
+        showThankyou();
+      }
+    })();
   </script>
 </body>
 </html>
