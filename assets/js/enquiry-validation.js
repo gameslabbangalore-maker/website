@@ -422,6 +422,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   var monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  var monthDisplayNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   function clearHiddenParts() {
     dateInput.value = '';
@@ -435,24 +436,11 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function setWrapperState() {
-    datetimeWrapper.classList.toggle('has-value', Boolean(datetimeField.value));
+    datetimeWrapper.classList.toggle('has-value', Boolean(datetimeField.value && datetimeField.value.trim()));
   }
 
-  function formatZohoDateFromIso(isoDate) {
-    if (!isoDate) {
-      return '';
-    }
-    var parts = isoDate.split('-');
-    if (parts.length !== 3) {
-      return '';
-    }
-    var year = parts[0];
-    var monthIndex = parseInt(parts[1], 10) - 1;
-    var day = parseInt(parts[2], 10);
-    if (Number.isNaN(monthIndex) || monthIndex < 0 || monthIndex > 11 || Number.isNaN(day)) {
-      return '';
-    }
-    return pad(day) + '-' + monthNames[monthIndex] + '-' + year;
+  function formatDateOnly(dateObj) {
+    return dateObj.day + '-' + monthNames[dateObj.monthIndex] + '-' + dateObj.year;
   }
 
   function parseZohoDate(dateValue) {
@@ -471,61 +459,89 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     return {
       year: match[3],
-      month: pad(monthIndex + 1),
+      monthIndex: monthIndex,
       day: day
     };
   }
 
-  function updatePartsFromNative() {
-    var value = datetimeField.value;
+  function formatDisplayValue(dateObj, hour12, minute, meridiem) {
+    return (
+      dateObj.day +
+      '-' +
+      monthDisplayNames[dateObj.monthIndex] +
+      '-' +
+      dateObj.year +
+      ' ' +
+      pad(hour12) +
+      ':' +
+      pad(minute) +
+      ' ' +
+      meridiem
+    );
+  }
+
+  function parseDisplayValue(value) {
     if (!value) {
+      return null;
+    }
+    var match = value
+      .trim()
+      .match(/^(\d{1,2})-([A-Za-z]{3})-(\d{4})\s+(\d{1,2}):(\d{1,2})\s*(AM|PM)$/i);
+    if (!match) {
+      return null;
+    }
+    var day = pad(parseInt(match[1], 10));
+    var monthName = match[2].toUpperCase();
+    var monthIndex = monthNames.indexOf(monthName);
+    if (monthIndex === -1) {
+      return null;
+    }
+    var hour12 = parseInt(match[4], 10);
+    var minutes = parseInt(match[5], 10);
+    if (Number.isNaN(hour12) || hour12 < 1 || hour12 > 12) {
+      return null;
+    }
+    if (Number.isNaN(minutes) || minutes < 0 || minutes > 59) {
+      return null;
+    }
+    var meridiem = match[6].toUpperCase();
+    return {
+      date: {
+        year: match[3],
+        monthIndex: monthIndex,
+        day: day
+      },
+      hour12: hour12,
+      minutes: minutes,
+      meridiem: meridiem
+    };
+  }
+
+  function updatePartsFromDisplay() {
+    var value = datetimeField.value;
+    if (!value || !value.trim()) {
       clearHiddenParts();
       setWrapperState();
       return;
     }
 
-    var segments = value.split('T');
-    if (segments.length !== 2) {
-      clearHiddenParts();
-      setWrapperState();
-      return;
-    }
-    var isoDate = segments[0];
-    var timePart = segments[1];
-    var formattedDate = formatZohoDateFromIso(isoDate);
-    if (!formattedDate) {
-      clearHiddenParts();
-      setWrapperState();
-      return;
-    }
-    var timePieces = timePart.split(':');
-    if (timePieces.length < 2) {
-      clearHiddenParts();
-      setWrapperState();
-      return;
-    }
-    var hours = parseInt(timePieces[0], 10);
-    var minutes = parseInt(timePieces[1], 10);
-    if (Number.isNaN(hours) || Number.isNaN(minutes)) {
+    var parsed = parseDisplayValue(value);
+    if (!parsed) {
       clearHiddenParts();
       setWrapperState();
       return;
     }
 
-    var meridiem = hours >= 12 ? 'PM' : 'AM';
-    var hour12 = hours % 12;
-    if (hour12 === 0) {
-      hour12 = 12;
-    }
-
-    dateInput.value = formattedDate;
-    hourSelect.value = pad(hour12);
-    minuteSelect.value = pad(minutes);
-    meridiemSelect.value = meridiem;
+    var canonicalDisplay = formatDisplayValue(parsed.date, parsed.hour12, parsed.minutes, parsed.meridiem);
+    datetimeField.value = canonicalDisplay;
+    dateInput.value = formatDateOnly(parsed.date);
+    hourSelect.value = pad(parsed.hour12);
+    minuteSelect.value = pad(parsed.minutes);
+    meridiemSelect.value = parsed.meridiem;
     setWrapperState();
   }
 
-  function syncNativeFromParts() {
+  function syncDisplayFromParts() {
     var parsedDate = parseZohoDate(dateInput.value);
     if (!parsedDate) {
       datetimeField.value = '';
@@ -537,45 +553,51 @@ document.addEventListener('DOMContentLoaded', function () {
     var minuteVal = parseInt(minuteSelect.value, 10);
     var meridiemVal = meridiemSelect.value;
 
-    if (Number.isNaN(hourVal) || Number.isNaN(minuteVal) || (meridiemVal !== 'AM' && meridiemVal !== 'PM')) {
+    if (Number.isNaN(hourVal) || hourVal < 1 || hourVal > 12) {
+      datetimeField.value = '';
+      setWrapperState();
+      return;
+    }
+    if (Number.isNaN(minuteVal) || minuteVal < 0 || minuteVal > 59) {
+      datetimeField.value = '';
+      setWrapperState();
+      return;
+    }
+    if (meridiemVal !== 'AM' && meridiemVal !== 'PM') {
       datetimeField.value = '';
       setWrapperState();
       return;
     }
 
-    if (meridiemVal === 'PM' && hourVal < 12) {
-      hourVal += 12;
-    }
-    if (meridiemVal === 'AM' && hourVal === 12) {
-      hourVal = 0;
-    }
-
-    var isoValue = parsedDate.year + '-' + parsedDate.month + '-' + parsedDate.day + 'T' + pad(hourVal) + ':' + pad(minuteVal);
-    datetimeField.value = isoValue;
+    datetimeField.value = formatDisplayValue(parsedDate, hourVal, minuteVal, meridiemVal);
     setWrapperState();
   }
 
-  datetimeField.addEventListener('input', updatePartsFromNative);
-  datetimeField.addEventListener('change', updatePartsFromNative);
+  datetimeField.addEventListener('input', function () {
+    setWrapperState();
+  });
+  datetimeField.addEventListener('change', updatePartsFromDisplay);
+  datetimeField.addEventListener('blur', updatePartsFromDisplay);
 
-  dateInput.addEventListener('change', syncNativeFromParts);
-  hourSelect.addEventListener('change', syncNativeFromParts);
-  minuteSelect.addEventListener('change', syncNativeFromParts);
-  meridiemSelect.addEventListener('change', syncNativeFromParts);
+  dateInput.addEventListener('change', syncDisplayFromParts);
+  hourSelect.addEventListener('change', syncDisplayFromParts);
+  minuteSelect.addEventListener('change', syncDisplayFromParts);
+  meridiemSelect.addEventListener('change', syncDisplayFromParts);
 
   window.enquirySyncDateTimeParts = function () {
-    updatePartsFromNative();
+    updatePartsFromDisplay();
   };
 
   form.addEventListener('submit', function () {
-    updatePartsFromNative();
+    updatePartsFromDisplay();
   });
 
   form.addEventListener('reset', function () {
     datetimeField.value = '';
-    updatePartsFromNative();
+    clearHiddenParts();
+    setWrapperState();
   });
 
-  syncNativeFromParts();
+  syncDisplayFromParts();
   setWrapperState();
 });

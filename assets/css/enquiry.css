@@ -221,7 +221,6 @@
 .enquiry-form input[type="text"],
 .enquiry-form input[type="email"],
 .enquiry-form input[type="tel"],
-.enquiry-form input[type="datetime-local"],
 .enquiry-form .zf-form-sBox {
   width: 100%;
   border: none;
@@ -380,28 +379,13 @@
   color: var(--enquiry-text);
 }
 
-.enquiry-input select,
-.enquiry-input input[type="datetime-local"] {
+.enquiry-input select {
   background-color: transparent;
   color-scheme: light;
 }
 
-.dark .enquiry-input select,
-.dark .enquiry-input input[type="datetime-local"] {
+.dark .enquiry-input select {
   color-scheme: dark;
-}
-
-.enquiry-input input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-  filter: brightness(0) invert(0.75);
-  opacity: 0.85;
-}
-
-body:not(.dark) .enquiry-input input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-  filter: none;
-}
-
-.enquiry-input input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
-  opacity: 1;
 }
 
 .enquiry-input--select:focus-within::after {
