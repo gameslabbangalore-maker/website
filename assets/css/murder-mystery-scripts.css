@@ -326,6 +326,13 @@ body.scripts-page a:not(.book-btn) {
     border-radius: 20px;
   }
 
+  .script-card__media {
+    width: min(220px, 100%);
+    align-self: center;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
   .scripts-hero-actions .book-btn {
     width: 100%;
     text-align: center;
@@ -376,6 +383,10 @@ body.scripts-page a:not(.book-btn) {
 @media (max-width: 520px) {
   .scripts-hero-highlights {
     grid-template-columns: 1fr;
+  }
+
+  .script-card__media {
+    width: min(200px, 100%);
   }
 
   .scripts-grid--three,
