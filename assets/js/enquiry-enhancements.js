@@ -4,6 +4,51 @@
   }
 
   var REDIRECT_DELAY = 5000;
+  var SUBMISSION_FLAG_KEY = 'enquirySubmissionPending';
+
+  function getSessionStorage() {
+    try {
+      return window.sessionStorage;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function setSubmissionFlag(value) {
+    var storage = getSessionStorage();
+    if (!storage) {
+      return;
+    }
+    try {
+      storage.setItem(SUBMISSION_FLAG_KEY, value);
+    } catch (err) {
+      /* noop */
+    }
+  }
+
+  function getSubmissionFlag() {
+    var storage = getSessionStorage();
+    if (!storage) {
+      return null;
+    }
+    try {
+      return storage.getItem(SUBMISSION_FLAG_KEY);
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function clearSubmissionFlag() {
+    var storage = getSessionStorage();
+    if (!storage) {
+      return;
+    }
+    try {
+      storage.removeItem(SUBMISSION_FLAG_KEY);
+    } catch (err) {
+      /* noop */
+    }
+  }
 
   function digitsOnly(value) {
     return value.replace(/\D/g, '');
@@ -305,6 +350,7 @@
       thankYouVisible = true;
       iframeSubmissionPending = false;
       submitting = false;
+      clearSubmissionFlag();
       if (submitButton) {
         submitButton.textContent = defaultSubmitLabel;
       }
@@ -357,8 +403,13 @@
       } catch (err) {
         return;
       }
-      if (params.get('submitted') === '1') {
+      var hasSubmittedParam = params.get('submitted') === '1';
+      var hadPendingFlag = getSubmissionFlag() === '1';
+      if (hasSubmittedParam && hadPendingFlag) {
         handleSuccess();
+      }
+      if (hasSubmittedParam) {
+        clearSubmissionFlag();
         if (window.history && typeof window.history.replaceState === 'function') {
           params.delete('submitted');
           var newSearch = params.toString();
@@ -449,6 +500,7 @@
 
       submitting = true;
       iframeSubmissionPending = true;
+      setSubmissionFlag('1');
       if (submitButton) {
         submitButton.textContent = submittingLabel;
       }
