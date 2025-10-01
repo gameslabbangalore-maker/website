@@ -86,25 +86,7 @@ body.scripts-page a {
   margin-bottom: clamp(24px, 4.5vw, 36px);
 }
 
-.scripts-hero-actions .book-btn {
-  box-sizing: border-box;
-  max-width: 100%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: background 0.15s ease, transform 0.15s ease;
-}
 
-.scripts-hero-actions .book-btn:hover {
-  transform: translateY(-1px);
-}
-
-
-.scripts-hero-actions .book-btn:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 3px;
-}
 
 .scripts-hero-highlights {
   display: grid;
@@ -322,11 +304,11 @@ body.scripts-page a {
 }
 
 body.scripts-page .scripts-main > .title {
-  margin-top: 40px !important;
+  margin-top: 28px !important;
 }
 
 body.scripts-page .scripts-main > .title + .contact-wrap {
-  margin-top: 0;
+  margin-top: 12px;
 }
 
 @media (prefers-color-scheme: light) {
@@ -344,7 +326,7 @@ body.scripts-page .scripts-main > .title + .contact-wrap {
 @media (max-width: 768px) {
   .scripts-main {
     padding-top: 28px;
-    gap: 36px;
+    gap: 28px;
   }
 
   .scripts-hero {
@@ -354,10 +336,6 @@ body.scripts-page .scripts-main > .title + .contact-wrap {
   .scripts-hero-actions {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  .scripts-hero-actions .book-btn {
-    width: 100%;
   }
 
   .scripts-grid--cards {
@@ -370,6 +348,24 @@ body.scripts-page .scripts-main > .title + .contact-wrap {
 
   .scripts-hero-highlights li {
     padding: 16px 18px 16px 40px;
+  }
+
+  .scripts-section {
+    gap: 18px;
+  }
+
+  .scripts-grid,
+  .scripts-steps {
+    gap: 16px;
+  }
+
+  .scripts-card,
+  .scripts-step {
+    padding: 20px;
+  }
+
+  .scripts-faq details {
+    padding: 16px 18px;
   }
 }
 
