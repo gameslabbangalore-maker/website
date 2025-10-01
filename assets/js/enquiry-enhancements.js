@@ -295,17 +295,30 @@
       }
     }
 
+    var iframeSubmissionPending = false;
+    var thankYouVisible = false;
+
     function handleSuccess() {
+      if (thankYouVisible) {
+        return;
+      }
+      thankYouVisible = true;
+      iframeSubmissionPending = false;
       submitting = false;
       if (submitButton) {
         submitButton.textContent = defaultSubmitLabel;
       }
       if (formContainer) {
         formContainer.setAttribute('hidden', '');
+        formContainer.setAttribute('aria-hidden', 'true');
       }
       if (thankYou) {
         thankYou.removeAttribute('hidden');
+        thankYou.setAttribute('aria-hidden', 'false');
         thankYou.classList.add('is-visible');
+        if (typeof document !== 'undefined' && document.body) {
+          document.body.classList.add('enquiry-thankyou-open');
+        }
         window.requestAnimationFrame(function () {
           focusElement(thankYou);
         });
@@ -317,14 +330,11 @@
       }
     }
 
-    var iframeSubmissionPending = false;
-
     if (iframe) {
       iframe.addEventListener('load', function () {
         if (!iframeSubmissionPending) {
           return;
         }
-        iframeSubmissionPending = false;
         handleSuccess();
       });
     }
@@ -336,6 +346,30 @@
         }
       });
     }
+
+    (function handleQuerySuccess() {
+      if (!thankYou) {
+        return;
+      }
+      var params;
+      try {
+        params = new URLSearchParams(window.location.search);
+      } catch (err) {
+        return;
+      }
+      if (params.get('submitted') === '1') {
+        handleSuccess();
+        if (window.history && typeof window.history.replaceState === 'function') {
+          params.delete('submitted');
+          var newSearch = params.toString();
+          var newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '');
+          if (window.location.hash) {
+            newUrl += window.location.hash;
+          }
+          window.history.replaceState({}, document.title, newUrl);
+        }
+      }
+    })();
 
     fieldGroups.forEach(function (group) {
       group.inputs.forEach(function (input) {
