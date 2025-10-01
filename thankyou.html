@@ -1,0 +1,28 @@
+---
+layout: null
+title: Thank you from Games Lab
+permalink: /thankyou/
+seo_description: Thanks for your enquiry—sit tight while we redirect you back to the homepage.
+---
+<!doctype html>
+<html lang="en">
+<head>
+  {% include head.html %}
+  <link rel="stylesheet" href="{{ '/assets/css/thankyou.css' | relative_url }}">
+</head>
+<body class="thankyou-page">
+  <main class="thankyou-main" role="main">
+    <section class="thankyou-overlay" aria-live="polite" role="status" aria-labelledby="thankyou-title"
+      data-redirect="{{ '/' | relative_url }}" data-delay="5">
+      <div class="thankyou-card" tabindex="-1">
+        <h1 id="thankyou-title" class="thankyou-title">Woohoo&mdash;got it! 🎉</h1>
+        <p class="thankyou-message">Your enquiry is in. We&rsquo;ll get back to you within 24 hours.</p>
+        <p class="thankyou-countdown">Redirecting to the homepage in <strong><span data-countdown>5</span></strong> seconds.</p>
+        <a class="thankyou-link" href="{{ '/' | relative_url }}">Click here to redirect now</a>
+        <p class="thankyou-meta">Prefer not to wait? Use the link above to jump back instantly.</p>
+      </div>
+    </section>
+  </main>
+  <script src="{{ '/assets/js/thankyou.js' | relative_url }}"></script>
+</body>
+</html>

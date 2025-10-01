@@ -10,6 +10,10 @@
   --enquiry-accent-soft: color-mix(in srgb, var(--enquiry-accent) 32%, transparent);
 }
 
+[hidden] {
+  display: none !important;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     --enquiry-border: rgba(0, 0, 0, 0.08);
@@ -470,6 +474,20 @@
   font-size: 0.9rem;
 }
 
+.enquiry-field.has-error .enquiry-input,
+.enquiry-field.has-error .enquiry-textarea {
+  border-color: #ff4b63;
+  box-shadow: 0 0 0 3px rgba(255, 75, 99, 0.18);
+}
+
+.enquiry-field.has-error .enquiry-field-icon {
+  color: #ff4b63;
+}
+
+.enquiry-field.has-error .zf-errorMessage {
+  display: block;
+}
+
 .enquiry-form .zf-fmFooter {
   text-align: center;
   padding: 24px 24px 36px;
@@ -491,11 +509,56 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.enquiry-form .zf-submitColor[disabled],
+.enquiry-form .zf-submitColor[aria-disabled='true'] {
+  background: color-mix(in srgb, var(--enquiry-accent) 40%, rgba(255, 255, 255, 0.12));
+  color: color-mix(in srgb, var(--enquiry-submit-text) 70%, rgba(0, 0, 0, 0.4));
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
 .enquiry-form .zf-submitColor:hover,
 .enquiry-form .zf-submitColor:focus-visible {
   transform: scale(1.02);
   box-shadow: 0 12px 32px var(--enquiry-accent-soft);
   outline: none;
+}
+
+.enquiry-form .zf-submitColor[disabled]:hover,
+.enquiry-form .zf-submitColor[disabled]:focus-visible,
+.enquiry-form .zf-submitColor[aria-disabled='true']:hover,
+.enquiry-form .zf-submitColor[aria-disabled='true']:focus-visible {
+  transform: none;
+  box-shadow: none;
+}
+
+.enquiry-submit-frame {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  border: 0;
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+}
+
+.calendar-subscribe {
+  padding: 18px 12px 12px;
+  text-align: center;
+  font-size: clamp(1rem, 2.4vw, 1.35rem);
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.calendar-subscribe a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.calendar-subscribe a:hover,
+.calendar-subscribe a:focus-visible {
+  text-decoration: underline;
 }
 
 @media (max-width: 600px) {
@@ -531,4 +594,5 @@
   .enquiry-textarea {
     padding: 14px 16px 14px 46px;
   }
+
 }
