@@ -164,12 +164,12 @@ Plan Your Event with Games Lab
                   <use href="#icon-phone"></use>
                 </svg>
               </span>
-              <input type="tel" compname="PhoneNumber" name="PhoneNumber_countrycode" maxlength="20" checktype="c7" value="" phoneFormat="1" isCountryCodeEnabled="false" fieldType="11" id="international_PhoneNumber_countrycode" valType="number" phoneFormatType="1" placeholder="e.g. +91 98765 43210" />
+              <input type="tel" compname="PhoneNumber" name="PhoneNumber_countrycode" maxlength="10" checktype="c7" value="" phoneFormat="1" isCountryCodeEnabled="false" fieldType="11" id="international_PhoneNumber_countrycode" valType="number" phoneFormatType="2" pattern="[0-9]{10}" inputmode="numeric" autocomplete="tel" placeholder="e.g. 9876543210" />
             </div>
           </span>
           <div class="zf-clearBoth"></div>
         </div>
-        <p id="PhoneNumber_error" class="zf-errorMessage" style="display:none;">Invalid value</p>
+        <p id="PhoneNumber_error" class="zf-errorMessage" style="display:none;">Please enter a 10-digit contact number.</p>
       </div>
       <div class="zf-clearBoth"></div>
     </div>
@@ -271,7 +271,7 @@ Plan Your Event with Games Lab
   </ul>
 </div>
 <ul>
-  <li class="zf-fmFooter"><button class="zf-submitColor">Submit</button></li>
+  <li class="zf-fmFooter"><button type="submit" class="zf-submitColor" disabled aria-disabled="true">Submit</button></li>
 </ul>
 </div>
 </form>
@@ -305,32 +305,105 @@ Plan Your Event with Games Lab
 
       var redirectField = form.querySelector('input[name="zf_redirect_url"]');
       if (redirectField) {
-        var redirectPath = "{{ '/enquiry/?submitted=1' | relative_url }}";
-        var origin = window.location.origin || (window.location.protocol + '//' + window.location.host);
-        redirectField.value = origin.replace(/\/$/, '') + redirectPath;
+        try {
+          var origin = window.location.origin || (window.location.protocol + '//' + window.location.host);
+          var path = window.location.pathname || '/';
+          redirectField.value = origin.replace(/\/$/, '') + path + '?submitted=1';
+        } catch (error) {
+          redirectField.value = "{{ '/enquiry/?submitted=1' | absolute_url }}";
+        }
       }
 
       var submitButton = form.querySelector('.zf-submitColor');
-      var requiredSelectors = ['#Name_First', '#Name_Last', '#Dropdown', '[name="PhoneNumber_countrycode"]', '#Email'];
-      var requiredFields = requiredSelectors.map(function (selector) {
-        return form.querySelector(selector);
-      });
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.setAttribute('aria-disabled', 'true');
+      }
+
+      var nameFirst = form.querySelector('#Name_First');
+      var nameLast = form.querySelector('#Name_Last');
+      var dropdown = form.querySelector('#Dropdown');
+      var phoneField = form.querySelector('[name="PhoneNumber_countrycode"]');
+      var emailField = form.querySelector('#Email');
+
+      var requiredFields = [nameFirst, nameLast, dropdown, phoneField, emailField].filter(Boolean);
+      var errorMap = {
+        Dropdown: 'Dropdown_error',
+        PhoneNumber_countrycode: 'PhoneNumber_error',
+        Email: 'Email_error'
+      };
+
+      function setDirty(field) {
+        if (!field) {
+          return;
+        }
+
+        if (field.dataset) {
+          field.dataset.dirty = 'true';
+        } else {
+          field.setAttribute('data-dirty', 'true');
+        }
+      }
+
+      function isDirty(field) {
+        if (!field) {
+          return false;
+        }
+
+        if (field.dataset && typeof field.dataset.dirty !== 'undefined') {
+          return field.dataset.dirty === 'true';
+        }
+
+        return field.getAttribute('data-dirty') === 'true';
+      }
+
+      function setAriaInvalid(field, dirty, valid) {
+        if (!field) {
+          return;
+        }
+
+        if (dirty && !valid) {
+          field.setAttribute('aria-invalid', 'true');
+        } else {
+          field.removeAttribute('aria-invalid');
+        }
+      }
+
+      function getPhoneDigits() {
+        if (!phoneField) {
+          return '';
+        }
+
+        return phoneField.value.replace(/\D/g, '');
+      }
+
+      function isPhoneValid() {
+        return phoneField ? getPhoneDigits().length === 10 : false;
+      }
 
       function isFieldValid(field) {
         if (!field) {
           return false;
         }
 
-        if (field.tagName && field.tagName.toLowerCase() === 'select') {
+        if (field === phoneField) {
+          return isPhoneValid();
+        }
+
+        if (field === dropdown) {
           return field.value && field.value !== '-Select-';
         }
 
-        if (field.type === 'email') {
-          var value = field.value.trim();
-          return value.length > 0 && field.checkValidity();
+        var value = (field.value || '').trim();
+        if (!value) {
+          return false;
         }
 
-        return field.value.trim().length > 0;
+        if (typeof field.checkValidity === 'function') {
+          return field.checkValidity();
+        }
+
+        return true;
       }
 
       function updateSubmitState() {
@@ -338,9 +411,21 @@ Plan Your Event with Games Lab
           return;
         }
 
-        var allValid = requiredFields.every(isFieldValid);
+        var allValid = requiredFields.every(function (field) {
+          return isFieldValid(field);
+        });
 
-        if (allValid) {
+        var hasVisibleErrors = Array.prototype.some.call(
+          form.querySelectorAll('.zf-errorMessage'),
+          function (message) {
+            if (!message || !message.style) {
+              return false;
+            }
+            return message.style.display !== 'none';
+          }
+        );
+
+        if (allValid && !hasVisibleErrors) {
           submitButton.disabled = false;
           submitButton.removeAttribute('aria-disabled');
         } else {
@@ -349,24 +434,108 @@ Plan Your Event with Games Lab
         }
       }
 
-      requiredFields.forEach(function (field) {
+      function updateErrors() {
+        var nameError = document.getElementById('Name_error');
+        if (nameError) {
+          var firstDirty = isDirty(nameFirst);
+          var lastDirty = isDirty(nameLast);
+          var firstValid = isFieldValid(nameFirst);
+          var lastValid = isFieldValid(nameLast);
+
+          setAriaInvalid(nameFirst, firstDirty, firstValid);
+          setAriaInvalid(nameLast, lastDirty, lastValid);
+
+          if ((firstDirty && !firstValid) || (lastDirty && !lastValid)) {
+            nameError.style.display = 'block';
+          } else {
+            nameError.style.display = 'none';
+          }
+        }
+
+        [dropdown, phoneField, emailField].forEach(function (field) {
+          if (!field) {
+            return;
+          }
+
+          var key = field.name || field.id;
+          var errorId = errorMap[key];
+          if (!errorId) {
+            return;
+          }
+
+          var errorEl = document.getElementById(errorId);
+          if (!errorEl) {
+            return;
+          }
+
+          var dirty = isDirty(field);
+          var valid = isFieldValid(field);
+
+          setAriaInvalid(field, dirty, valid);
+
+          if (dirty && !valid) {
+            errorEl.style.display = 'block';
+          } else {
+            errorEl.style.display = 'none';
+          }
+        });
+      }
+
+      function handleFieldEvent(field, options) {
         if (!field) {
           return;
         }
 
-        field.addEventListener('input', updateSubmitState);
-        field.addEventListener('change', updateSubmitState);
-        field.addEventListener('blur', updateSubmitState);
+        if (options && options.sanitise && field === phoneField) {
+          var digits = getPhoneDigits().slice(0, 10);
+          if (phoneField.value !== digits) {
+            phoneField.value = digits;
+          }
+        }
+
+        if (options && options.markDirty) {
+          setDirty(field);
+        }
+
+        updateErrors();
+        updateSubmitState();
+      }
+
+      requiredFields.forEach(function (field) {
+        field.addEventListener('input', function (event) {
+          handleFieldEvent(event.target, { sanitise: true });
+        });
+
+        field.addEventListener('change', function (event) {
+          handleFieldEvent(event.target);
+        });
+
+        field.addEventListener('blur', function (event) {
+          handleFieldEvent(event.target, { markDirty: true, sanitise: true });
+        });
       });
 
-      window.addEventListener('pageshow', updateSubmitState);
-      updateSubmitState();
+      form.addEventListener('invalid', function (event) {
+        if (event && event.target) {
+          setDirty(event.target);
+        }
+        updateErrors();
+        updateSubmitState();
+      }, true);
 
       form.addEventListener('submit', function (event) {
         if (submitButton && submitButton.disabled) {
           event.preventDefault();
         }
       });
+
+      window.addEventListener('pageshow', function () {
+        updateErrors();
+        updateSubmitState();
+      });
+
+      updateErrors();
+      updateSubmitState();
 
       var thankyou = document.querySelector('.enquiry-thankyou');
       if (!thankyou) {
@@ -376,6 +545,8 @@ Plan Your Event with Games Lab
       var redirectHome = function () {
         window.location.href = "{{ '/' | relative_url }}";
       };
+
+      var redirectTimer = null;
 
       function showThankyou() {
         thankyou.setAttribute('aria-hidden', 'false');
@@ -387,22 +558,32 @@ Plan Your Event with Games Lab
         }
 
         if (window.history && window.history.replaceState) {
-          window.history.replaceState(null, '', window.location.pathname + window.location.hash);
+          if (typeof URLSearchParams === 'function') {
+            var currentParams = new URLSearchParams(window.location.search);
+            currentParams.delete('submitted');
+            var nextSearch = currentParams.toString();
+            var updatedUrl = window.location.pathname + (nextSearch ? '?' + nextSearch : '') + window.location.hash;
+            window.history.replaceState(null, '', updatedUrl);
+          } else {
+            window.history.replaceState(null, '', window.location.pathname + window.location.hash);
+          }
         }
 
-        var redirectTimer = window.setTimeout(redirectHome, 5000);
+        redirectTimer = window.setTimeout(redirectHome, 5000);
         var goNowButton = thankyou.querySelector('.enquiry-thankyou__primary');
         if (goNowButton) {
           goNowButton.addEventListener('click', function () {
-            window.clearTimeout(redirectTimer);
+            if (redirectTimer) {
+              window.clearTimeout(redirectTimer);
+            }
             redirectHome();
           });
         }
       }
 
       if (typeof URLSearchParams === 'function') {
-        var params = new URLSearchParams(window.location.search);
-        if (params.get('submitted') === '1') {
+        var paramsCheck = new URLSearchParams(window.location.search);
+        if (paramsCheck.get('submitted') === '1') {
           showThankyou();
         }
       } else if (window.location.search.indexOf('submitted=1') !== -1) {
