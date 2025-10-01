@@ -309,19 +309,6 @@ body.scripts-page a:not(.book-btn) {
   color: var(--scripts-muted);
 }
 
-.scripts-contact {
-  display: grid;
-  gap: 18px;
-  margin-top: -12px;
-}
-
-body.scripts-page .scripts-contact .title {
-  margin: 12px auto 18px !important;
-}
-
-body.scripts-page .scripts-contact .contact-wrap {
-  margin: 0 auto;
-}
 
 @media (prefers-color-scheme: light) {
   .script-card {
@@ -394,10 +381,6 @@ body.scripts-page .scripts-contact .contact-wrap {
     padding: 16px 18px;
   }
 
-  .scripts-contact {
-    gap: 12px;
-    margin-top: -8px;
-  }
 }
 
 @media (max-width: 520px) {
