@@ -21,13 +21,14 @@ seo_description: Downloadable Murder Mystery scripts, character dossiers, and ho
       <h1 id="scripts-hero-title" class="scripts-hero-title">Host your own Murder Mystery night with our story packs</h1>
       <p class="scripts-hero-lede">Our pre-written scripts give you everything you need to run a gripping whodunnit at home, in the office, or online. No professional host required—just assemble your crew, pass out the character dossiers, and let the drama unfold.</p>
       <div class="scripts-hero-actions">
-        <a class="book-btn" href="{{ '/enquiry/' | relative_url }}?interest=murder-mystery-scripts">Talk to our team</a>
-        <a class="scripts-hero-secondary" href="{{ '/events/murder-mystery/' | relative_url }}">See the hosted experience</a>
+        <a class="book-btn"
+           href="https://wa.me/917676099857?text={{ 'Hey ! I want to host my own Murder Mystery night 🎭. Could you share your script options and how to get started?' | uri_escape }}"
+           target="_blank" rel="noopener">Enquire about scripts</a>
       </div>
       <ul class="scripts-hero-highlights">
         <li>12–20 character roles with secrets, motives, and alibis</li>
-        <li>Step-by-step host timeline with reveal prompts and twists</li>
-        <li>Printable clue cards, voting sheets, and editable digital files</li>
+        <li>Step-by-step host timeline with clear set of instructions</li>
+        <li>Printable envelopes, character cards, clues, and solution</li>
       </ul>
     </section>
 
@@ -50,49 +51,9 @@ seo_description: Downloadable Murder Mystery scripts, character dossiers, and ho
         </article>
         <article class="scripts-card">
           <h3>Flexible formats</h3>
-          <p>Choose a story that fits your group size and vibe. Play in person, hybrid, or fully remote using the same toolkit.</p>
+          <p>Choose a story that fits your group size and vibe. With different formats in stories our team helps you pick the best setup for an unforgettable event.</p>
         </article>
       </div>
-    </section>
-
-    {% include divider.html mt='40px' %}
-
-    <section class="scripts-section" aria-labelledby="scripts-kit-title">
-      <div class="scripts-section-header">
-        <p class="scripts-eyebrow">What’s inside the download</p>
-        <h2 id="scripts-kit-title">Everything you need to run the night</h2>
-        <p>Receive a neatly organised folder with printable PDFs, facilitator notes, and editable documents so you can customise names, locations, or accents.</p>
-      </div>
-      <ul class="scripts-kit-list">
-        <li class="scripts-kit-item">
-          <span class="scripts-kit-icon">A</span>
-          <div class="scripts-kit-content">
-            <h3>Character dossiers</h3>
-            <p>Individual booklets with backstory, secret objectives, and conversation prompts for each suspect and investigator.</p>
-          </div>
-        </li>
-        <li class="scripts-kit-item">
-          <span class="scripts-kit-icon">B</span>
-          <div class="scripts-kit-content">
-            <h3>Host playbook</h3>
-            <p>Minute-by-minute timeline, twist reveals, prop suggestions, and safety tips to keep the energy high and the story on track.</p>
-          </div>
-        </li>
-        <li class="scripts-kit-item">
-          <span class="scripts-kit-icon">C</span>
-          <div class="scripts-kit-content">
-            <h3>Clues &amp; evidence</h3>
-            <p>Printable clue cards, audio/visual cue suggestions, voting ballots, and recap slides to wrap up the investigation in style.</p>
-          </div>
-        </li>
-        <li class="scripts-kit-item">
-          <span class="scripts-kit-icon">D</span>
-          <div class="scripts-kit-content">
-            <h3>Facilitator cheat sheets</h3>
-            <p>Quick-reference summaries and troubleshooting guides so any co-host can step in and support the flow.</p>
-          </div>
-        </li>
-      </ul>
     </section>
 
     {% include divider.html mt='40px' %}
@@ -106,11 +67,11 @@ seo_description: Downloadable Murder Mystery scripts, character dossiers, and ho
       <div class="scripts-steps">
         <article class="scripts-step">
           <h3>Pick your script</h3>
-          <p>Tell us about your group, and we’ll recommend the perfect mystery—corporate-friendly, college chaos, or spicy noir.</p>
+          <p>Tell us about your group, and we’ll recommend the perfect mystery that suits your suits your group setting.</p>
         </article>
         <article class="scripts-step">
-          <h3>Download the toolkit</h3>
-          <p>Get instant access to the files along with optional add-ons like virtual backgrounds and Spotify playlists.</p>
+          <h3>Get your toolkit</h3>
+          <p>Our team sends you the printable files, explains the details and guides you on how to go about it.</p>
         </article>
         <article class="scripts-step">
           <h3>Host with confidence</h3>
@@ -141,20 +102,13 @@ seo_description: Downloadable Murder Mystery scripts, character dossiers, and ho
       </details>
       <details>
         <summary>How long does the game usually run?</summary>
-        <p>Most mysteries take about 3–4 hours including an introduction, two acts of investigation, and the final accusation round. You’ll get pacing notes to speed up or slow down.</p>
+        <p>Most mysteries take about 3–4 hours including an introduction, an open discussion, accusations and discussions, building timelines and the final round where the complete story comes out. You can ask our team for pacing notes to speed up or slow down.</p>
       </details>
     </section>
 
     {% include divider.html mt='40px' %}
 
-    <section class="scripts-cta" aria-labelledby="scripts-cta-title">
-      <h2 id="scripts-cta-title">Ready to bring your story to life?</h2>
-      <p>Drop us a line and we’ll share the latest script catalogue, pricing, and quick tips for hosting. We can even hop on a call to workshop your guest list.</p>
-      <div class="scripts-cta-actions">
-        <a class="book-btn" href="{{ '/enquiry/' | relative_url }}?interest=murder-mystery-scripts">Enquire about scripts</a>
-        <a class="scripts-cta-secondary" href="mailto:hello@gameslab.fun">Email the team</a>
-      </div>
-    </section>
+    {% include contact.html %}
   </main>
 </body>
 </html>
