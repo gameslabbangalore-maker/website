@@ -23,9 +23,6 @@ body.scripts-page a:not(.book-btn) {
 
 .scripts-main {
   padding: 48px 0 96px;
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
 }
 
 .scripts-hero {
@@ -325,7 +322,6 @@ body.scripts-page a:not(.book-btn) {
 @media (max-width: 768px) {
   .scripts-main {
     padding-top: 28px;
-    gap: 28px;
   }
 
   body.scripts-page .scripts-main .divider {
