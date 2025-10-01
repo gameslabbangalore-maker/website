@@ -346,6 +346,10 @@ body.scripts-page .scripts-contact .contact-wrap {
   .scripts-hero-actions .book-btn {
     width: 100%;
     text-align: center;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .scripts-hero-actions {
