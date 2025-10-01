@@ -165,16 +165,22 @@ body.scripts-page a:not(.book-btn) {
 }
 
 .script-card__media {
-  aspect-ratio: 4 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: rgba(0, 0, 0, 0.4);
   overflow: hidden;
+  padding: 20px;
+  min-height: 150px;
 }
 
 .script-card__media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 72%;
+  height: auto;
+  object-fit: contain;
   display: block;
+  border-radius: 14px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.22);
 }
 
 .script-card__body {
@@ -397,5 +403,32 @@ body.scripts-page .scripts-contact .contact-wrap {
 @media (max-width: 520px) {
   .scripts-hero-highlights {
     grid-template-columns: 1fr;
+  }
+
+  .script-card__media {
+    min-height: 120px;
+    padding: 16px;
+  }
+
+  .script-card__body {
+    padding: 16px 14px 18px;
+    gap: 8px;
+  }
+
+  .scripts-grid--three,
+  .scripts-steps {
+    gap: 12px;
+  }
+
+  .scripts-grid--three .scripts-card,
+  .scripts-steps .scripts-step {
+    padding: 16px 14px;
+    gap: 8px;
+  }
+
+  .scripts-grid--three .scripts-card p,
+  .scripts-steps .scripts-step p {
+    font-size: 0.95rem;
+    line-height: 1.48;
   }
 }
