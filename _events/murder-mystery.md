@@ -53,4 +53,9 @@ closing: |
   **🕵️ Do you have what it takes to solve the crime—or will you be the one hiding the deepest secret?**
 
   **Join us for Murder Mystery — where every glance is suspicious, every clue matters, and nothing is as it seems.**
+
+script_offer:
+  text: "Looking to host your own Murder Mystery night? We also have pre-written scripts available for purchase."
+  cta_label: "Explore Scripts"
+  cta_url: "/murder-mystery-scripts/"
 ---
