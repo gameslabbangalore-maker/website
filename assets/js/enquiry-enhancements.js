@@ -310,19 +310,28 @@
 
     var thankYouVisible = false;
 
-    function handleSuccess() {
+    function startRedirectTimer() {
+      if (redirectTimer || !redirectUrl) {
+        return;
+      }
+      redirectTimer = window.setTimeout(function () {
+        window.location.href = redirectUrl;
+      }, REDIRECT_DELAY);
+    }
+
+    function showThankYou() {
       if (thankYouVisible) {
         return;
       }
       thankYouVisible = true;
-      didSubmit = false;
-      submitting = false;
-      if (submitButton) {
-        submitButton.textContent = defaultSubmitLabel;
-      }
       if (formContainer) {
         formContainer.setAttribute('hidden', '');
         formContainer.setAttribute('aria-hidden', 'true');
+      }
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.setAttribute('aria-disabled', 'true');
+        submitButton.textContent = defaultSubmitLabel;
       }
       if (thankYou) {
         thankYou.removeAttribute('hidden');
@@ -334,6 +343,16 @@
         window.requestAnimationFrame(function () {
           focusElement(thankYou);
         });
+      }
+      startRedirectTimer();
+    }
+
+    function finalizeSuccess() {
+      showThankYou();
+      didSubmit = false;
+      submitting = false;
+      if (submitButton) {
+        submitButton.textContent = defaultSubmitLabel;
       }
       form.reset();
       fieldGroups.forEach(function (group) {
@@ -352,18 +371,13 @@
         submitButton.setAttribute('aria-disabled', 'true');
       }
       updateSubmitState();
-      if (redirectUrl) {
-        redirectTimer = window.setTimeout(function () {
-          window.location.href = redirectUrl;
-        }, REDIRECT_DELAY);
-      }
     }
 
     iframe.addEventListener('load', function () {
       if (!didSubmit) {
         return;
       }
-      handleSuccess();
+      finalizeSuccess();
     });
 
     if (thankYouLink) {
@@ -472,6 +486,7 @@
         submitButton.textContent = submittingLabel;
       }
       updateSubmitState();
+      showThankYou();
     });
   });
 })();
