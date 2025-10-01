@@ -89,6 +89,21 @@ body.scripts-page a {
 .scripts-hero-actions .book-btn {
   box-sizing: border-box;
   max-width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.scripts-hero-actions .book-btn:hover {
+  transform: translateY(-1px);
+}
+
+
+.scripts-hero-actions .book-btn:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
 }
 
 .scripts-hero-highlights {
@@ -307,11 +322,11 @@ body.scripts-page a {
 }
 
 body.scripts-page .scripts-main > .title {
-  margin-top: 0 !important;
+  margin-top: 40px !important;
 }
 
 body.scripts-page .scripts-main > .title + .contact-wrap {
-  margin-top: -8px;
+  margin-top: 0;
 }
 
 @media (prefers-color-scheme: light) {
