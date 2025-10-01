@@ -303,12 +303,17 @@ body.scripts-page a {
   color: var(--scripts-muted);
 }
 
-body.scripts-page .scripts-main > .title {
-  margin-top: 28px !important;
+.scripts-contact {
+  display: grid;
+  gap: 18px;
 }
 
-body.scripts-page .scripts-main > .title + .contact-wrap {
-  margin-top: 12px;
+body.scripts-page .scripts-contact .title {
+  margin: 0 !important;
+}
+
+body.scripts-page .scripts-contact .contact-wrap {
+  margin: 0;
 }
 
 @media (prefers-color-scheme: light) {
@@ -329,8 +334,17 @@ body.scripts-page .scripts-main > .title + .contact-wrap {
     gap: 28px;
   }
 
+  body.scripts-page .scripts-main .divider {
+    margin-top: 24px !important;
+  }
+
   .scripts-hero {
     border-radius: 20px;
+  }
+
+  .scripts-hero-actions .book-btn {
+    width: 100%;
+    text-align: center;
   }
 
   .scripts-hero-actions {
@@ -366,6 +380,10 @@ body.scripts-page .scripts-main > .title + .contact-wrap {
 
   .scripts-faq details {
     padding: 16px 18px;
+  }
+
+  .scripts-contact {
+    gap: 14px;
   }
 }
 
