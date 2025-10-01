@@ -42,15 +42,15 @@ seo_description: Downloadable Murder Mystery scripts, character dossiers, and ho
           <h2 id="scripts-showcase-title">Choose a script that fits your crew</h2>
           <p>Pick from ready-to-host mysteries spanning royal intrigue, family feuds, and high-society scandals. Each kit ships with detailed character dossiers, timelines, and reveal notes.</p>
         </div>
-        <div class="scripts-grid scripts-grid--cards" role="list">
+        <div class="cards-row scripts-cards-row" role="list">
           {% for script in script_catalog.scripts %}
-            <article class="script-card" role="listitem">
-              <figure class="script-card__media">
+            <article class="card script-card" role="listitem">
+              <div class="media">
                 <img src="{{ script.image | escape }}" alt="{{ script.title | escape }} cover art placeholder" loading="lazy">
-              </figure>
-              <div class="script-card__body">
-                <h3 class="script-card__title">{{ script.title }}</h3>
-                <p class="script-card__description">{{ script.description }}</p>
+              </div>
+              <div class="card-body">
+                <h3 class="event-title">{{ script.title }}</h3>
+                <p class="event-tagline">{{ script.description }}</p>
               </div>
             </article>
           {% endfor %}
