@@ -183,6 +183,7 @@ body.scripts-page a {
 }
 
 .script-card__media {
+  width: 100%;
   aspect-ratio: 4 / 3;
   background: rgba(0, 0, 0, 0.4);
   overflow: hidden;
@@ -364,8 +365,41 @@ body.scripts-page .scripts-main > .title + .contact-wrap {
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   }
 
-  .script-card__body {
+  .script-card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "title title"
+      "media body";
+    gap: 14px 16px;
+    align-items: start;
     padding: 20px 18px 24px;
+  }
+
+  .script-card__body {
+    display: contents;
+    padding: 0;
+    gap: 0;
+  }
+
+  .script-card__title {
+    grid-area: title;
+    margin: 0 0 2px;
+  }
+
+  .script-card__description {
+    grid-area: body;
+    margin: 0;
+  }
+
+  .script-card__media {
+    grid-area: media;
+    width: 84px;
+    aspect-ratio: 1 / 1;
+    flex: none;
+    border-radius: 12px;
+    overflow: hidden;
+    align-self: start;
   }
 
   .scripts-hero-highlights li {
