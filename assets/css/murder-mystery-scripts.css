@@ -17,15 +17,12 @@ body.scripts-page {
   color: var(--text-main);
 }
 
-body.scripts-page a {
+body.scripts-page a:not(.book-btn) {
   color: inherit;
 }
 
 .scripts-main {
   padding: 48px 0 96px;
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
 }
 
 .scripts-hero {
@@ -86,25 +83,7 @@ body.scripts-page a {
   margin-bottom: clamp(24px, 4.5vw, 36px);
 }
 
-.scripts-hero-actions .book-btn {
-  box-sizing: border-box;
-  max-width: 100%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: background 0.15s ease, transform 0.15s ease;
-}
 
-.scripts-hero-actions .book-btn:hover {
-  transform: translateY(-1px);
-}
-
-
-.scripts-hero-actions .book-btn:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 3px;
-}
 
 .scripts-hero-highlights {
   display: grid;
@@ -321,13 +300,6 @@ body.scripts-page a {
   color: var(--scripts-muted);
 }
 
-body.scripts-page .scripts-main > .title {
-  margin-top: 40px !important;
-}
-
-body.scripts-page .scripts-main > .title + .contact-wrap {
-  margin-top: 0;
-}
 
 @media (prefers-color-scheme: light) {
   .script-card {
@@ -344,20 +316,35 @@ body.scripts-page .scripts-main > .title + .contact-wrap {
 @media (max-width: 768px) {
   .scripts-main {
     padding-top: 28px;
-    gap: 36px;
+  }
+
+  body.scripts-page .scripts-main .divider {
+    margin-top: 36px;
   }
 
   .scripts-hero {
     border-radius: 20px;
   }
 
-  .scripts-hero-actions {
-    flex-direction: column;
-    align-items: stretch;
+  .script-card__media {
+    width: min(220px, 100%);
+    align-self: center;
+    border-radius: 16px;
+    overflow: hidden;
   }
 
   .scripts-hero-actions .book-btn {
     width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .scripts-hero-actions {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .scripts-grid--cards {
@@ -371,10 +358,51 @@ body.scripts-page .scripts-main > .title + .contact-wrap {
   .scripts-hero-highlights li {
     padding: 16px 18px 16px 40px;
   }
+
+  .scripts-section {
+    gap: 16px;
+  }
+
+  .scripts-grid,
+  .scripts-steps {
+    gap: 14px;
+  }
+
+  .scripts-card,
+  .scripts-step {
+    padding: 18px 16px;
+    gap: 10px;
+  }
+
+  .scripts-faq details {
+    padding: 16px 18px;
+  }
+
 }
 
 @media (max-width: 520px) {
   .scripts-hero-highlights {
     grid-template-columns: 1fr;
+  }
+
+  .script-card__media {
+    width: min(200px, 100%);
+  }
+
+  .scripts-grid--three,
+  .scripts-steps {
+    gap: 12px;
+  }
+
+  .scripts-grid--three .scripts-card,
+  .scripts-steps .scripts-step {
+    padding: 16px 14px;
+    gap: 8px;
+  }
+
+  .scripts-grid--three .scripts-card p,
+  .scripts-steps .scripts-step p {
+    font-size: 0.95rem;
+    line-height: 1.48;
   }
 }
