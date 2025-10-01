@@ -481,38 +481,68 @@ Plan Your Event with Games Lab
         });
       }
 
-      function handleFieldEvent(field, options) {
+      function sanitisePhoneInput() {
+        if (!phoneField) {
+          return;
+        }
+
+        var digits = getPhoneDigits().slice(0, 10);
+        if (phoneField.value !== digits) {
+          phoneField.value = digits;
+        }
+      }
+
+      function handleInput(event) {
+        var field = event && event.target;
         if (!field) {
           return;
         }
 
-        if (options && options.sanitise && field === phoneField) {
-          var digits = getPhoneDigits().slice(0, 10);
-          if (phoneField.value !== digits) {
-            phoneField.value = digits;
-          }
+        if (field === phoneField) {
+          sanitisePhoneInput();
         }
 
-        if (options && options.markDirty) {
-          setDirty(field);
+        if (isDirty(field)) {
+          updateErrors();
         }
 
+        updateSubmitState();
+      }
+
+      function handleChange(event) {
+        var field = event && event.target;
+        if (!field) {
+          return;
+        }
+
+        if (field === phoneField) {
+          sanitisePhoneInput();
+        }
+
+        setDirty(field);
+        updateErrors();
+        updateSubmitState();
+      }
+
+      function handleBlur(event) {
+        var field = event && event.target;
+        if (!field) {
+          return;
+        }
+
+        if (field === phoneField) {
+          sanitisePhoneInput();
+        }
+
+        setDirty(field);
         updateErrors();
         updateSubmitState();
       }
 
       requiredFields.forEach(function (field) {
-        field.addEventListener('input', function (event) {
-          handleFieldEvent(event.target, { sanitise: true });
-        });
-
-        field.addEventListener('change', function (event) {
-          handleFieldEvent(event.target);
-        });
-
-        field.addEventListener('blur', function (event) {
-          handleFieldEvent(event.target, { markDirty: true, sanitise: true });
-        });
+        field.addEventListener('input', handleInput);
+        field.addEventListener('change', handleChange);
+        field.addEventListener('blur', handleBlur);
       });
 
       form.addEventListener('invalid', function (event) {
