@@ -4,51 +4,7 @@
   }
 
   var REDIRECT_DELAY = 5000;
-  var SUBMISSION_FLAG_KEY = 'enquirySubmissionPending';
-
-  function getSessionStorage() {
-    try {
-      return window.sessionStorage;
-    } catch (err) {
-      return null;
-    }
-  }
-
-  function setSubmissionFlag(value) {
-    var storage = getSessionStorage();
-    if (!storage) {
-      return;
-    }
-    try {
-      storage.setItem(SUBMISSION_FLAG_KEY, value);
-    } catch (err) {
-      /* noop */
-    }
-  }
-
-  function getSubmissionFlag() {
-    var storage = getSessionStorage();
-    if (!storage) {
-      return null;
-    }
-    try {
-      return storage.getItem(SUBMISSION_FLAG_KEY);
-    } catch (err) {
-      return null;
-    }
-  }
-
-  function clearSubmissionFlag() {
-    var storage = getSessionStorage();
-    if (!storage) {
-      return;
-    }
-    try {
-      storage.removeItem(SUBMISSION_FLAG_KEY);
-    } catch (err) {
-      /* noop */
-    }
-  }
+  var didSubmit = false;
 
   function digitsOnly(value) {
     return value.replace(/\D/g, '');
@@ -275,17 +231,29 @@
   }
 
   document.addEventListener('DOMContentLoaded', function () {
+    if (window.__enquiryEnhancementsBound) {
+      return;
+    }
+
     var form = document.getElementById('form');
     if (!form) {
       return;
     }
 
+    var iframe = document.getElementById('enquiry-submit-frame');
+    if (!iframe) {
+      return;
+    }
+
+    window.__enquiryEnhancementsBound = true;
+    didSubmit = false;
+
     var submitButton = form.querySelector('.zf-submitColor');
     var formContainer = document.querySelector('.enquiry-form');
-    var iframe = document.getElementById('enquiry-submit-frame');
     var thankYou = document.querySelector('.enquiry-thankyou');
     var thankYouLink = thankYou ? thankYou.querySelector('.enquiry-thankyou__link') : null;
     var redirectUrl = thankYou ? thankYou.getAttribute('data-redirect') : null;
+
     var redirectTimer = null;
     var submitting = false;
     var defaultSubmitLabel = submitButton ? submitButton.textContent.trim() : '';
@@ -340,7 +308,6 @@
       }
     }
 
-    var iframeSubmissionPending = false;
     var thankYouVisible = false;
 
     function handleSuccess() {
@@ -348,9 +315,8 @@
         return;
       }
       thankYouVisible = true;
-      iframeSubmissionPending = false;
+      didSubmit = false;
       submitting = false;
-      clearSubmissionFlag();
       if (submitButton) {
         submitButton.textContent = defaultSubmitLabel;
       }
@@ -369,6 +335,23 @@
           focusElement(thankYou);
         });
       }
+      form.reset();
+      fieldGroups.forEach(function (group) {
+        group.dirty = false;
+        hideGroupError(group);
+        if (group.key === 'Dropdown') {
+          group.inputs.forEach(function (input) {
+            if (input && input.tagName === 'SELECT') {
+              updateDropdownValidity(input);
+            }
+          });
+        }
+      });
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.setAttribute('aria-disabled', 'true');
+      }
+      updateSubmitState();
       if (redirectUrl) {
         redirectTimer = window.setTimeout(function () {
           window.location.href = redirectUrl;
@@ -376,14 +359,12 @@
       }
     }
 
-    if (iframe) {
-      iframe.addEventListener('load', function () {
-        if (!iframeSubmissionPending) {
-          return;
-        }
-        handleSuccess();
-      });
-    }
+    iframe.addEventListener('load', function () {
+      if (!didSubmit) {
+        return;
+      }
+      handleSuccess();
+    });
 
     if (thankYouLink) {
       thankYouLink.addEventListener('click', function () {
@@ -392,35 +373,6 @@
         }
       });
     }
-
-    (function handleQuerySuccess() {
-      if (!thankYou) {
-        return;
-      }
-      var params;
-      try {
-        params = new URLSearchParams(window.location.search);
-      } catch (err) {
-        return;
-      }
-      var hasSubmittedParam = params.get('submitted') === '1';
-      var hadPendingFlag = getSubmissionFlag() === '1';
-      if (hasSubmittedParam && hadPendingFlag) {
-        handleSuccess();
-      }
-      if (hasSubmittedParam) {
-        clearSubmissionFlag();
-        if (window.history && typeof window.history.replaceState === 'function') {
-          params.delete('submitted');
-          var newSearch = params.toString();
-          var newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '');
-          if (window.location.hash) {
-            newUrl += window.location.hash;
-          }
-          window.history.replaceState({}, document.title, newUrl);
-        }
-      }
-    })();
 
     fieldGroups.forEach(function (group) {
       group.inputs.forEach(function (input) {
@@ -456,56 +408,70 @@
     updateSubmitState();
 
     form.addEventListener('submit', function (event) {
-      event.preventDefault();
       var firstInvalidGroup = null;
+      var shouldPrevent = false;
+      var focusTarget = null;
 
       fieldGroups.forEach(function (group) {
         var isValid = validateGroup(group, { force: true });
-        if (!isValid && !firstInvalidGroup) {
-          firstInvalidGroup = group;
+        if (!isValid) {
+          shouldPrevent = true;
+          if (!firstInvalidGroup) {
+            firstInvalidGroup = group;
+          }
         }
       });
 
       updateSubmitState();
 
       if (firstInvalidGroup) {
-        var focusTarget = firstInvalidGroup.focusTarget || firstInvalidGroup.inputs[0];
-        focusElement(focusTarget);
-        return;
+        focusTarget = firstInvalidGroup.focusTarget || firstInvalidGroup.inputs[0];
       }
 
-      document.charset = 'UTF-8';
-      var zohoResult = runZohoValidation();
+      var zohoResult = null;
 
-      if (!zohoResult.ok) {
-        zohoResult.triggered.forEach(function (name) {
-          var key = name.split('_')[0];
-          var group = groupMap[key];
-          if (group) {
-            group.dirty = true;
-            validateGroup(group, { force: true });
+      if (!shouldPrevent) {
+        document.charset = 'UTF-8';
+        zohoResult = runZohoValidation();
+
+        if (!zohoResult.ok) {
+          shouldPrevent = true;
+          zohoResult.triggered.forEach(function (name) {
+            var key = name.split('_')[0];
+            var group = groupMap[key];
+            if (group) {
+              group.dirty = true;
+              validateGroup(group, { force: true });
+            }
+          });
+          updateSubmitState();
+          if (zohoResult.focusTarget) {
+            focusTarget = zohoResult.focusTarget;
+          } else if (zohoResult.triggered.length) {
+            var fallbackGroup = groupMap[zohoResult.triggered[0].split('_')[0]];
+            var fallbackTarget = fallbackGroup ? fallbackGroup.focusTarget || fallbackGroup.inputs[0] : null;
+            focusTarget = fallbackTarget;
           }
-        });
+        }
+      }
+
+      if (shouldPrevent) {
+        event.preventDefault();
+        submitting = false;
+        didSubmit = false;
         updateSubmitState();
-        var focusTargetFromZoho = zohoResult.focusTarget;
-        if (focusTargetFromZoho) {
-          focusElement(focusTargetFromZoho);
-        } else if (zohoResult.triggered.length) {
-          var fallbackGroup = groupMap[zohoResult.triggered[0].split('_')[0]];
-          var fallbackTarget = fallbackGroup ? fallbackGroup.focusTarget || fallbackGroup.inputs[0] : null;
-          focusElement(fallbackTarget);
+        if (focusTarget) {
+          focusElement(focusTarget);
         }
         return;
       }
 
       submitting = true;
-      iframeSubmissionPending = true;
-      setSubmissionFlag('1');
+      didSubmit = true;
       if (submitButton) {
         submitButton.textContent = submittingLabel;
       }
       updateSubmitState();
-      form.submit();
     });
   });
 })();

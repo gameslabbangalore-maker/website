@@ -10,6 +10,10 @@
   --enquiry-accent-soft: color-mix(in srgb, var(--enquiry-accent) 32%, transparent);
 }
 
+[hidden] {
+  display: none !important;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     --enquiry-border: rgba(0, 0, 0, 0.08);
