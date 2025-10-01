@@ -344,8 +344,20 @@ body.scripts-page a:not(.book-btn) {
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   }
 
+  .script-card {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .script-card__media {
+    width: clamp(72px, 22vw, 96px);
+    aspect-ratio: 1 / 1;
+    flex-shrink: 0;
+  }
+
   .script-card__body {
-    padding: 20px 18px 24px;
+    padding: 16px 16px 18px;
+    flex: 1 1 auto;
   }
 
   .scripts-hero-highlights li {
@@ -381,6 +393,10 @@ body.scripts-page a:not(.book-btn) {
   .scripts-grid--three,
   .scripts-steps {
     gap: 12px;
+  }
+
+  .script-card__media {
+    width: clamp(64px, 28vw, 76px);
   }
 
   .scripts-grid--three .scripts-card,
