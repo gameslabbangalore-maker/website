@@ -87,10 +87,8 @@ body.scripts-page a {
 }
 
 .scripts-hero-actions .book-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .scripts-hero-highlights {
@@ -156,14 +154,14 @@ body.scripts-page a {
 }
 
 .scripts-grid--cards {
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
 .script-card {
   background: color-mix(in srgb, var(--surface-elevated) 88%, transparent);
   border: 1px solid var(--scripts-border);
-  border-radius: 20px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+  border-radius: 18px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.26);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -184,8 +182,8 @@ body.scripts-page a {
 
 .script-card__body {
   display: grid;
-  gap: 12px;
-  padding: 22px 22px 26px;
+  gap: 10px;
+  padding: 18px 18px 22px;
 }
 
 .script-card__title {
