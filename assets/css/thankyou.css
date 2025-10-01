@@ -81,6 +81,8 @@ body.thankyou-page {
   font-weight: 600;
   text-decoration: none;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .thankyou-link:hover,
