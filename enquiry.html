@@ -67,9 +67,9 @@ seo_description: Plan your corporate, team-building, or private event with Games
       <div class="zf-templateWidth">
         <form action='https://forms.zohopublic.in/infogame1/form/CorporateEventEnquiry/formperma/gOUPBxGRNfRVLpx9oRV8JE50fKlxKeLe6RZaHNNIF4o/htmlRecords/submit' name='form'
 method='POST'
-accept-charset='UTF-8' enctype='multipart/form-data' id='form' novalidate>
+accept-charset='UTF-8' enctype='multipart/form-data' id='form' novalidate data-success-url="{{ '/thankyou/' | relative_url }}">
 <input type="hidden" name="zf_referrer_name" value=""><!-- To Track referrals , place the referrer name within the " " in the above hidden input field -->
-<input type="hidden" name="zf_redirect_url" value=""><!-- To redirect to a specific page after record submission , place the respective url within the " " in the above hidden input field -->
+<input type="hidden" name="zf_redirect_url" value="{{ '/thankyou/' | absolute_url }}"><!-- To redirect to a specific page after record submission , place the respective url within the " " in the above hidden input field -->
 <input type="hidden" name="zc_gad" value=""><!-- If GCLID is enabled in Zoho CRM Integration, click details of AdWords Ads will be pushed to Zoho CRM -->
 <div class="zf-templateWrapper"><ul class="zf-tempHeadBdr"><li class="zf-tempHeadContBdr"><h2 class="zf-frmTitle">
 Plan Your Event with Games Lab
@@ -277,14 +277,6 @@ Plan Your Event with Games Lab
         <iframe id="enquiry-submit-frame" name="enquiry-submit-frame" class="enquiry-submit-frame" title="Enquiry form submission" hidden></iframe>
     </div>
 
-    <section class="enquiry-thankyou" aria-live="polite" aria-hidden="true" role="status" hidden data-redirect="{{ '/' | relative_url }}" tabindex="-1">
-      <div class="enquiry-thankyou__inner">
-        <h2 class="enquiry-thankyou__title">Woohoo&mdash;got it! 🎉</h2>
-        <p class="enquiry-thankyou__message">Your enquiry is in. We&rsquo;ll get back to you within 24 hours.</p>
-        <p class="enquiry-thankyou__meta">We&rsquo;ll take you to the homepage in a few seconds.</p>
-        <a class="enquiry-thankyou__link" href="{{ '/' | relative_url }}">Go now</a>
-      </div>
-    </section>
   </main>
 
   <script src="{{ '/assets/js/enquiry-validation.js' | relative_url }}"></script>

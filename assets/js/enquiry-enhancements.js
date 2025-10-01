@@ -3,7 +3,6 @@
     return;
   }
 
-  var REDIRECT_DELAY = 5000;
   var didSubmit = false;
 
   function digitsOnly(value) {
@@ -249,12 +248,8 @@
     didSubmit = false;
 
     var submitButton = form.querySelector('.zf-submitColor');
-    var formContainer = document.querySelector('.enquiry-form');
-    var thankYou = document.querySelector('.enquiry-thankyou');
-    var thankYouLink = thankYou ? thankYou.querySelector('.enquiry-thankyou__link') : null;
-    var redirectUrl = thankYou ? thankYou.getAttribute('data-redirect') : null;
+    var successUrl = form.getAttribute('data-success-url') || '/';
 
-    var redirectTimer = null;
     var submitting = false;
     var defaultSubmitLabel = submitButton ? submitButton.textContent.trim() : '';
     var submittingLabel = 'Submitting…';
@@ -308,52 +303,9 @@
       }
     }
 
-    var thankYouVisible = false;
-
-    function startRedirectTimer() {
-      if (redirectTimer || !redirectUrl) {
-        return;
-      }
-      redirectTimer = window.setTimeout(function () {
-        window.location.href = redirectUrl;
-      }, REDIRECT_DELAY);
-    }
-
-    function showThankYou() {
-      if (thankYouVisible) {
-        return;
-      }
-      thankYouVisible = true;
-      if (formContainer) {
-        formContainer.setAttribute('hidden', '');
-        formContainer.setAttribute('aria-hidden', 'true');
-      }
-      if (submitButton) {
-        submitButton.disabled = true;
-        submitButton.setAttribute('aria-disabled', 'true');
-        submitButton.textContent = defaultSubmitLabel;
-      }
-      if (thankYou) {
-        thankYou.removeAttribute('hidden');
-        thankYou.setAttribute('aria-hidden', 'false');
-        thankYou.classList.add('is-visible');
-        if (typeof document !== 'undefined' && document.body) {
-          document.body.classList.add('enquiry-thankyou-open');
-        }
-        window.requestAnimationFrame(function () {
-          focusElement(thankYou);
-        });
-      }
-      startRedirectTimer();
-    }
-
     function finalizeSuccess() {
-      showThankYou();
       didSubmit = false;
       submitting = false;
-      if (submitButton) {
-        submitButton.textContent = defaultSubmitLabel;
-      }
       form.reset();
       fieldGroups.forEach(function (group) {
         group.dirty = false;
@@ -369,8 +321,12 @@
       if (submitButton) {
         submitButton.disabled = true;
         submitButton.setAttribute('aria-disabled', 'true');
+        submitButton.textContent = defaultSubmitLabel;
       }
       updateSubmitState();
+      if (successUrl) {
+        window.location.href = successUrl;
+      }
     }
 
     iframe.addEventListener('load', function () {
@@ -379,14 +335,6 @@
       }
       finalizeSuccess();
     });
-
-    if (thankYouLink) {
-      thankYouLink.addEventListener('click', function () {
-        if (redirectTimer) {
-          window.clearTimeout(redirectTimer);
-        }
-      });
-    }
 
     fieldGroups.forEach(function (group) {
       group.inputs.forEach(function (input) {
