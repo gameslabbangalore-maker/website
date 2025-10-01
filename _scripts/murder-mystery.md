@@ -2,7 +2,7 @@
 slug: murder-mystery
 scripts:
   - title: "Murder at the Royal Dinner"
-    image: "https://ik.imagekit.io/gameslab/1.png"
+    image: "https://ik.imagekit.io/gameslab/1.png?updatedAt=1759337967979"
     description: "A lavish evening at a Rajasthan hotel spirals into chaos when a core business partner is found dead. Beginner-friendly with 8–12 players, mixing royalty, intrigue, and hidden vendettas."
   - title: "Shadows at the Anniversary Dinner"
     image: "https://ik.imagekit.io/gameslab/2.png"
