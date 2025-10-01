@@ -1,5 +1,5 @@
 {
-  "generated_at": "2025-10-01T17:10:28.978Z",
+  "generated_at": "2025-10-01T17:13:14.728Z",
   "timezone": "Asia/Kolkata",
   "events": [
     {
@@ -19,9 +19,9 @@
       "start": "2025-10-17T14:00:00Z",
       "day_key": "2025-10-17",
       "timezone": "Asia/Kolkata",
-      "location_name": "To be Announced",
-      "location_map_url": "",
-      "location_warning": true,
+      "location_name": "Buddiezz Cafe",
+      "location_map_url": "https://maps.app.goo.gl/uio6gTTufNMuribs5",
+      "location_warning": false,
       "raw_location": "Buddiezz Cafe\nBuddiezz Cafe\n615, 80 Feet Road, Block 6, Koramangala, Bengaluru, 560095, Karnataka, India"
     }
   ]
