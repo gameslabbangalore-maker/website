@@ -32,6 +32,30 @@ seo_description: Downloadable Murder Mystery scripts, character dossiers, and ho
       </ul>
     </section>
 
+    {% assign script_catalog = site.scripts | where: "slug", "murder-mystery" | first %}
+    {% if script_catalog and script_catalog.scripts %}
+      <section class="scripts-section scripts-showcase" aria-labelledby="scripts-showcase-title">
+        <div class="scripts-section-header">
+          <p class="scripts-eyebrow">Story packs</p>
+          <h2 id="scripts-showcase-title">Choose a script that fits your crew</h2>
+          <p>Pick from ready-to-host mysteries spanning royal intrigue, family feuds, and high-society scandals. Each kit ships with detailed character dossiers, timelines, and reveal notes.</p>
+        </div>
+        <div class="scripts-grid scripts-grid--cards" role="list">
+          {% for script in script_catalog.scripts %}
+            <article class="script-card" role="listitem">
+              <figure class="script-card__media">
+                <img src="{{ script.image | escape }}" alt="{{ script.title | escape }} cover art placeholder" loading="lazy">
+              </figure>
+              <div class="script-card__body">
+                <h3 class="script-card__title">{{ script.title }}</h3>
+                <p class="script-card__description">{{ script.description }}</p>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+
     {% include divider.html mt='40px' %}
 
     <section class="scripts-section" aria-labelledby="scripts-why-title">
