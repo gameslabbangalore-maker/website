@@ -67,8 +67,7 @@ seo_description: Plan your corporate, team-building, or private event with Games
       <div class="zf-templateWidth">
         <form action='https://forms.zohopublic.in/infogame1/form/CorporateEventEnquiry/formperma/gOUPBxGRNfRVLpx9oRV8JE50fKlxKeLe6RZaHNNIF4o/htmlRecords/submit' name='form'
 method='POST'
-onSubmit='javascript:document.charset="UTF-8"; return zf_ValidateAndSubmit();'
-accept-charset='UTF-8' enctype='multipart/form-data' id='form'>
+accept-charset='UTF-8' enctype='multipart/form-data' id='form' novalidate>
 <input type="hidden" name="zf_referrer_name" value=""><!-- To Track referrals , place the referrer name within the " " in the above hidden input field -->
 <input type="hidden" name="zf_redirect_url" value=""><!-- To redirect to a specific page after record submission , place the respective url within the " " in the above hidden input field -->
 <input type="hidden" name="zc_gad" value=""><!-- If GCLID is enabled in Zoho CRM Integration, click details of AdWords Ads will be pushed to Zoho CRM -->
@@ -108,7 +107,7 @@ Plan Your Event with Games Lab
           </span>
           <div class="zf-clearBoth"></div>
         </div>
-        <p id="Name_error" class="zf-errorMessage" style="display:none;">Invalid value</p>
+        <p id="Name_error" class="zf-errorMessage" role="alert" aria-live="polite" style="display:none;"></p>
       </div>
       <div class="zf-clearBoth"></div>
     </div>
@@ -146,7 +145,7 @@ Plan Your Event with Games Lab
             <option value="Private Celebration">Private Celebration</option>
           </select>
         </div>
-        <p id="Dropdown_error" class="zf-errorMessage" style="display:none;">Invalid value</p>
+        <p id="Dropdown_error" class="zf-errorMessage" role="alert" aria-live="polite" style="display:none;"></p>
       </div>
       <div class="zf-clearBoth"></div>
     </div>
@@ -164,12 +163,12 @@ Plan Your Event with Games Lab
                   <use href="#icon-phone"></use>
                 </svg>
               </span>
-              <input type="tel" compname="PhoneNumber" name="PhoneNumber_countrycode" maxlength="20" checktype="c7" value="" phoneFormat="1" isCountryCodeEnabled="false" fieldType="11" id="international_PhoneNumber_countrycode" valType="number" phoneFormatType="1" placeholder="e.g. +91 98765 43210" />
+              <input type="tel" compname="PhoneNumber" name="PhoneNumber_countrycode" maxlength="20" checktype="c7" value="" phoneFormat="1" isCountryCodeEnabled="false" fieldType="11" id="international_PhoneNumber_countrycode" valType="number" phoneFormatType="1" placeholder="e.g. 9876543210" />
             </div>
           </span>
           <div class="zf-clearBoth"></div>
         </div>
-        <p id="PhoneNumber_error" class="zf-errorMessage" style="display:none;">Invalid value</p>
+        <p id="PhoneNumber_error" class="zf-errorMessage" role="alert" aria-live="polite" style="display:none;"></p>
       </div>
       <div class="zf-clearBoth"></div>
     </div>
@@ -187,7 +186,7 @@ Plan Your Event with Games Lab
           </span>
           <input type="email" name="Email" id="Email" checktype="c5" value="" maxlength="255" fieldType="9" placeholder="you@example.com" />
         </div>
-        <p id="Email_error" class="zf-errorMessage" style="display: none;">Invalid value</p>
+        <p id="Email_error" class="zf-errorMessage" role="alert" aria-live="polite" style="display: none;"></p>
       </div>
       <div class="zf-clearBoth"></div>
     </div>
@@ -271,22 +270,25 @@ Plan Your Event with Games Lab
   </ul>
 </div>
 <ul>
-  <li class="zf-fmFooter"><button class="zf-submitColor">Submit</button></li>
+  <li class="zf-fmFooter"><button class="zf-submitColor" type="submit" disabled>Submit</button></li>
 </ul>
 </div>
 </form>
+        <iframe id="enquiry-submit-frame" name="enquiry-submit-frame" class="enquiry-submit-frame" title="Enquiry form submission" hidden></iframe>
     </div>
+
+    <section class="enquiry-thankyou" aria-live="polite" role="status" hidden data-redirect="{{ '/' | relative_url }}" tabindex="-1">
+      <div class="enquiry-thankyou__inner">
+        <h2 class="enquiry-thankyou__title">Woohoo&mdash;got it! 🎉</h2>
+        <p class="enquiry-thankyou__message">Your enquiry is in. We&rsquo;ll get back to you within 24 hours.</p>
+        <p class="enquiry-thankyou__meta">We&rsquo;ll take you to the homepage in a few seconds.</p>
+        <a class="enquiry-thankyou__link" href="{{ '/' | relative_url }}">Go now</a>
+      </div>
+    </section>
   </main>
 
   <script src="{{ '/assets/js/enquiry-validation.js' | relative_url }}"></script>
-  <script>
-    var dateAndMonthRegexFormateArray = zf_SetDateAndMonthRegexBasedOnDateFormate('dd-MM-yyyy');
-    var zf_DateRegex = new RegExp(dateAndMonthRegexFormateArray[0]);
-    var zf_MonthYearRegex = new RegExp(dateAndMonthRegexFormateArray[1]);
-    var zf_MandArray = [ 'Name_First', 'Name_Last', 'Dropdown', 'PhoneNumber_countrycode', 'Email'];
-    var zf_FieldArray = [ 'Name_First', 'Name_Last', 'SingleLine', 'Dropdown', 'PhoneNumber_countrycode', 'Email', 'Number', 'SingleLine3', 'SingleLine1', 'MultiLine', 'SingleLine2'];
-    var isSalesIQIntegrationEnabled = false;
-    var salesIQFieldsArray = [];
-  </script>
+  <script src="{{ '/assets/js/enquiry-config.js' | relative_url }}"></script>
+  <script src="{{ '/assets/js/enquiry-enhancements.js' | relative_url }}"></script>
 </body>
 </html>
