@@ -1,18 +1,18 @@
 :root {
-  --scripts-accent: #fce029;
-  --scripts-accent-dark: #ffc800;
-  --scripts-surface: color-mix(in srgb, var(--card) 90%, transparent);
-  --scripts-surface-strong: color-mix(in srgb, var(--surface-elevated) 94%, black 6%);
+  --scripts-accent: var(--accent);
+  --scripts-accent-dark: color-mix(in srgb, var(--accent) 82%, black 18%);
+  --scripts-surface: color-mix(in srgb, var(--card) 94%, transparent);
+  --scripts-surface-strong: color-mix(in srgb, var(--surface-elevated) 92%, transparent);
   --scripts-border: rgba(255, 255, 255, 0.12);
-  --scripts-muted: rgba(255, 255, 255, 0.7);
+  --scripts-muted: var(--muted);
 }
 
 @media (prefers-color-scheme: light) {
   :root {
     --scripts-border: rgba(0, 0, 0, 0.08);
-    --scripts-muted: rgba(0, 0, 0, 0.68);
-    --scripts-surface: color-mix(in srgb, var(--card) 96%, white 4%);
-    --scripts-surface-strong: color-mix(in srgb, var(--surface-elevated) 86%, white 14%);
+    --scripts-muted: rgba(0, 0, 0, 0.64);
+    --scripts-surface: color-mix(in srgb, var(--card) 94%, white 6%);
+    --scripts-surface-strong: color-mix(in srgb, var(--surface-elevated) 90%, white 10%);
   }
 }
 
@@ -37,17 +37,16 @@ body.scripts-page a {
   overflow: hidden;
   border-radius: 24px;
   padding: clamp(32px, 6vw, 64px);
-  background: radial-gradient(circle at top right, rgba(252, 224, 41, 0.18), rgba(15, 15, 15, 0.92) 58%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 34px 110px rgba(0, 0, 0, 0.55);
+  background: linear-gradient(140deg, color-mix(in srgb, var(--surface-elevated) 88%, transparent) 0%, color-mix(in srgb, var(--scripts-accent) 22%, transparent) 100%);
+  border: 1px solid var(--scripts-border);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.48);
   isolation: isolate;
 }
 
 @media (prefers-color-scheme: light) {
   .scripts-hero {
-    background: linear-gradient(140deg, rgba(10, 117, 188, 0.16), rgba(255, 255, 255, 0.95));
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: 0 28px 60px rgba(10, 20, 40, 0.22);
+    background: linear-gradient(140deg, color-mix(in srgb, var(--surface-elevated) 92%, white 8%) 0%, color-mix(in srgb, var(--scripts-accent) 18%, transparent) 100%);
+    box-shadow: 0 24px 60px rgba(12, 24, 42, 0.16);
   }
 }
 
@@ -55,9 +54,9 @@ body.scripts-page a {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 12% 18%, rgba(252, 224, 41, 0.25), transparent 54%),
-              radial-gradient(circle at 86% 80%, rgba(9, 94, 148, 0.36), transparent 60%);
-  opacity: 0.9;
+  background: radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--scripts-accent) 32%, transparent) 0%, transparent 54%),
+              radial-gradient(circle at 86% 80%, color-mix(in srgb, var(--scripts-accent-dark) 28%, transparent) 0%, transparent 60%);
+  opacity: 0.8;
   z-index: -1;
 }
 
@@ -106,32 +105,32 @@ body.scripts-page a {
   justify-content: center;
   padding: 10px 20px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(24, 24, 24, 0.35);
   color: inherit;
   text-decoration: none;
   font-weight: 700;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.28);
   transition: background 0.2s ease, border 0.2s ease, color 0.2s ease;
 }
 
 .scripts-hero-secondary:hover,
 .scripts-hero-secondary:focus-visible {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.32);
+  background: rgba(24, 24, 24, 0.5);
+  border-color: rgba(255, 255, 255, 0.42);
   text-decoration: none;
 }
 
 @media (prefers-color-scheme: light) {
   .scripts-hero-secondary {
-    background: rgba(9, 94, 148, 0.12);
-    border-color: rgba(9, 94, 148, 0.28);
-    color: #0a2c42;
+    background: rgba(255, 255, 255, 0.72);
+    border-color: rgba(0, 0, 0, 0.12);
+    color: inherit;
   }
 
   .scripts-hero-secondary:hover,
   .scripts-hero-secondary:focus-visible {
-    background: rgba(9, 94, 148, 0.18);
-    border-color: rgba(9, 94, 148, 0.36);
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(0, 0, 0, 0.18);
   }
 }
 
@@ -147,11 +146,12 @@ body.scripts-page a {
 .scripts-hero-highlights li {
   padding: 18px 18px 18px 46px;
   border-radius: 18px;
-  background: color-mix(in srgb, rgba(255, 255, 255, 0.08) 62%, transparent);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--scripts-surface);
+  border: 1px solid var(--scripts-border);
   position: relative;
   font-size: 1rem;
   line-height: 1.55;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.26);
 }
 
 .scripts-hero-highlights li::before {
@@ -163,14 +163,7 @@ body.scripts-page a {
   height: 12px;
   border-radius: 50%;
   background: var(--scripts-accent);
-  box-shadow: 0 0 0 6px rgba(252, 224, 41, 0.18);
-}
-
-@media (prefers-color-scheme: light) {
-  .scripts-hero-highlights li {
-    background: rgba(255, 255, 255, 0.82);
-    border-color: rgba(0, 0, 0, 0.06);
-  }
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--scripts-accent) 30%, transparent);
 }
 
 .scripts-section {
@@ -208,7 +201,7 @@ body.scripts-page a {
   border-radius: 20px;
   background: var(--scripts-surface);
   border: 1px solid var(--scripts-border);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.26);
   min-height: 100%;
   display: grid;
   gap: 12px;
@@ -249,12 +242,12 @@ body.scripts-page a {
   width: 38px;
   height: 38px;
   border-radius: 12px;
-  background: rgba(252, 224, 41, 0.16);
+  background: color-mix(in srgb, var(--scripts-accent) 20%, transparent);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  color: var(--scripts-accent);
+  color: var(--scripts-accent-dark);
   font-size: 1.05rem;
 }
 
@@ -313,18 +306,19 @@ body.scripts-page a {
 .scripts-cta {
   padding: clamp(32px, 5vw, 48px);
   border-radius: 22px;
-  background: linear-gradient(130deg, rgba(252, 224, 41, 0.18), rgba(9, 94, 148, 0.32));
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: linear-gradient(130deg, color-mix(in srgb, var(--scripts-accent) 20%, transparent) 0%, color-mix(in srgb, var(--surface-elevated) 88%, transparent) 100%);
+  border: 1px solid var(--scripts-border);
   text-align: center;
   display: grid;
   gap: 16px;
   justify-items: center;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
 }
 
 @media (prefers-color-scheme: light) {
   .scripts-cta {
-    background: linear-gradient(130deg, rgba(10, 117, 188, 0.18), rgba(255, 255, 255, 0.92));
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    background: linear-gradient(130deg, color-mix(in srgb, var(--scripts-accent) 16%, transparent) 0%, color-mix(in srgb, var(--surface-elevated) 94%, white 6%) 100%);
+    box-shadow: 0 20px 44px rgba(12, 24, 42, 0.12);
   }
 }
 
@@ -354,28 +348,27 @@ body.scripts-page a {
   font-weight: 700;
   padding: 10px 20px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(0, 0, 0, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(24, 24, 24, 0.35);
   transition: background 0.2s ease, border 0.2s ease;
 }
 
 .scripts-cta-secondary:hover,
 .scripts-cta-secondary:focus-visible {
-  background: rgba(0, 0, 0, 0.34);
-  border-color: rgba(255, 255, 255, 0.32);
+  background: rgba(24, 24, 24, 0.5);
+  border-color: rgba(255, 255, 255, 0.42);
 }
 
 @media (prefers-color-scheme: light) {
   .scripts-cta-secondary {
-    background: rgba(255, 255, 255, 0.72);
-    border-color: rgba(0, 0, 0, 0.1);
-    color: #0a2c42;
+    background: rgba(255, 255, 255, 0.78);
+    border-color: rgba(0, 0, 0, 0.12);
   }
 
   .scripts-cta-secondary:hover,
   .scripts-cta-secondary:focus-visible {
-    background: rgba(255, 255, 255, 0.9);
-    border-color: rgba(0, 0, 0, 0.16);
+    background: rgba(255, 255, 255, 0.92);
+    border-color: rgba(0, 0, 0, 0.18);
   }
 }
 
