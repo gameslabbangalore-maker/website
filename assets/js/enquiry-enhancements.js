@@ -260,8 +260,11 @@
       groupMap[group.key] = group;
     });
 
-    if (iframe && !form.getAttribute('target')) {
-      form.setAttribute('target', iframe.name || 'enquiry-submit-frame');
+    if (iframe) {
+      var iframeTarget = iframe.getAttribute('name') || iframe.id;
+      if (iframeTarget) {
+        form.setAttribute('target', iframeTarget);
+      }
     }
 
     if (submitButton) {
@@ -301,7 +304,7 @@
         formContainer.setAttribute('hidden', '');
       }
       if (thankYou) {
-        thankYou.hidden = false;
+        thankYou.removeAttribute('hidden');
         thankYou.classList.add('is-visible');
         window.requestAnimationFrame(function () {
           focusElement(thankYou);
@@ -314,11 +317,14 @@
       }
     }
 
+    var iframeSubmissionPending = false;
+
     if (iframe) {
       iframe.addEventListener('load', function () {
-        if (!submitting) {
+        if (!iframeSubmissionPending) {
           return;
         }
+        iframeSubmissionPending = false;
         handleSuccess();
       });
     }
@@ -408,6 +414,7 @@
       }
 
       submitting = true;
+      iframeSubmissionPending = true;
       if (submitButton) {
         submitButton.textContent = submittingLabel;
       }
