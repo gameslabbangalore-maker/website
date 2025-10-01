@@ -1,0 +1,140 @@
+---
+layout: null
+title: Murder Mystery Scripts by Games Lab
+permalink: /murder-mystery-scripts/
+seo_description: Downloadable Murder Mystery scripts, character dossiers, and host guides to run your own whodunnit night.
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  {% include head.html %}
+  <link rel="stylesheet" href="{{ '/assets/css/murder-mystery-scripts.css' | relative_url }}">
+</head>
+<body class="scripts-page">
+  {% include topbar-bleed.html %}
+  {% include header.html %}
+
+  <main class="scripts-main wrap" role="main">
+    <section class="scripts-hero" aria-labelledby="scripts-hero-title">
+      <p class="scripts-eyebrow">DIY EXPERIENCE</p>
+      <h1 id="scripts-hero-title" class="scripts-hero-title">Host your own Murder Mystery night with our story packs</h1>
+      <p class="scripts-hero-lede">Our pre-written scripts give you everything you need to run a gripping whodunnit at home, in the office, or online. No professional host required—just assemble your crew, pass out the character dossiers, and let the drama unfold.</p>
+      <div class="scripts-hero-actions">
+        <a class="book-btn"
+           href="https://wa.me/917676099857?text={{ 'Hey ! I want to host my own Murder Mystery night 🎭. Could you share your script options and how to get started?' | uri_escape }}"
+           target="_blank" rel="noopener">Enquire about scripts</a>
+      </div>
+      <ul class="scripts-hero-highlights">
+        <li>12–20 character roles with secrets, motives, and alibis</li>
+        <li>Step-by-step host timeline with clear set of instructions</li>
+        <li>Printable envelopes, character cards, clues, and solution</li>
+      </ul>
+    </section>
+
+    {% include divider.html mt='32px' %}
+
+    {% assign script_catalog = site.scripts | where: "slug", "murder-mystery" | first %}
+    {% if script_catalog and script_catalog.scripts %}
+      <section class="scripts-section scripts-showcase" aria-labelledby="scripts-showcase-title">
+        <div class="scripts-section-header">
+          <p class="scripts-eyebrow">Story packs</p>
+          <h2 id="scripts-showcase-title">Choose a script that fits your crew</h2>
+          <p>Pick from ready-to-host mysteries spanning royal intrigue, family feuds, and high-society scandals. Each kit ships with detailed character dossiers, timelines, and reveal notes.</p>
+        </div>
+        <div class="scripts-grid scripts-grid--cards" role="list">
+          {% for script in script_catalog.scripts %}
+            <article class="script-card" role="listitem">
+              <figure class="script-card__media">
+                <img src="{{ script.image | escape }}" alt="{{ script.title | escape }} cover art placeholder" loading="lazy">
+              </figure>
+              <div class="script-card__body">
+                <h3 class="script-card__title">{{ script.title }}</h3>
+                <p class="script-card__description">{{ script.description }}</p>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+
+    {% include divider.html mt='40px' %}
+
+    <section class="scripts-section" aria-labelledby="scripts-why-title">
+      <div class="scripts-section-header">
+        <p class="scripts-eyebrow">Why hosts love it</p>
+        <h2 id="scripts-why-title">Designed for first-time storytellers</h2>
+        <p>Every kit has been refined in live sessions across clubs, offices, and private parties. We’ve done the playtesting so you can focus on creating the perfect guest list.</p>
+      </div>
+      <div class="scripts-grid scripts-grid--three">
+        <article class="scripts-card">
+          <h3>Plug-and-play narratives</h3>
+          <p>Each script comes with a rich world, timeline, and character arcs so your players jump into the intrigue from the first scene.</p>
+        </article>
+        <article class="scripts-card">
+          <h3>Easy facilitation</h3>
+          <p>Follow the host guide to know when to drop clues, start accusations, and deliver the big reveal—even if you’ve never run a mystery before.</p>
+        </article>
+        <article class="scripts-card">
+          <h3>Flexible formats</h3>
+          <p>Choose a story that fits your group size and vibe. With different formats in stories our team helps you pick the best setup for an unforgettable event.</p>
+        </article>
+      </div>
+    </section>
+
+    {% include divider.html mt='40px' %}
+
+    <section class="scripts-section" aria-labelledby="scripts-steps-title">
+      <div class="scripts-section-header">
+        <p class="scripts-eyebrow">How it works</p>
+        <h2 id="scripts-steps-title">Plan your DIY mystery night</h2>
+        <p>Our team helps you pick the right story and answers any setup questions before the big night.</p>
+      </div>
+      <div class="scripts-steps">
+        <article class="scripts-step">
+          <h3>Pick your script</h3>
+          <p>Tell us about your group, and we’ll recommend the perfect mystery that suits your suits your group setting.</p>
+        </article>
+        <article class="scripts-step">
+          <h3>Get your toolkit</h3>
+          <p>Our team sends you the printable files, explains the details and guides you on how to go about it.</p>
+        </article>
+        <article class="scripts-step">
+          <h3>Host with confidence</h3>
+          <p>Follow the playbook, drop the clues, and enjoy the chaos. Need backup? We’re a message away for final-hour questions.</p>
+        </article>
+      </div>
+    </section>
+
+    {% include divider.html mt='40px' %}
+
+    <section class="scripts-section scripts-faq" aria-labelledby="scripts-faq-title">
+      <div class="scripts-section-header">
+        <p class="scripts-eyebrow">FAQ</p>
+        <h2 id="scripts-faq-title">Your questions, answered</h2>
+        <p>Still unsure about running your own game? Here are the most common things hosts ask us.</p>
+      </div>
+      <details>
+        <summary>How many people can play with one script?</summary>
+        <p>Each story specifies the minimum and maximum players. Most kits cover 12–20 roles, and we include alternates so you can flex up or down without breaking the plot.</p>
+      </details>
+      <details>
+        <summary>Can we customise the characters or theme?</summary>
+        <p>Absolutely. Editable files let you tweak names, pronouns, or settings. If you’d like deeper customisation, mention it in your enquiry and we can quote an add-on.</p>
+      </details>
+      <details>
+        <summary>Do you offer facilitators if we change our mind?</summary>
+        <p>Yes! If you decide you’d prefer a hosted experience, our team can step in. We’ll credit your script purchase towards the facilitation package.</p>
+      </details>
+      <details>
+        <summary>How long does the game usually run?</summary>
+        <p>Most mysteries take about 3–4 hours including an introduction, an open discussion, accusations and discussions, building timelines and the final round where the complete story comes out. You can ask our team for pacing notes to speed up or slow down.</p>
+      </details>
+    </section>
+
+    {% include divider.html mt='28px' %}
+
+    {% include contact.html %}
+  </main>
+</body>
+</html>
