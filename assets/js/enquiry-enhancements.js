@@ -105,6 +105,7 @@
     }
     if (email) {
       email.required = true;
+      email.setAttribute('pattern', '^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$');
     }
 
     groups.push({
