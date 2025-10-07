@@ -14,7 +14,7 @@ highlights:
   group_size: "4–20 teams"
   difficulty: "All levels"
   age: "14+"
-  price: "₹ 350/-"
+  price: "₹ 300/-"
 
 # CTA
 ticket_link: "https://rzp.io/rzp/Trivia-Takedown"   
