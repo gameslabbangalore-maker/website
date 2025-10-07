@@ -14,7 +14,7 @@ highlights:
   group_size: "6–25 players"
   difficulty: "All skill levels"
   age: "12+"
-  price: "₹ 350/-"
+  price: "₹ 250/-"
 
 # CTA
 ticket_link: "https://rzp.io/rzp/Board-Game-Night"   
