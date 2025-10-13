@@ -122,9 +122,12 @@
       return res.json();
     })
     .then(data => {
+      const now = Date.now();
       const scheduled = new Set();
       (data.events || []).forEach(entry => {
-        if (!entry) return;
+        if (!entry || !entry.start) return;
+        const start = Date.parse(entry.start);
+        if (Number.isNaN(start) || start < now) return;
         const slug = normalizeSlug(entry.slug || entry.title);
         if (slug) scheduled.add(slug);
       });

@@ -323,14 +323,100 @@
   const close  = document.getElementById('vidClose');
   if (!modal || !frame || !stage) return;
 
+  function buildEmbed(url){
+    const result = { url: '', vendor: 'generic' };
+    if (!url) return result;
+
+    let parsed = null;
+    try{
+      parsed = new URL(url, window.location.href);
+    }catch(err){ parsed = null; }
+
+    const urlLower = url.toLowerCase();
+    const looksYoutube = /youtube\.com|youtu\.be/.test(urlLower);
+
+    if (parsed){
+      const host = parsed.hostname.replace(/^www\./,'').toLowerCase();
+      if (host === 'youtu.be'){
+        const id = parsed.pathname.replace(/^\/+|\/+$/g,'');
+        const carry = parsed.searchParams;
+        parsed = new URL('https://www.youtube.com/embed/' + id);
+        carry.forEach((value, key) => { parsed.searchParams.set(key, value); });
+      }
+
+      const normalizedHost = parsed.hostname.replace(/^www\./,'').toLowerCase();
+      if (normalizedHost === 'youtube.com'){
+        result.vendor = 'youtube';
+        if (parsed.pathname === '/watch'){
+          const vid = parsed.searchParams.get('v');
+          if (vid){
+            parsed.pathname = '/embed/' + vid;
+            parsed.searchParams.delete('v');
+          }
+        } else if (parsed.pathname.startsWith('/live/')){
+          const parts = parsed.pathname.split('/').filter(Boolean);
+          const vid = parts.pop();
+          if (vid) parsed.pathname = '/embed/' + vid;
+        }
+        parsed.searchParams.set('enablejsapi','1');
+        if (!parsed.searchParams.has('rel')) parsed.searchParams.set('rel','0');
+      }
+
+      parsed.searchParams.set('autoplay','1');
+      if (!parsed.searchParams.has('playsinline')) parsed.searchParams.set('playsinline','1');
+      result.url = parsed.toString();
+      return result;
+    }
+
+    let final = url;
+    const extras = [];
+    if (!/[?&]autoplay=/.test(final)) extras.push('autoplay=1');
+    if (!/[?&]playsinline=/.test(final)) extras.push('playsinline=1');
+    if (looksYoutube){
+      result.vendor = 'youtube';
+      if (!/[?&]enablejsapi=/.test(final)) extras.push('enablejsapi=1');
+      if (!/[?&]rel=/.test(final)) extras.push('rel=0');
+    }
+    if (extras.length){
+      final += (final.includes('?') ? '&' : '?') + extras.join('&');
+    }
+    result.url = final;
+    return result;
+  }
+
+  function pingYoutube(){
+    if (frame.dataset.vendor !== 'youtube') return;
+    try{
+      frame.contentWindow?.postMessage(JSON.stringify({ event:'command', func:'playVideo', args:[] }), '*');
+    }catch(err){}
+  }
+
+  frame.addEventListener('load', () => {
+    if (frame.dataset.vendor === 'youtube'){
+      requestAnimationFrame(pingYoutube);
+      setTimeout(pingYoutube, 200);
+    }
+  });
+
   function openFrom(el){
     const url = el.getAttribute('data-embed') || el.querySelector('iframe')?.src || '';
-    const withAuto = url + (url.includes('?') ? '&' : '?') + 'autoplay=1';
+    const embed = buildEmbed(url);
     if (el.classList.contains('video-portrait')) stage.classList.add('portrait'); else stage.classList.remove('portrait');
-    frame.src = withAuto;
+    frame.dataset.vendor = embed.vendor;
+    frame.src = embed.url || 'about:blank';
     modal.hidden = false;
+    requestAnimationFrame(() => {
+      try{ frame.focus({ preventScroll: true }); }
+      catch(err){ try{ frame.focus(); }catch(_){} }
+    });
+    if (embed.vendor === 'youtube') pingYoutube();
   }
-  function shut(){ frame.src = 'about:blank'; modal.hidden = true; }
+  function shut(){
+    frame.src = 'about:blank';
+    delete frame.dataset.vendor;
+    stage.classList.remove('portrait');
+    modal.hidden = true;
+  }
 
   document.querySelectorAll('[data-embed], .video-portrait').forEach(v => {
     v.addEventListener('click', () => openFrom(v));
