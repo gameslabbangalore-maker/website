@@ -78,7 +78,14 @@
     if (!res.ok) throw new Error('Calendar fetch failed: ' + res.status);
     const data = await res.json();
     const timezone = (typeof data.timezone === 'string' && data.timezone.trim()) || TIMEZONE;
-    const list = Array.isArray(data.events) ? data.events.slice() : [];
+    let list = Array.isArray(data.events) ? data.events.slice() : [];
+
+    const now = Date.now();
+    list = list.filter(entry => {
+      if (!entry || !entry.start) return false;
+      const start = Date.parse(entry.start);
+      return !Number.isNaN(start) && start >= now;
+    });
 
     list.sort((a, b) => {
       const da = a?.start ? new Date(a.start) : null;
