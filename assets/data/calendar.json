@@ -1,5 +1,17 @@
 {
-  "generated_at": "2025-10-17T10:53:32.374Z",
+  "generated_at": "2025-10-27T14:08:36.018Z",
   "timezone": "Asia/Kolkata",
-  "events": []
+  "events": [
+    {
+      "title": "Night of Mafias !",
+      "slug": "night-of-mafias",
+      "start": "2025-10-31T14:00:00Z",
+      "day_key": "2025-10-31",
+      "timezone": "Asia/Kolkata",
+      "location_name": "Dialogues Cafe",
+      "location_map_url": "https://maps.app.goo.gl/iL4GWxFT7PQ13xtCA",
+      "location_warning": false,
+      "raw_location": "Dialogues Cafe\nDialogues\n21, 20th Main Road, KHB Colony, Block 5, Koramangala, Bengaluru, 560095, Karnataka, India"
+    }
+  ]
 }
