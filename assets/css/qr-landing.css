@@ -50,7 +50,7 @@ body.qr-landing{
   width:90vw;
   max-width:384px;
   padding:clamp(12px,2.1vw,16px) clamp(14px,2.4vw,18px);
-  min-height:clamp(88px,21vw,108px);
+  min-height:clamp(88.5px,20.1vw,108px);
   border-radius:12px;
   background:var(--card);
   box-shadow:0 2px 8px rgba(0,0,0,.8);
