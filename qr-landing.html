@@ -1,0 +1,251 @@
+---
+layout: null
+title: Games Lab QR Hub
+permalink: /qr/
+seo_description: Book upcoming Games Lab events or stay connected via WhatsApp, Instagram, Google Reviews, and the main site.
+action_links:
+  - label: "Join our WhatsApp Community"
+    url: "https://chat.whatsapp.com/BDglWOECbIiGLaCRVmzAaj"
+    emoji: "💬"
+    external: true
+  - label: "Follow us on Instagram"
+    url: "https://www.instagram.com/games._.lab/"
+    emoji: "📸"
+    external: true
+  - label: "Leave a Google Review"
+    url: "https://g.page/r/CY9mVvE36CuwEBM/review"
+    emoji: "⭐"
+    external: true
+  - label: "Visit our Website"
+    url: "/"
+    emoji: "🌐"
+---
+<!doctype html>
+<html lang="en">
+<head>
+  {% include head.html %}
+  <link rel="stylesheet" href="{{ '/assets/css/qr-landing.css' | relative_url }}">
+</head>
+<body class="qr-landing">
+  {% include topbar-bleed.html %}
+  {% include header.html %}
+  {% include scripts-skeletons.html %}
+
+  <main id="main" class="wrap qr-main" role="main">
+    <section class="qr-feature" aria-labelledby="qr-feature-title">
+      <h1 id="qr-feature-title">Upcoming Games Lab Event</h1>
+      <p>Lock in your spot for the next experience or stay tuned by joining our community links below.</p>
+      <div class="qr-event-container">
+        <div id="qr-event-card" class="cards-row" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="qr-actions" aria-labelledby="qr-actions-title">
+      <h2 id="qr-actions-title">Stay in the Loop</h2>
+      <div class="qr-action-grid">
+        {% for link in page.action_links %}
+          {% assign href = link.url %}
+          {% if link.external %}
+            {% assign final_href = href %}
+          {% else %}
+            {% assign final_href = href | relative_url %}
+          {% endif %}
+          <a class="qr-action" href="{{ final_href }}"{% if link.external %} target="_blank" rel="noopener"{% endif %}>
+            <span><span class="qr-emoji" aria-hidden="true">{{ link.emoji }}</span>{{ link.label }}</span>
+            <span class="qr-arrow" aria-hidden="true">➜</span>
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+  </main>
+
+  <script>
+  (async function(){
+    const BASEURL = "{{ site.baseurl | default: '' }}";
+    const CALENDAR_URL = BASEURL + "/assets/data/calendar.json";
+    const TIMEZONE = 'Asia/Kolkata';
+    const fallbackImage = "https://via.placeholder.com/800x450?text=Event+Image";
+    const container = document.getElementById('qr-event-card');
+    if (!container) return;
+
+    const EVENTS = window.__EVENTS_METADATA || (window.__EVENTS_METADATA = {% include events-metadata.json %});
+
+    setSkeletons(container, 1);
+
+    function normalizeSlug(value){
+      if (!value) return '';
+      return value.toString()
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g,'')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g,'-')
+        .replace(/^-+|-+$/g,'');
+    }
+
+    function withTransform(url){
+      if (!url) return '';
+      if (/\/tr:/.test(url) || /[?&]tr=/.test(url)) return url;
+      if (url.includes('imagekit.io')){
+        return url.replace(/(imagekit\.io\/[^/]+)/, '$1/tr:w-800,h-450,fo-auto');
+      }
+      return url + (url.includes('?') ? '&' : '?') + 'tr=w-800,h-450,fo-auto';
+    }
+
+    const metaBySlug = new Map();
+    const metaByTitle = new Map();
+    EVENTS.forEach(evt => {
+      if (!evt) return;
+      const slug = normalizeSlug(evt.slug || evt.title);
+      if (slug) metaBySlug.set(slug, evt);
+      if (evt.title) metaByTitle.set(evt.title.toLowerCase(), evt);
+    });
+
+    function formatDate(date, timezone){
+      const parts = new Intl.DateTimeFormat('en-US', {
+        weekday: 'short',
+        day: '2-digit',
+        month: 'short',
+        year: '2-digit',
+        timeZone: timezone
+      }).formatToParts(date).reduce((acc, part) => {
+        if (part.type !== 'literal') acc[part.type] = part.value;
+        return acc;
+      }, {});
+      return `${parts.weekday || ''}, ${parts.day || ''} ${parts.month || ''} '${parts.year || ''}`.trim();
+    }
+
+    function formatTime(date, timezone){
+      const str = new Intl.DateTimeFormat('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: timezone
+      }).format(date).replace(/\u202f/g, ' ');
+      return str.toUpperCase();
+    }
+
+    function formatWeekday(date, timezone){
+      return new Intl.DateTimeFormat('en-US', {
+        weekday: 'short',
+        timeZone: timezone
+      }).format(date);
+    }
+
+    try {
+      const res = await fetch(CALENDAR_URL + '?v=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) throw new Error('Calendar fetch failed: ' + res.status);
+      const data = await res.json();
+      const timezone = (typeof data.timezone === 'string' && data.timezone.trim()) || TIMEZONE;
+      let list = Array.isArray(data.events) ? data.events.slice() : [];
+      const now = Date.now();
+      list = list.filter(entry => {
+        if (!entry || !entry.start) return false;
+        const start = Date.parse(entry.start);
+        return !Number.isNaN(start) && start >= now;
+      });
+      list.sort((a, b) => {
+        const da = a?.start ? new Date(a.start) : null;
+        const db = b?.start ? new Date(b.start) : null;
+        if (!da) return 1;
+        if (!db) return -1;
+        return da - db;
+      });
+
+      const entry = list[0];
+      if (!entry){
+        container.innerHTML = '<div class="qr-empty"><h2>No events right now</h2><p>We are brewing the next experience. Join our WhatsApp community or follow us on Instagram below for instant updates.</p></div>';
+        return;
+      }
+
+      const slug = normalizeSlug(entry.slug || entry.title);
+      const meta = (slug && metaBySlug.get(slug)) || (entry.title ? metaByTitle.get(entry.title.toLowerCase()) : null);
+      const title = meta?.title || entry.title || 'Upcoming Event';
+      const card = document.createElement('article');
+      card.className = 'card qr-card';
+
+      const media = document.createElement('div');
+      media.className = 'media';
+      const img = document.createElement('img');
+      const banner = meta?.banner ? withTransform(meta.banner) : fallbackImage;
+      img.loading = 'lazy';
+      img.src = banner || fallbackImage;
+      img.alt = title || 'Event image';
+      img.width = 800;
+      img.height = 450;
+      img.onerror = function(){ this.onerror = null; this.src = fallbackImage; };
+      media.appendChild(img);
+      card.appendChild(media);
+
+      const body = document.createElement('div');
+      body.className = 'card-body';
+
+      const h = document.createElement('h3');
+      h.className = 'event-title';
+      h.textContent = title;
+      body.appendChild(h);
+
+      const start = entry.start ? new Date(entry.start) : null;
+      const dateLabel = start ? formatDate(start, timezone) : '';
+      const timeLabel = start ? formatTime(start, timezone) : '';
+      const weekdayLabel = start ? formatWeekday(start, timezone) : '';
+
+      if (dateLabel || timeLabel){
+        const metaLine = document.createElement('p');
+        metaLine.className = 'meta';
+        metaLine.textContent = [dateLabel, timeLabel].filter(Boolean).join(' | ');
+        body.appendChild(metaLine);
+      }
+
+      const locationText = entry.location_name || 'Location coming soon';
+      if (locationText){
+        const locP = document.createElement('p');
+        locP.className = 'location';
+        locP.textContent = locationText;
+        body.appendChild(locP);
+      }
+
+      if (timeLabel || weekdayLabel){
+        const timeP = document.createElement('p');
+        timeP.className = 'time';
+        timeP.textContent = [weekdayLabel, timeLabel].filter(Boolean).join(' | ');
+        body.appendChild(timeP);
+      }
+
+      card.appendChild(body);
+
+      if (start){
+        const dayNum = new Intl.DateTimeFormat('en-US', { day: '2-digit', timeZone: timezone }).format(start);
+        const monthShort = new Intl.DateTimeFormat('en-US', { month: 'short', timeZone: timezone }).format(start);
+        const dateBox = document.createElement('div');
+        dateBox.className = 'card-date';
+        dateBox.innerHTML = '<div class="day">' + dayNum + '</div><div class="month">' + monthShort + '</div>';
+        card.appendChild(dateBox);
+      }
+
+      const footer = document.createElement('div');
+      footer.className = 'card-footer';
+      const fallbackLink = slug ? BASEURL + '/events/' + slug + '/' : '';
+      const pageLink = meta?.url || entry.page_url || fallbackLink;
+      if (pageLink){
+        const btn = document.createElement('a');
+        btn.className = 'book-btn';
+        btn.href = pageLink;
+        btn.textContent = 'Book Now';
+        btn.target = '_self';
+        footer.appendChild(btn);
+        card.addEventListener('click', function(e){
+          if (e.target.closest('a,button')) return;
+          window.location.href = pageLink;
+        });
+      }
+      card.appendChild(footer);
+
+      replaceSkeletonWithCard(container, 0, card);
+    } catch (err) {
+      console.error('QR landing event error:', err);
+      container.innerHTML = '<div class="qr-empty"><h2>Could not load events</h2><p>Please try again in a moment or use the quick links below to stay updated.</p></div>';
+    }
+  })();
+  </script>
+</body>
+</html>
