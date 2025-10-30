@@ -32,17 +32,16 @@ action_links:
   {% include scripts-skeletons.html %}
 
   <main id="main" class="wrap qr-main" role="main">
-    <section class="qr-feature" aria-labelledby="qr-feature-title">
-      <h1 id="qr-feature-title">Upcoming Games Lab Event</h1>
-      <p>Lock in your spot for the next experience or stay tuned by joining our community links below.</p>
-      <div class="qr-event-container">
-        <div id="qr-event-card" class="cards-row" aria-live="polite"></div>
-      </div>
+    <h1 class="sr-only">Games Lab QR Hub</h1>
+
+    <section class="qr-upcoming">
+      {% include cards-upcoming.html %}
     </section>
 
     <section class="qr-actions" aria-labelledby="qr-actions-title">
       <h2 id="qr-actions-title">Stay in the Loop</h2>
-      <div class="qr-action-grid">
+      <p class="qr-actions-copy">Scan &mdash; tap &mdash; done. Use the quick links below to connect with Games Lab instantly.</p>
+      <div class="qr-action-row">
         {% for link in page.action_links %}
           {% assign href = link.url %}
           {% if link.external %}
@@ -50,25 +49,25 @@ action_links:
           {% else %}
             {% assign final_href = href | relative_url %}
           {% endif %}
-          <a class="qr-action" href="{{ final_href }}"{% if link.external %} target="_blank" rel="noopener"{% endif %}>
-            <span class="qr-action-label">
-              <span class="qr-icon" aria-hidden="true">
-                {% case link.icon %}
-                  {% when 'whatsapp' %}
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.52 3.48A11.8 11.8 0 0 0 12.01.2C5.55.2.3 5.43.3 11.9c0 2.08.55 4.11 1.6 5.9L.2 24l6.36-1.65a11.7 11.7 0 0 0 5.45 1.38h.01c6.47 0 11.7-5.23 11.7-11.7 0-3.12-1.22-6.06-3.2-8.04ZM12.02 21.2h-.01c-1.74 0-3.45-.46-4.95-1.32l-.35-.2-3.77.98 1.01-3.67-.23-.38a9.79 9.79 0 0 1-1.5-5.12c0-5.42 4.42-9.83 9.85-9.83 2.63 0 5.1 1.03 6.96 2.9a9.76 9.76 0 0 1 2.89 6.95c0 5.42-4.42 9.83-9.85 9.83Zm5.6-7.33c-.3-.15-1.78-.88-2.06-.98-.28-.1-.48-.15-.68.15-.2.3-.78.98-.95 1.18-.17.2-.35.22-.65.07-.3-.15-1.28-.47-2.44-1.5-.9-.77-1.5-1.72-1.67-2.01-.17-.3-.02-.46.13-.61.14-.14.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.38-.02-.53-.07-.15-.68-1.62-.93-2.22-.24-.58-.49-.5-.68-.5l-.58-.01c-.2 0-.52.07-.8.38s-1.05 1.03-1.05 2.5 1.08 2.9 1.23 3.11c.15.2 2.12 3.24 5.14 4.55.72.31 1.29.5 1.74.64.73.23 1.4.2 1.93.12.59-.09 1.78-.73 2.03-1.44.25-.71.25-1.3.17-1.43-.07-.13-.27-.2-.57-.35Z"/></svg>
-                  {% when 'instagram' %}
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 3.5A5.5 5.5 0 1 1 6.5 13 5.5 5.5 0 0 1 12 7.5Zm0 2A3.5 3.5 0 1 0 15.5 13 3.5 3.5 0 0 0 12 9.5Zm5.25-2.75a.75.75 0 1 1-.75.75.75.75 0 0 1 .75-.75Z"/></svg>
-                  {% when 'review' %}
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m12 2 2.47 5 5.53.8-4 3.9.94 5.5L12 14.9 7.06 17.2l.94-5.5-4-3.9 5.53-.8Z"/></svg>
-                  {% when 'website' %}
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm6.93 9h-3.16a16.9 16.9 0 0 0-1.22-5.19A8.04 8.04 0 0 1 18.93 11ZM12 4c.86 0 2.64 2.26 3.29 6H8.71C9.36 6.26 11.14 4 12 4ZM7.45 6.81A16.9 16.9 0 0 0 6.23 11H3.07a8.04 8.04 0 0 1 4.38-4.19ZM4.07 13h2.16a16.9 16.9 0 0 0 1.22 5.19A8.04 8.04 0 0 1 4.07 13Zm7.93 7c-.86 0-2.64-2.26-3.29-6h6.58c-.65 3.74-2.43 6-3.29 6Zm4.55-1.81A16.9 16.9 0 0 0 17.77 13h3.16a8.04 8.04 0 0 1-4.38 4.19Z"/></svg>
-                  {% else %}
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 5a1.5 1.5 0 1 1-1.5 1.5A1.5 1.5 0 0 1 12 7Zm2 10h-4a1 1 0 0 1 0-2h1v-2h-1a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v3h1a1 1 0 0 1 0 2Z"/></svg>
-                {% endcase %}
-              </span>
-              <span class="qr-text">{{ link.label }}</span>
+          <a class="qr-action-card" href="{{ final_href }}"{% if link.external %} target="_blank" rel="noopener"{% endif %}>
+            <span class="qr-action-media" aria-hidden="true">
+              {% case link.icon %}
+                {% when 'whatsapp' %}
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.52 3.48A11.8 11.8 0 0 0 12.01.2C5.55.2.3 5.43.3 11.9c0 2.08.55 4.11 1.6 5.9L.2 24l6.36-1.65a11.7 11.7 0 0 0 5.45 1.38h.01c6.47 0 11.7-5.23 11.7-11.7 0-3.12-1.2-6.06-3.2-8.04ZM12.02 21.2h-.01c-1.74 0-3.45-.46-4.95-1.32l-.35-.2-3.77.98 1.01-3.67-.23-.38a9.79 9.79 0 0 1-1.5-5.12c0-5.42 4.42-9.83 9.85-9.83 2.63 0 5.1 1.03 6.96 2.9a9.76 9.76 0 0 1 2.89 6.95c0 5.42-4.42 9.83-9.85 9.83Zm5.6-7.33c-.3-.15-1.78-.88-2.06-.98-.28-.1-.48-.15-.68.15-.2.3-.78.98-.95 1.18-.17.2-.35.22-.65.07-.3-.15-1.28-.47-2.44-1.5-.9-.77-1.5-1.72-1.67-2.01-.17-.3-.02-.46.13-.61.14-.14.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.38-.02-.53-.07-.15-.68-1.62-.93-2.22-.24-.58-.49-.5-.68-.5l-.58-.01c-.2 0-.52.07-.8.38s-1.05 1.03-1.05 2.5 1.08 2.9 1.23 3.11c.15.2 2.12 3.24 5.14 4.55.72.31 1.29.5 1.74.64.73.23 1.4.2 1.93.12.59-.09 1.78-.73 2.03-1.44.25-.71.25-1.3.17-1.43-.07-.13-.27-.2-.57-.35Z"/></svg>
+                {% when 'instagram' %}
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 3.5A5.5 5.5 0 1 1 6.5 13 5.5 5.5 0 0 1 12 7.5Zm0 2A3.5 3.5 0 1 0 15.5 13 3.5 3.5 0 0 0 12 9.5Zm5.25-2.75a.75.75 0 1 1-.75.75.75.75 0 0 1 .75-.75Z"/></svg>
+                {% when 'review' %}
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m12 2 2.47 5 5.53.8-4 3.9.94 5.5L12 14.9 7.06 17.2l.94-5.5-4-3.9 5.53-.8Z"/></svg>
+                {% when 'website' %}
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm6.93 9h-3.16a16.9 16.9 0 0 0-1.22-5.19A8.04 8.04 0 0 1 18.93 11ZM12 4c.86 0 2.64 2.26 3.29 6H8.71C9.36 6.26 11.14 4 12 4ZM7.45 6.81A16.9 16.9 0 0 0 6.23 11H3.07a8.04 8.04 0 0 1 4.38-4.19ZM4.07 13h2.16a16.9 16.9 0 0 0 1.22 5.19A8.04 8.04 0 0 1 4.07 13Zm7.93 7c-.86 0-2.64-2.26-3.29-6h6.58c-.65 3.74-2.43 6-3.29 6Zm4.55-1.81A16.9 16.9 0 0 0 17.77 13h3.16a8.04 8.04 0 0 1-4.38 4.19Z"/></svg>
+                {% else %}
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 5a1.5 1.5 0 1 1-1.5 1.5A1.5 1.5 0 0 1 12 7Zm2 10h-4a1 1 0 0 1 0-2h1v-2h-1a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v3h1a1 1 0 0 1 0 2Z"/></svg>
+              {% endcase %}
             </span>
-            <span class="qr-arrow" aria-hidden="true">➜</span>
+            <span class="qr-action-label">{{ link.label }}</span>
+            <span class="qr-action-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path fill="currentColor" d="m9.29 6.71 1.42-1.42L18.42 13l-7.71 7.71-1.42-1.42L14.58 13z"/><path fill="currentColor" d="M5 11h12v2H5z"/></svg>
+            </span>
           </a>
         {% endfor %}
       </div>
@@ -76,193 +75,36 @@ action_links:
   </main>
 
   <script>
-  (async function(){
-    const BASEURL = "{{ site.baseurl | default: '' }}";
-    const CALENDAR_URL = BASEURL + "/assets/data/calendar.json";
-    const TIMEZONE = 'Asia/Kolkata';
-    const fallbackImage = "https://via.placeholder.com/800x450?text=Event+Image";
-    const container = document.getElementById('qr-event-card');
-    if (!container) return;
+    (function(){
+      const container = document.getElementById('events');
+      if (!container) return;
 
-    const EVENTS = window.__EVENTS_METADATA || (window.__EVENTS_METADATA = {% include events-metadata.json %});
+      const emptyMarkup = `
+        <article class="qr-empty-card" role="status">
+          <h3>No events right now</h3>
+          <p>We're brewing the next experience. Join the WhatsApp community or follow us on Instagram below for instant updates.</p>
+        </article>`;
 
-    setSkeletons(container, 1);
+      let observer;
 
-    function normalizeSlug(value){
-      if (!value) return '';
-      return value.toString()
-        .normalize('NFKD')
-        .replace(/[\u0300-\u036f]/g,'')
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g,'-')
-        .replace(/^-+|-+$/g,'');
-    }
+      const applyEmpty = () => {
+        if (!container) return;
+        if (container.querySelector('.sk-card')) return;
+        if (container.querySelector('.card')) return;
+        const text = container.textContent.trim();
+        if (/No upcoming events\./i.test(text)){
+          container.innerHTML = emptyMarkup;
+          if (observer) observer.disconnect();
+        }
+      };
 
-    function withTransform(url){
-      if (!url) return '';
-      if (/\/tr:/.test(url) || /[?&]tr=/.test(url)) return url;
-      if (url.includes('imagekit.io')){
-        return url.replace(/(imagekit\.io\/[^/]+)/, '$1/tr:w-800,h-450,fo-auto');
-      }
-      return url + (url.includes('?') ? '&' : '?') + 'tr=w-800,h-450,fo-auto';
-    }
-
-    const metaBySlug = new Map();
-    const metaByTitle = new Map();
-    EVENTS.forEach(evt => {
-      if (!evt) return;
-      const slug = normalizeSlug(evt.slug || evt.title);
-      if (slug) metaBySlug.set(slug, evt);
-      if (evt.title) metaByTitle.set(evt.title.toLowerCase(), evt);
-    });
-
-    function formatDate(date, timezone){
-      const parts = new Intl.DateTimeFormat('en-US', {
-        weekday: 'short',
-        day: '2-digit',
-        month: 'short',
-        year: '2-digit',
-        timeZone: timezone
-      }).formatToParts(date).reduce((acc, part) => {
-        if (part.type !== 'literal') acc[part.type] = part.value;
-        return acc;
-      }, {});
-      return `${parts.weekday || ''}, ${parts.day || ''} ${parts.month || ''} '${parts.year || ''}`.trim();
-    }
-
-    function formatTime(date, timezone){
-      const str = new Intl.DateTimeFormat('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-        timeZone: timezone
-      }).format(date).replace(/\u202f/g, ' ');
-      return str.toUpperCase();
-    }
-
-    function formatWeekday(date, timezone){
-      return new Intl.DateTimeFormat('en-US', {
-        weekday: 'short',
-        timeZone: timezone
-      }).format(date);
-    }
-
-    try {
-      const res = await fetch(CALENDAR_URL + '?v=' + Date.now(), { cache: 'no-store' });
-      if (!res.ok) throw new Error('Calendar fetch failed: ' + res.status);
-      const data = await res.json();
-      const timezone = (typeof data.timezone === 'string' && data.timezone.trim()) || TIMEZONE;
-      let list = Array.isArray(data.events) ? data.events.slice() : [];
-      const now = Date.now();
-      list = list.filter(entry => {
-        if (!entry || !entry.start) return false;
-        const start = Date.parse(entry.start);
-        return !Number.isNaN(start) && start >= now;
-      });
-      list.sort((a, b) => {
-        const da = a?.start ? new Date(a.start) : null;
-        const db = b?.start ? new Date(b.start) : null;
-        if (!da) return 1;
-        if (!db) return -1;
-        return da - db;
+      observer = new MutationObserver(() => {
+        applyEmpty();
       });
 
-      const entry = list[0];
-      if (!entry){
-        container.innerHTML = '<div class="qr-empty"><h2>No events right now</h2><p>We are brewing the next experience. Join our WhatsApp community or follow us on Instagram below for instant updates.</p></div>';
-        return;
-      }
-
-      const slug = normalizeSlug(entry.slug || entry.title);
-      const meta = (slug && metaBySlug.get(slug)) || (entry.title ? metaByTitle.get(entry.title.toLowerCase()) : null);
-      const title = meta?.title || entry.title || 'Upcoming Event';
-      const card = document.createElement('article');
-      card.className = 'card';
-      card.style.cursor = 'pointer';
-
-      const media = document.createElement('div');
-      media.className = 'media';
-      const img = document.createElement('img');
-      const banner = meta?.banner ? withTransform(meta.banner) : fallbackImage;
-      img.loading = 'lazy';
-      img.src = banner || fallbackImage;
-      img.alt = title || 'Event image';
-      img.width = 800;
-      img.height = 450;
-      img.onerror = function(){ this.onerror = null; this.src = fallbackImage; };
-      media.appendChild(img);
-      card.appendChild(media);
-
-      const body = document.createElement('div');
-      body.className = 'card-body';
-
-      const h = document.createElement('h3');
-      h.className = 'event-title';
-      h.textContent = title;
-      body.appendChild(h);
-
-      const start = entry.start ? new Date(entry.start) : null;
-      const dateLabel = start ? formatDate(start, timezone) : '';
-      const timeLabel = start ? formatTime(start, timezone) : '';
-      const weekdayLabel = start ? formatWeekday(start, timezone) : '';
-
-      if (dateLabel || timeLabel){
-        const metaLine = document.createElement('p');
-        metaLine.className = 'meta';
-        metaLine.textContent = [dateLabel, timeLabel].filter(Boolean).join(' | ');
-        body.appendChild(metaLine);
-      }
-
-      const locationText = entry.location_name || 'Location coming soon';
-      if (locationText){
-        const locP = document.createElement('p');
-        locP.className = 'location';
-        locP.textContent = locationText;
-        body.appendChild(locP);
-      }
-
-      if (timeLabel || weekdayLabel){
-        const timeP = document.createElement('p');
-        timeP.className = 'time';
-        timeP.textContent = [weekdayLabel, timeLabel].filter(Boolean).join(' | ');
-        body.appendChild(timeP);
-      }
-
-      card.appendChild(body);
-
-      if (start){
-        const dayNum = new Intl.DateTimeFormat('en-US', { day: '2-digit', timeZone: timezone }).format(start);
-        const monthShort = new Intl.DateTimeFormat('en-US', { month: 'short', timeZone: timezone }).format(start);
-        const dateBox = document.createElement('div');
-        dateBox.className = 'card-date';
-        dateBox.innerHTML = '<div class="day">' + dayNum + '</div><div class="month">' + monthShort + '</div>';
-        card.appendChild(dateBox);
-      }
-
-      const footer = document.createElement('div');
-      footer.className = 'card-footer';
-      const fallbackLink = slug ? BASEURL + '/events/' + slug + '/' : '';
-      const pageLink = meta?.url || entry.page_url || fallbackLink;
-      if (pageLink){
-        const btn = document.createElement('a');
-        btn.className = 'book-btn';
-        btn.href = pageLink;
-        btn.textContent = 'Book Now';
-        btn.target = '_self';
-        footer.appendChild(btn);
-        card.addEventListener('click', function(e){
-          if (e.target.closest('a,button')) return;
-          window.location.href = pageLink;
-        });
-      }
-      card.appendChild(footer);
-
-      replaceSkeletonWithCard(container, 0, card);
-    } catch (err) {
-      console.error('QR landing event error:', err);
-      container.innerHTML = '<div class="qr-empty"><h2>Could not load events</h2><p>Please try again in a moment or use the quick links below to stay updated.</p></div>';
-    }
-  })();
+      observer.observe(container, { childList: true });
+      applyEmpty();
+    })();
   </script>
 </body>
 </html>
