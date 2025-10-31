@@ -48,8 +48,8 @@ body.qr-landing{
 
 .qr-action-card{
   width:90vw;
-  max-width:400px;
-  padding:calc(10px + 1vw) calc(8px + 1vw);
+  max-width:392px;
+  padding:calc(9px + 1vw) calc(10px + 1vw);
   border-radius:12px;
   background:var(--card);
   box-shadow:0 2px 8px rgba(0,0,0,.8);
@@ -57,7 +57,7 @@ body.qr-landing{
   color:var(--text-main);
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:clamp(10px,2.2vw,14px);
   backdrop-filter:blur(14px);
   -webkit-backdrop-filter:blur(14px);
   transition:transform .18s ease, box-shadow .18s ease;
@@ -75,36 +75,37 @@ body.qr-landing{
 }
 
 .qr-action-icon{
-  width:18vw;
-  max-width:72px;
-  min-height:clamp(56px,18vw,72px);
-  max-height:72px;
+  width:clamp(56px,18vw,66px);
   aspect-ratio:1 / 1;
   display:flex;
   align-items:center;
   justify-content:center;
   color:var(--accent);
   flex-shrink:0;
-  padding:clamp(4px,1vw,10px);
+  border-radius:10px;
+  background:#111;
+  padding:clamp(6px,1.9vw,11px);
 }
 
 .qr-action-icon svg,
 .qr-action-icon img{
   width:100%;
+  max-width:46px;
   height:auto;
   display:block;
 }
 
 .qr-action-label{
   font-weight:700;
-  font-size:clamp(1rem,2.2vw,1.25rem);
+  font-size:calc(13px + 1.2vw);
   text-align:left;
   flex:1 1 auto;
+  line-height:1.25;
 }
 
 .qr-action-arrow{
-  width:clamp(32px,9vw,44px);
-  height:clamp(32px,9vw,44px);
+  width:clamp(28px,7.6vw,36px);
+  height:clamp(28px,7.6vw,36px);
   border-radius:50%;
   background:rgba(255,255,255,.08);
   display:flex;
@@ -115,8 +116,8 @@ body.qr-landing{
 }
 
 .qr-action-arrow svg{
-  width:clamp(22px,6.4vw,26px);
-  height:clamp(22px,6.4vw,26px);
+  width:clamp(18px,5.4vw,22px);
+  height:clamp(18px,5.4vw,22px);
   display:block;
   transform:translateX(2px);
   opacity:.88;
