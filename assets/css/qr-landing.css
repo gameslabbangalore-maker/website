@@ -49,7 +49,7 @@ body.qr-landing{
 .qr-action-card{
   width:90vw;
   max-width:384px;
-  padding:clamp(10px,1.8vw,14px) clamp(14px,2.4vw,18px);
+  padding:clamp(6px,1.2vw,8px) clamp(14px,2.4vw,18px);
   min-height:clamp(70px,18vw,90px);
   border-radius:12px;
   background:var(--card);
