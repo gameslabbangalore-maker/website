@@ -75,7 +75,7 @@ body.qr-landing{
 }
 
 .qr-action-icon{
-  width:clamp(56px,18vw,66px);
+  width:clamp(36px,8vw,46px);
   aspect-ratio:1 / 1;
   display:flex;
   align-items:center;
