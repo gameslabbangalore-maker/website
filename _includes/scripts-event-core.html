@@ -212,10 +212,13 @@
     const bindInlineTrigger = (btn) => {
       if (!btn) return;
       btn.addEventListener('click', async (event) => {
-        const target = await waitForRzpButton();
-        if (!target) return;
         event.preventDefault();
-        target.click();
+        const target = await waitForRzpButton();
+        if (target){
+          target.click();
+        } else if (btn.href){
+          window.location.href = btn.href;
+        }
       });
     };
 
