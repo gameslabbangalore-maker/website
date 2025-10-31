@@ -3,6 +3,7 @@
   const CALENDAR_URL = "{{ site.baseurl | default: '' }}/assets/data/calendar.json";
   const BASEURL = "{{ site.baseurl | default: '' }}";
   const PAGE_SLUG = {{ page.slug | jsonify }} || '';
+  const USE_INLINE_CHECKOUT = Boolean({{ page.use_inline_checkout | default: false | jsonify }});
   const CLEAN = v => (v == null) ? "" : String(v).trim();
 
   function stripDomain(p){ return p.replace(/^https?:\/\/[^/]+/, ''); }
@@ -186,6 +187,41 @@
   const timeStr = scheduleDate ? fmtTime(scheduleDate, timezone) : '';
   const whenText = scheduleDate ? fmtDateOnly(scheduleDate, timezone) : '';
   const ticket = fallbackTicket;
+
+  const enableInlineCheckout = USE_INLINE_CHECKOUT && PAGE_SLUG === 'night-of-mafias';
+
+  if (enableInlineCheckout){
+    const rzpForm = document.getElementById('rzp-pb-form');
+    const getRzpButton = () => rzpForm?.querySelector('button') || document.querySelector('#rzp-pb-form button');
+    const waitForRzpButton = () => {
+      const existing = getRzpButton();
+      if (existing) return Promise.resolve(existing);
+      return new Promise(resolve => {
+        let attempts = 0;
+        const timer = setInterval(() => {
+          const candidate = getRzpButton();
+          if (candidate || attempts >= 20){
+            clearInterval(timer);
+            resolve(candidate || null);
+          }
+          attempts += 1;
+        }, 150);
+      });
+    };
+
+    const bindInlineTrigger = (btn) => {
+      if (!btn) return;
+      btn.addEventListener('click', async (event) => {
+        const target = await waitForRzpButton();
+        if (!target) return;
+        event.preventDefault();
+        target.click();
+      });
+    };
+
+    bindInlineTrigger(scBook);
+    bindInlineTrigger(fabBook);
+  }
 
   if (M.title) M.title.textContent = titleFallback;
 

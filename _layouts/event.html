@@ -28,6 +28,10 @@
     </div>
   </div>
 
+  {% if page.use_inline_checkout %}
+    {% include rzp-payment-button.html %}
+  {% endif %}
+
   {% include scripts-event-core.html %}
 </body>
 </html>

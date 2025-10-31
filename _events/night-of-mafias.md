@@ -1,6 +1,7 @@
 ---
 title: "Night of Mafias !"
 slug: night-of-mafias
+use_inline_checkout: true
 
 # Hero
 banner: "https://ik.imagekit.io/gameslab/Night_of_Mafias.png"
