@@ -19,7 +19,7 @@
           <a id="scDir" class="inline-link" href="#" target="_blank" rel="noopener">Get directions</a>
         </div>
       </div>
-      <a id="scBook" class="btn btn-primary wide-cta" href="#" target="_blank" rel="noopener">Book Now</a>
+      <button id="scBook" class="btn btn-primary wide-cta" type="button">Book Now</button>
       <div class="row-div" aria-hidden="true"></div>
     </div>
 
@@ -43,7 +43,7 @@
 </aside>
 
 <!-- Floating FABs (mobile) -->
-<a id="fabBook" class="fab-book" href="#" target="_blank" rel="noopener" hidden>Book Now</a>
+<button id="fabBook" class="fab-book" type="button" hidden>Book Now</button>
 <button id="shareFab" class="fab-share" aria-label="Share this event" title="Share">
   <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
     <path fill="currentColor" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7a3.27 3.27 0 000-1.39l7.02-4.11A2.99 2.99 0 0018 7.91a3 3 0 10-2.82-4H15a3 3 0 00.04 1.5l-7.02 4.11a3 3 0 10.01 4.96l7.02 4.11A3 3 0 1018 16.09z"/>
@@ -70,3 +70,11 @@
     <div class="h-item"><div class="h-label">Price</div><div class="h-value">{{ page.highlights.price | default: '₹ 350/-' }}</div></div>
   </div>
 </div>
+
+{% if page.payment_button_id %}
+  <div id="razorpayEmbedContainer" hidden aria-hidden="true">
+    <form id="razorpayPaymentForm">
+      <script src="https://checkout.razorpay.com/v1/payment-button.js" data-payment_button_id="{{ page.payment_button_id }}" async></script>
+    </form>
+  </div>
+{% endif %}

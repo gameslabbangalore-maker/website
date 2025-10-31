@@ -17,7 +17,7 @@ highlights:
   price: "₹ 500/-"
 
 # CTA
-ticket_link: "https://rzp.io/rzp/Game-Set-Switch"   
+payment_button_id: ""
 
 # Optional videos
 about_video: ""   

@@ -17,7 +17,7 @@ highlights:
   price: "₹ 550/-"
 
 # CTA
-ticket_link: "https://rzp.io/rzp/Murder-Mystery"
+payment_button_id: ""
 
 # Optional videos
 about_video: "https://www.youtube.com/embed/bUdFcYPSd00"   # hide section if blank

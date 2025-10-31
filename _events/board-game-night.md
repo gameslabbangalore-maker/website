@@ -17,7 +17,7 @@ highlights:
   price: "₹ 250/-"
 
 # CTA
-ticket_link: "https://rzp.io/rzp/Board-Game-Night"   
+payment_button_id: ""
 
 # Optional videos
 about_video: ""   

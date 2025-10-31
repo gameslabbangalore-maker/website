@@ -130,7 +130,9 @@
     R3: document.getElementById('microRight3'),
   };
 
-  const fallbackTicket = {{ page.ticket_link | jsonify }} || '';
+  const paymentButtonId = "{{ page.payment_button_id | default: '' | strip }}";
+  const hasPaymentButton = Boolean(paymentButtonId);
+  const hiddenPaymentForm = document.getElementById('razorpayPaymentForm');
   const dFormat = "{{ page.highlights.format | default: 'Social deduction' | escape }}";
   const dDuration = "{{ page.highlights.duration | default: '3–4 hours' | escape }}";
   const dGroup = "{{ page.highlights.group_size | default: '8–25 players' | escape }}";
@@ -185,8 +187,6 @@
   const locationUrl = match?.location_map_url || '';
   const timeStr = scheduleDate ? fmtTime(scheduleDate, timezone) : '';
   const whenText = scheduleDate ? fmtDateOnly(scheduleDate, timezone) : '';
-  const ticket = fallbackTicket;
-
   if (M.title) M.title.textContent = titleFallback;
 
   if (isUpcoming && scheduleDate){
@@ -204,20 +204,21 @@
         scDir.removeAttribute('href');
       }
     }
-    if (ticket){
-      if (scBook) scBook.href = ticket;
+    if (hasPaymentButton){
+      if (scBook) scBook.removeAttribute('hidden');
       if (fabBook){
-        fabBook.href = ticket;
         fabBook.removeAttribute('hidden');
+        requestAnimationFrame(updateFabSpacing);
       }
-      requestAnimationFrame(updateFabSpacing);
     } else {
+      if (scBook) scBook.setAttribute('hidden','');
       if (fabBook){ fabBook.setAttribute('hidden',''); }
       updateFabSpacing();
     }
   } else {
     scHeading && scHeading.setAttribute('hidden','');
     if (scBlock) scBlock.hidden = true;
+    if (scBook) scBook.setAttribute('hidden','');
     if (fabBook){ fabBook.setAttribute('hidden',''); }
     updateFabSpacing();
   }
@@ -294,6 +295,27 @@
     window.addEventListener('resize', update);
     window.__updateMicrobarVis = update;
   })();
+
+  if (hasPaymentButton){
+    const triggerPayment = (event) => {
+      event?.preventDefault();
+      let tries = 0;
+      const attempt = () => {
+        const paymentButton = hiddenPaymentForm?.querySelector('.razorpay-payment-button');
+        if (paymentButton){
+          paymentButton.click();
+        } else if (tries < 10){
+          tries += 1;
+          setTimeout(attempt, 100);
+        } else {
+          console.warn('Razorpay payment button could not be initialized.');
+        }
+      };
+      attempt();
+    };
+    scBook?.addEventListener('click', triggerPayment);
+    fabBook?.addEventListener('click', triggerPayment);
+  }
 
   updateFabSpacing();
   window.addEventListener('resize', ()=>{ updateFabSpacing(); });

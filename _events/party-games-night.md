@@ -17,7 +17,7 @@ highlights:
   price: "₹ 400/-"
 
 # CTA
-ticket_link: "https://rzp.io/rzp/Party-Game-Night"   
+payment_button_id: ""
 
 # Optional videos
 about_video: "https://www.youtube.com/embed/TmWqrMSGbbs"
