@@ -109,8 +109,8 @@
   const scWhere   = document.getElementById('scWhere');
   const scAdd     = document.getElementById('scAddCal');
   const scDir     = document.getElementById('scDir');
-  const scBook    = document.getElementById('scBook');
-  const fabBook   = document.getElementById('fabBook');
+  let scBook      = document.getElementById('scBook');
+  let fabBook     = document.getElementById('fabBook');
   const shareFab  = document.getElementById('shareFab');
 
   const M = {
@@ -189,170 +189,80 @@
   const whenText = scheduleDate ? fmtDateOnly(scheduleDate, timezone) : '';
   const ticket = fallbackTicket;
 
-  const razorpayContainer = document.getElementById('razorpayCheckoutContainer');
-  const razorpayState = {
-    button: null,
-    ready: false,
-    failed: false,
-    waitingPromise: null,
-  };
+  function waitForRazorpayButton(form, timeoutMs = 15000){
+    if (!form) return Promise.resolve(null);
+    const existing = form.querySelector('.razorpay-payment-button');
+    if (existing) return Promise.resolve(existing);
 
-  function getRazorpayButton(){
-    if (razorpayState.button && document.contains(razorpayState.button)){
-      return razorpayState.button;
-    }
-    return razorpayContainer?.querySelector('.razorpay-payment-button') || null;
-  }
-
-  function markRazorpayReady(button){
-    if (!button) return;
-    razorpayState.button = button;
-    razorpayState.ready = true;
-    razorpayState.failed = false;
-    setCheckoutLoading(scBook, false);
-    setCheckoutLoading(fabBook, false);
-  }
-
-  function markRazorpayFailed(){
-    if (razorpayState.ready) return;
-    razorpayState.failed = true;
-    setCheckoutLoading(scBook, false);
-    setCheckoutLoading(fabBook, false);
-  }
-
-  function waitForRazorpayButton(timeoutMs = 5000){
-    const existing = getRazorpayButton();
-    if (existing){
-      markRazorpayReady(existing);
-      return Promise.resolve(existing);
-    }
-    if (!razorpayContainer){
-      markRazorpayFailed();
-      return Promise.resolve(null);
-    }
-    if (razorpayState.waitingPromise) return razorpayState.waitingPromise;
-
-    razorpayState.waitingPromise = new Promise((resolve) => {
-      let observer = null;
+    return new Promise((resolve) => {
       let timer = null;
-
-      const finish = (button) => {
-        if (observer) observer.disconnect();
-        if (timer) clearTimeout(timer);
-        razorpayState.waitingPromise = null;
-        if (button){
-          markRazorpayReady(button);
-          resolve(button);
-        } else {
-          markRazorpayFailed();
-          resolve(null);
+      const observer = new MutationObserver(() => {
+        const found = form.querySelector('.razorpay-payment-button');
+        if (found){
+          observer.disconnect();
+          clearTimeout(timer);
+          resolve(found);
         }
-      };
-
-      observer = new MutationObserver(() => {
-        const button = getRazorpayButton();
-        if (button) finish(button);
       });
 
-      observer.observe(razorpayContainer, { childList: true, subtree: true });
+      observer.observe(form, { childList: true, subtree: true });
 
       timer = setTimeout(() => {
-        finish(getRazorpayButton());
+        observer.disconnect();
+        resolve(form.querySelector('.razorpay-payment-button'));
       }, timeoutMs);
     });
-
-    return razorpayState.waitingPromise;
   }
 
-  function ensureRazorpayReadiness(){
-    if (!useRazorpay) return;
-    if (razorpayState.ready || razorpayState.failed) return;
-    waitForRazorpayButton(15000).catch(() => { markRazorpayFailed(); });
-  }
+  function adoptRazorpayButton(slot){
+    const form = document.querySelector(`form[data-razorpay-slot="${slot}"]`);
+    if (!form || form.dataset.razorpayApplied === 'true') return;
 
-  function openFallback(element){
-    if (!element) return;
-    const href = element.getAttribute('href');
-    if (!href || href === '#') return;
-    const target = element.getAttribute('target');
-    if (target === '_blank'){
-      const win = window.open(href, '_blank');
-      if (win) win.opener = null;
-    } else {
-      window.location.href = href;
-    }
-  }
+    const fallback = slot === 'scBook' ? scBook : fabBook;
+    if (!fallback) return;
 
-  function setCheckoutLoading(element, loading){
-    if (!element) return;
-    if (loading){
-      if (!element.dataset.originalText){
-        element.dataset.originalText = element.textContent;
+    waitForRazorpayButton(form).then((button) => {
+      if (!button) return;
+
+      form.dataset.razorpayApplied = 'true';
+      form.classList.add('razorpay-checkout-form--active');
+
+      const fallbackClasses = (fallback.getAttribute('class') || '').split(/\s+/).filter(Boolean);
+      fallbackClasses.forEach(cls => { if (cls && !button.classList.contains(cls)) button.classList.add(cls); });
+      button.classList.add('razorpay-checkout-btn');
+      button.setAttribute('type', 'button');
+      button.textContent = 'Book Now';
+      button.style.cssText = '';
+
+      if (fallback.getAttribute('aria-label') && !button.getAttribute('aria-label')){
+        button.setAttribute('aria-label', fallback.getAttribute('aria-label'));
       }
-      const loadingLabel = element.id === 'fabBook' ? 'Loading…' : 'Loading checkout…';
-      element.textContent = loadingLabel;
-      element.setAttribute('aria-disabled', 'true');
-      element.setAttribute('aria-busy', 'true');
-      element.classList.add('checkout-loading');
-    } else {
-      if (element.dataset.originalText != null){
-        element.textContent = element.dataset.originalText;
-        delete element.dataset.originalText;
-      }
-      element.removeAttribute('aria-disabled');
-      element.removeAttribute('aria-busy');
-      element.classList.remove('checkout-loading');
-    }
-  }
-
-  function triggerRazorpayCheckout(button){
-    const targetButton = button || getRazorpayButton();
-    if (targetButton){
-      try {
-        targetButton.dispatchEvent(new MouseEvent('click', { view: window, bubbles: true, cancelable: true }));
-      } catch (err) {}
-      if (typeof targetButton.click === 'function'){
-        targetButton.click();
-        return true;
-      }
-    }
-    const form = document.getElementById('razorpayCheckoutForm');
-    if (form){
-      try {
-        if (typeof form.requestSubmit === 'function') form.requestSubmit();
-        else form.submit();
-        return true;
-      } catch (err) {}
-    }
-    return false;
-  }
-
-  function attachRazorpayTrigger(element){
-    if (!element || !useRazorpay) return;
-
-    const prep = () => { ensureRazorpayReadiness(); };
-
-    element.addEventListener('pointerenter', prep, { passive: true });
-    element.addEventListener('touchstart', prep, { passive: true });
-    element.addEventListener('focus', prep, { passive: true });
-
-    element.addEventListener('click', (event) => {
-      event.preventDefault();
-
-      if (razorpayState.ready && razorpayState.button){
-        if (!triggerRazorpayCheckout(razorpayState.button)){
-          openFallback(element);
-        }
-        return;
+      if (fallback.getAttribute('title') && !button.getAttribute('title')){
+        button.setAttribute('title', fallback.getAttribute('title'));
       }
 
-      if (razorpayState.failed){
-        openFallback(element);
-        return;
+      if (slot === 'scBook'){
+        fallback.id = 'scBookFallback';
+        button.id = 'scBook';
+        scBook = button;
+      } else if (slot === 'fabBook'){
+        fallback.id = 'fabBookFallback';
+        button.id = 'fabBook';
+        fabBook = button;
       }
 
-      ensureRazorpayReadiness();
-      setCheckoutLoading(element, true);
+      fallback.classList.add('razorpay-fallback');
+      fallback.setAttribute('hidden','');
+      fallback.setAttribute('aria-hidden','true');
+      fallback.setAttribute('tabindex','-1');
+
+      button.removeAttribute('hidden');
+
+      if (slot === 'fabBook'){
+        updateFabSpacing();
+      }
+
+      requestAnimationFrame(updateFabSpacing);
     });
   }
 
@@ -375,15 +285,14 @@
     }
     if (ticket || useRazorpay){
       const targetHref = ticket || '#';
-      if (scBook) scBook.href = targetHref;
+      if (ticket && scBook && scBook.tagName === 'A') scBook.href = targetHref;
       if (fabBook){
-        fabBook.href = targetHref;
+        if (ticket && fabBook.tagName === 'A') fabBook.href = targetHref;
         fabBook.removeAttribute('hidden');
       }
       if (useRazorpay){
-        setCheckoutLoading(scBook, true);
-        setCheckoutLoading(fabBook, true);
-        ensureRazorpayReadiness();
+        adoptRazorpayButton('scBook');
+        adoptRazorpayButton('fabBook');
       }
       requestAnimationFrame(updateFabSpacing);
     } else {
@@ -472,12 +381,6 @@
 
   updateFabSpacing();
   window.addEventListener('resize', ()=>{ updateFabSpacing(); });
-
-  if (useRazorpay){
-    ensureRazorpayReadiness();
-    attachRazorpayTrigger(scBook);
-    attachRazorpayTrigger(fabBook);
-  }
 
   (function(){
     async function sharePage(){
