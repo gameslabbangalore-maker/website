@@ -52,7 +52,7 @@
 </button>
 
 {% if page.razorpay_button_id %}
-<div id="razorpayCheckoutContainer" hidden aria-hidden="true" data-razorpay-button-id="{{ page.razorpay_button_id | escape }}">
+<div id="razorpayCheckoutContainer" aria-hidden="true" data-razorpay-button-id="{{ page.razorpay_button_id | escape }}" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">
   <form id="razorpayCheckoutForm">
     <script src="https://checkout.razorpay.com/v1/payment-button.js" data-payment_button_id="{{ page.razorpay_button_id | escape }}" async></script>
   </form>
