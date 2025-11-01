@@ -221,7 +221,7 @@
     }
     if (ticket && scBook) scBook.href = ticket;
 
-    if (ticket && !useRazorpay){
+    if (ticket){
       if (fabBook){
         fabBook.href = ticket;
         fabBook.removeAttribute('hidden');
@@ -235,11 +235,6 @@
     scHeading && scHeading.setAttribute('hidden','');
     if (scBlock) scBlock.hidden = true;
     if (fabBook){ fabBook.setAttribute('hidden',''); }
-    updateFabSpacing();
-  }
-
-  if (useRazorpay && fabBook){
-    fabBook.setAttribute('hidden','');
     updateFabSpacing();
   }
 
