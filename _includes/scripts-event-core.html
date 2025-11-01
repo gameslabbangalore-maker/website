@@ -109,8 +109,8 @@
   const scWhere   = document.getElementById('scWhere');
   const scAdd     = document.getElementById('scAddCal');
   const scDir     = document.getElementById('scDir');
-  let scBook      = document.getElementById('scBook');
-  let fabBook     = document.getElementById('fabBook');
+  const scBook    = document.getElementById('scBook');
+  const fabBook   = document.getElementById('fabBook');
   const shareFab  = document.getElementById('shareFab');
 
   const M = {
@@ -131,8 +131,7 @@
   };
 
   const fallbackTicket = {{ page.ticket_link | jsonify }} || '';
-  const razorpayButtonId = {{ page.razorpay_button_id | jsonify }} || '';
-  const useRazorpay = Boolean(razorpayButtonId);
+  const useRazorpay = Boolean({{ page.razorpay_button_id | jsonify }} || '');
   const dFormat = "{{ page.highlights.format | default: 'Social deduction' | escape }}";
   const dDuration = "{{ page.highlights.duration | default: '3–4 hours' | escape }}";
   const dGroup = "{{ page.highlights.group_size | default: '8–25 players' | escape }}";
@@ -189,126 +188,6 @@
   const whenText = scheduleDate ? fmtDateOnly(scheduleDate, timezone) : '';
   const ticket = fallbackTicket;
 
-  function waitForRazorpayButton(form, timeoutMs = 15000){
-    if (!form) return Promise.resolve(null);
-    const existing = form.querySelector('.razorpay-payment-button');
-    if (existing) return Promise.resolve(existing);
-
-    return new Promise((resolve) => {
-      let timer = null;
-      const observer = new MutationObserver(() => {
-        const found = form.querySelector('.razorpay-payment-button');
-        if (found){
-          observer.disconnect();
-          clearTimeout(timer);
-          resolve(found);
-        }
-      });
-
-      observer.observe(form, { childList: true, subtree: true });
-
-      timer = setTimeout(() => {
-        observer.disconnect();
-        resolve(form.querySelector('.razorpay-payment-button'));
-      }, timeoutMs);
-    });
-  }
-
-  function triggerRazorpay(button){
-    if (!button) return false;
-    try {
-      button.click();
-      return true;
-    } catch (e) {
-      try {
-        const evt = new MouseEvent('click', { bubbles:true, cancelable:true, view:window });
-        button.dispatchEvent(evt);
-        return true;
-      } catch (err) {
-        return false;
-      }
-    }
-  }
-
-  function handleRazorpayClick(anchor, slot){
-    if (!anchor) return;
-    if (anchor.dataset.razorpayBound === 'true') return;
-    anchor.dataset.razorpayBound = 'true';
-    const fallbackHref = anchor.getAttribute('href') || '';
-    anchor.dataset.fallbackHref = fallbackHref;
-    anchor.addEventListener('click', (event) => {
-      if (!useRazorpay) return;
-      const form = document.querySelector(`form[data-razorpay-slot="${slot}"]`);
-      const button = form?.querySelector('.razorpay-payment-button');
-      if (button){
-        event.preventDefault();
-        const opened = triggerRazorpay(button);
-        if (!opened && fallbackHref){ window.open(fallbackHref, anchor.target || '_self'); }
-        return;
-      }
-
-      event.preventDefault();
-      waitForRazorpayButton(form).then((btn) => {
-        if (btn){
-          if (!triggerRazorpay(btn) && fallbackHref){ window.open(fallbackHref, anchor.target || '_self'); }
-        } else if (fallbackHref){
-          window.open(fallbackHref, anchor.target || '_self');
-        }
-      });
-    }, { passive:false });
-  }
-
-  function adoptRazorpayButton(slot){
-    const form = document.querySelector(`form[data-razorpay-slot="${slot}"]`);
-    if (!form || form.dataset.razorpayApplied === 'true') return;
-
-    const fallback = slot === 'scBook' ? scBook : fabBook;
-    if (!fallback) return;
-
-    waitForRazorpayButton(form).then((button) => {
-      if (!button) return;
-
-      form.dataset.razorpayApplied = 'true';
-      form.classList.add('razorpay-checkout-form--active');
-
-      const fallbackClasses = (fallback.getAttribute('class') || '').split(/\s+/).filter(Boolean);
-      fallbackClasses.forEach(cls => { if (cls && !button.classList.contains(cls)) button.classList.add(cls); });
-      button.classList.add('razorpay-checkout-btn');
-      const labelText = (fallback.textContent || '').trim();
-      if (labelText){ button.textContent = labelText; }
-
-      if (fallback.getAttribute('aria-label') && !button.getAttribute('aria-label')){
-        button.setAttribute('aria-label', fallback.getAttribute('aria-label'));
-      }
-      if (fallback.getAttribute('title') && !button.getAttribute('title')){
-        button.setAttribute('title', fallback.getAttribute('title'));
-      }
-
-      if (slot === 'scBook'){
-        fallback.id = 'scBookFallback';
-        button.id = 'scBook';
-        scBook = button;
-      } else if (slot === 'fabBook'){
-        fallback.id = 'fabBookFallback';
-        button.id = 'fabBook';
-        fabBook = button;
-      }
-
-      fallback.classList.add('razorpay-fallback');
-      fallback.setAttribute('hidden','');
-      fallback.setAttribute('aria-hidden','true');
-      fallback.setAttribute('tabindex','-1');
-
-      button.removeAttribute('hidden');
-
-      if (slot === 'fabBook'){
-        updateFabSpacing();
-      }
-
-      requestAnimationFrame(updateFabSpacing);
-    });
-  }
-
   if (M.title) M.title.textContent = titleFallback;
 
   if (isUpcoming && scheduleDate){
@@ -327,17 +206,10 @@
       }
     }
     if (ticket || useRazorpay){
-      const targetHref = ticket || '#';
-      if (ticket && scBook && scBook.tagName === 'A') scBook.href = targetHref;
+      if (ticket && scBook && scBook.tagName === 'A') scBook.href = ticket;
       if (fabBook){
-        if (ticket && fabBook.tagName === 'A') fabBook.href = targetHref;
+        if (ticket && fabBook.tagName === 'A') fabBook.href = ticket;
         fabBook.removeAttribute('hidden');
-      }
-      if (useRazorpay){
-        handleRazorpayClick(scBook, 'scBook');
-        handleRazorpayClick(fabBook, 'fabBook');
-        adoptRazorpayButton('scBook');
-        adoptRazorpayButton('fabBook');
       }
       requestAnimationFrame(updateFabSpacing);
     } else {

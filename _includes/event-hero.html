@@ -19,11 +19,12 @@
           <a id="scDir" class="inline-link" href="#" target="_blank" rel="noopener">Get directions</a>
         </div>
       </div>
-      <a id="scBook" class="btn btn-primary wide-cta" href="#" target="_blank" rel="noopener">Book Now</a>
       {% if page.razorpay_button_id %}
-      <form class="razorpay-checkout-form" data-razorpay-slot="scBook">
+      <form id="scBook">
         <script src="https://checkout.razorpay.com/v1/payment-button.js" data-payment_button_id="{{ page.razorpay_button_id | escape }}" async></script>
       </form>
+      {% else %}
+      <a id="scBook" class="btn btn-primary wide-cta" href="#" target="_blank" rel="noopener">Book Now</a>
       {% endif %}
       <div class="row-div" aria-hidden="true"></div>
     </div>
@@ -48,11 +49,12 @@
 </aside>
 
 <!-- Floating FABs (mobile) -->
-<a id="fabBook" class="fab-book" href="#" target="_blank" rel="noopener" hidden>Book Now</a>
 {% if page.razorpay_button_id %}
-<form class="razorpay-checkout-form razorpay-checkout-form--fab" data-razorpay-slot="fabBook">
+<form id="fabBook" hidden>
   <script src="https://checkout.razorpay.com/v1/payment-button.js" data-payment_button_id="{{ page.razorpay_button_id | escape }}" async></script>
 </form>
+{% else %}
+<a id="fabBook" class="fab-book" href="#" target="_blank" rel="noopener" hidden>Book Now</a>
 {% endif %}
 <button id="shareFab" class="fab-share" aria-label="Share this event" title="Share">
   <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
