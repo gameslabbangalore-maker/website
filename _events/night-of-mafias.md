@@ -17,7 +17,8 @@ highlights:
   price: "₹ 350/-"
 
 # CTA
-ticket_link: "https://rzp.io/rzp/Night-of-mafias"   
+ticket_link: "https://rzp.io/rzp/Night-of-mafias"
+razorpay_button_id: "pl_Ra2MBVPn95I9CF"
 
 # Optional videos
 about_video: "https://www.youtube.com/embed/p232ZZCCJKA?rel=0"   # hide section if blank

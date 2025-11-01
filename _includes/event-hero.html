@@ -51,6 +51,14 @@
   <span class="fab-share-label">Share</span>
 </button>
 
+{% if page.razorpay_button_id %}
+<div id="razorpayCheckoutContainer" hidden aria-hidden="true" data-razorpay-button-id="{{ page.razorpay_button_id | escape }}">
+  <form id="razorpayCheckoutForm">
+    <script src="https://checkout.razorpay.com/v1/payment-button.js" data-payment_button_id="{{ page.razorpay_button_id | escape }}" async></script>
+  </form>
+</div>
+{% endif %}
+
 <!-- Title + tagline -->
 <div class="title-row">
   <h2 class="heading" id="eventTitle">{{ page.title }}</h2>

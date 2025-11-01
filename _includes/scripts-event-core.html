@@ -131,6 +131,8 @@
   };
 
   const fallbackTicket = {{ page.ticket_link | jsonify }} || '';
+  const razorpayButtonId = {{ page.razorpay_button_id | jsonify }} || '';
+  const useRazorpay = Boolean(razorpayButtonId);
   const dFormat = "{{ page.highlights.format | default: 'Social deduction' | escape }}";
   const dDuration = "{{ page.highlights.duration | default: '3–4 hours' | escape }}";
   const dGroup = "{{ page.highlights.group_size | default: '8–25 players' | escape }}";
@@ -187,6 +189,20 @@
   const whenText = scheduleDate ? fmtDateOnly(scheduleDate, timezone) : '';
   const ticket = fallbackTicket;
 
+  function getRazorpayButton(){
+    return document.querySelector('#razorpayCheckoutContainer .razorpay-payment-button');
+  }
+
+  function attachRazorpayTrigger(element){
+    if (!element || !useRazorpay) return;
+    element.addEventListener('click', (event) => {
+      const button = getRazorpayButton();
+      if (!button) return;
+      event.preventDefault();
+      button.click();
+    });
+  }
+
   if (M.title) M.title.textContent = titleFallback;
 
   if (isUpcoming && scheduleDate){
@@ -204,10 +220,11 @@
         scDir.removeAttribute('href');
       }
     }
-    if (ticket){
-      if (scBook) scBook.href = ticket;
+    if (ticket || useRazorpay){
+      const targetHref = ticket || '#';
+      if (scBook) scBook.href = targetHref;
       if (fabBook){
-        fabBook.href = ticket;
+        fabBook.href = targetHref;
         fabBook.removeAttribute('hidden');
       }
       requestAnimationFrame(updateFabSpacing);
@@ -297,6 +314,11 @@
 
   updateFabSpacing();
   window.addEventListener('resize', ()=>{ updateFabSpacing(); });
+
+  if (useRazorpay){
+    attachRazorpayTrigger(scBook);
+    attachRazorpayTrigger(fabBook);
+  }
 
   (function(){
     async function sharePage(){
