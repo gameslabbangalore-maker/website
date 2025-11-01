@@ -109,9 +109,10 @@
   const scWhere   = document.getElementById('scWhere');
   const scAdd     = document.getElementById('scAddCal');
   const scDir     = document.getElementById('scDir');
-  let scBook      = document.getElementById('scBook');
-  let fabBook     = document.getElementById('fabBook');
+  const scBook    = document.getElementById('scBook');
+  const fabBook   = document.getElementById('fabBook');
   const shareFab  = document.getElementById('shareFab');
+  const razorpayFab = document.getElementById('razorpayFab');
 
   const M = {
     bar: document.getElementById('mobileInfoBar'),
@@ -131,47 +132,12 @@
   };
 
   const fallbackTicket = {{ page.ticket_link | jsonify }} || '';
-  const razorpayButtonId = {{ page.razorpay_button_id | jsonify }} || '';
-  const useRazorpay = Boolean(razorpayButtonId);
+  const useRazorpay = Boolean({{ page.razorpay_button_id | jsonify }});
   const dFormat = "{{ page.highlights.format | default: 'Social deduction' | escape }}";
   const dDuration = "{{ page.highlights.duration | default: '3–4 hours' | escape }}";
   const dGroup = "{{ page.highlights.group_size | default: '8–25 players' | escape }}";
   const dDiff = "{{ page.highlights.difficulty | default: 'Beginner-friendly' | escape }}";
   const dPrice = "{{ page.highlights.price | default: '₹ 350/-' | escape }}";
-
-  function replaceWithRazorpay(element){
-    if (!element || !razorpayButtonId) return null;
-    const form = document.createElement('form');
-    if (element.id) form.id = element.id;
-
-    const preservedClasses = [];
-    element.classList.forEach(cls => {
-      if (cls.startsWith('btn')) return;
-      preservedClasses.push(cls);
-    });
-    preservedClasses.push('razorpay-host');
-    if (preservedClasses.length) form.className = preservedClasses.join(' ');
-
-    if (element.hasAttribute('hidden')) form.setAttribute('hidden', '');
-    if (element.getAttribute('aria-label')) form.setAttribute('aria-label', element.getAttribute('aria-label'));
-    if (element.getAttribute('title')) form.setAttribute('title', element.getAttribute('title'));
-
-    const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/payment-button.js';
-    script.async = true;
-    script.dataset.payment_button_id = razorpayButtonId;
-    form.appendChild(script);
-
-    element.replaceWith(form);
-    return form;
-  }
-
-  if (useRazorpay){
-    const swappedDesktop = replaceWithRazorpay(scBook);
-    if (swappedDesktop) scBook = swappedDesktop;
-    const swappedFab = replaceWithRazorpay(fabBook);
-    if (swappedFab) fabBook = swappedFab;
-  }
 
   function assignText(el, value){
     if (!el) return;
@@ -185,25 +151,38 @@
     }
   }
 
+  function visibleHeight(el){
+    if (!el) return 0;
+    if (el.hasAttribute('hidden')) return 0;
+    const style = window.getComputedStyle(el);
+    if (style.display === 'none' || style.visibility === 'hidden' || parseFloat(style.opacity || '1') === 0) return 0;
+    const rect = el.getBoundingClientRect();
+    return rect.height || el.offsetHeight || 0;
+  }
+
   function updateFabSpacing(){
     const docEl = document.documentElement;
-    const bookVisible = fabBook && !fabBook.hasAttribute('hidden');
-    let bookHeight = 0;
-    if (bookVisible){
-      const rect = fabBook.getBoundingClientRect();
-      bookHeight = rect.height || fabBook.offsetHeight || 0;
-      if (!bookHeight){ requestAnimationFrame(updateFabSpacing); return; }
+    const bookHeight = visibleHeight(fabBook);
+    const razorpayHeight = (window.innerWidth < 960) ? visibleHeight(razorpayFab) : 0;
+
+    if (bookHeight === 0 && fabBook && !fabBook.hasAttribute('hidden') && fabBook.childElementCount){
+      requestAnimationFrame(updateFabSpacing);
+      return;
+    }
+    if (razorpayHeight === 0 && razorpayFab && razorpayFab.childElementCount){
+      requestAnimationFrame(updateFabSpacing);
     }
 
     let shareBottom = 12;
     if (shareFab){
-      if (bookVisible){ shareBottom += Math.round(bookHeight + 8); }
+      if (bookHeight){ shareBottom += Math.round(bookHeight + 8); }
       docEl.style.setProperty('--fab-share-bottom', shareBottom + 'px');
     }
 
     let pad = 16;
-    if (bookVisible && window.innerWidth < 960){
-      pad = Math.max(22, Math.round(bookHeight + 22));
+    if (window.innerWidth < 960){
+      if (bookHeight){ pad = Math.max(pad, Math.round(bookHeight + 22)); }
+      if (razorpayHeight){ pad = Math.max(pad, Math.round(razorpayHeight + 22)); }
     }
     docEl.style.setProperty('--mobile-bottom-pad', pad + 'px');
   }
@@ -240,10 +219,11 @@
         scDir.removeAttribute('href');
       }
     }
-    if (ticket || useRazorpay){
-      if (ticket && scBook && scBook.tagName === 'A') scBook.href = ticket;
+    if (ticket && scBook) scBook.href = ticket;
+
+    if (ticket && !useRazorpay){
       if (fabBook){
-        if (ticket && fabBook.tagName === 'A') fabBook.href = ticket;
+        fabBook.href = ticket;
         fabBook.removeAttribute('hidden');
       }
       requestAnimationFrame(updateFabSpacing);
@@ -256,6 +236,16 @@
     if (scBlock) scBlock.hidden = true;
     if (fabBook){ fabBook.setAttribute('hidden',''); }
     updateFabSpacing();
+  }
+
+  if (useRazorpay && fabBook){
+    fabBook.setAttribute('hidden','');
+    updateFabSpacing();
+  }
+
+  if (useRazorpay){
+    setTimeout(updateFabSpacing, 600);
+    setTimeout(updateFabSpacing, 1200);
   }
 
   if (isUpcoming && scheduleDate){

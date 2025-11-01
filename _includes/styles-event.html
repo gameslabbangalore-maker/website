@@ -129,6 +129,8 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
   .wide-cta{display:block;width:100%;text-align:center;padding:11px 18px;border-radius:999px;margin:6px 0 8px;box-sizing:border-box;text-decoration:none}
   .row-div{height:1px;margin:12px 0;background:linear-gradient(90deg,rgba(255,255,255,.12),rgba(255,255,255,.04));border:0}
   .facts{display:grid;gap:10px;margin:10px 0 4px}
+  .razorpay-desktop{margin:14px 0 18px}
+  .razorpay-desktop form{margin:0}
   .fact{display:flex;justify-content:space-between;gap:10px;font-size:14px;line-height:1.55}
   .fact .label{color:var(--muted)}
   .share-row{display:flex;justify-content:center;margin-top:10px}
@@ -158,18 +160,18 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
 
 /* FABs (mobile) */
 .fab-book,.fab-share{position:fixed;z-index:10000;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.35);display:flex;align-items:center;gap:10px;padding:12px 16px;text-decoration:none}
+.razorpay-fab{position:fixed;left:12px;right:12px;bottom:72px;z-index:10000;display:flex;justify-content:center}
+.razorpay-fab form{margin:0;display:flex;justify-content:center;width:100%}
+.razorpay-fab[hidden]{display:none}
 .fab-book{left:12px;right:12px;bottom:6px;background:var(--accent);color:#000;font-weight:900;justify-content:center;text-align:center}
 .fab-book[hidden]{display:none}
-.razorpay-host{margin:6px 0 8px;padding:0;border:0;background:transparent}
-.razorpay-host.wide-cta{display:block;width:100%}
-.razorpay-host.fab-book{background:transparent;box-shadow:none;padding:0;margin:0}
 .fab-share{right:12px;bottom:var(--fab-share-bottom,12px);background:rgba(24,24,24,.35);color:var(--text-main);border:1px solid rgba(255,255,255,.25);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .fab-share .fab-share-label{font-weight:900;font-size:.95rem}
 @media (prefers-color-scheme: light){
   .btn-primary,.fab-book{color:#fff}
   .fab-share{background:rgba(255,255,255,.65);border-color:rgba(0,0,0,.15);color:inherit}
 }
-@media (min-width:960px){.fab-book,.fab-share{display:none}}
+@media (min-width:960px){.fab-book,.fab-share,.razorpay-fab{display:none}}
 
 /* Contact section */
 {% include styles/contact.css %}
