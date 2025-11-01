@@ -214,6 +214,50 @@
     });
   }
 
+  function triggerRazorpay(button){
+    if (!button) return false;
+    try {
+      button.click();
+      return true;
+    } catch (e) {
+      try {
+        const evt = new MouseEvent('click', { bubbles:true, cancelable:true, view:window });
+        button.dispatchEvent(evt);
+        return true;
+      } catch (err) {
+        return false;
+      }
+    }
+  }
+
+  function handleRazorpayClick(anchor, slot){
+    if (!anchor) return;
+    if (anchor.dataset.razorpayBound === 'true') return;
+    anchor.dataset.razorpayBound = 'true';
+    const fallbackHref = anchor.getAttribute('href') || '';
+    anchor.dataset.fallbackHref = fallbackHref;
+    anchor.addEventListener('click', (event) => {
+      if (!useRazorpay) return;
+      const form = document.querySelector(`form[data-razorpay-slot="${slot}"]`);
+      const button = form?.querySelector('.razorpay-payment-button');
+      if (button){
+        event.preventDefault();
+        const opened = triggerRazorpay(button);
+        if (!opened && fallbackHref){ window.open(fallbackHref, anchor.target || '_self'); }
+        return;
+      }
+
+      event.preventDefault();
+      waitForRazorpayButton(form).then((btn) => {
+        if (btn){
+          if (!triggerRazorpay(btn) && fallbackHref){ window.open(fallbackHref, anchor.target || '_self'); }
+        } else if (fallbackHref){
+          window.open(fallbackHref, anchor.target || '_self');
+        }
+      });
+    }, { passive:false });
+  }
+
   function adoptRazorpayButton(slot){
     const form = document.querySelector(`form[data-razorpay-slot="${slot}"]`);
     if (!form || form.dataset.razorpayApplied === 'true') return;
@@ -230,9 +274,8 @@
       const fallbackClasses = (fallback.getAttribute('class') || '').split(/\s+/).filter(Boolean);
       fallbackClasses.forEach(cls => { if (cls && !button.classList.contains(cls)) button.classList.add(cls); });
       button.classList.add('razorpay-checkout-btn');
-      button.setAttribute('type', 'button');
-      button.textContent = 'Book Now';
-      button.style.cssText = '';
+      const labelText = (fallback.textContent || '').trim();
+      if (labelText){ button.textContent = labelText; }
 
       if (fallback.getAttribute('aria-label') && !button.getAttribute('aria-label')){
         button.setAttribute('aria-label', fallback.getAttribute('aria-label'));
@@ -291,6 +334,8 @@
         fabBook.removeAttribute('hidden');
       }
       if (useRazorpay){
+        handleRazorpayClick(scBook, 'scBook');
+        handleRazorpayClick(fabBook, 'fabBook');
         adoptRazorpayButton('scBook');
         adoptRazorpayButton('fabBook');
       }
