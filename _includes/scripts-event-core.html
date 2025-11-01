@@ -109,8 +109,8 @@
   const scWhere   = document.getElementById('scWhere');
   const scAdd     = document.getElementById('scAddCal');
   const scDir     = document.getElementById('scDir');
-  const scBook    = document.getElementById('scBook');
-  const fabBook   = document.getElementById('fabBook');
+  let scBook      = document.getElementById('scBook');
+  let fabBook     = document.getElementById('fabBook');
   const shareFab  = document.getElementById('shareFab');
 
   const M = {
@@ -131,12 +131,47 @@
   };
 
   const fallbackTicket = {{ page.ticket_link | jsonify }} || '';
-  const useRazorpay = Boolean({{ page.razorpay_button_id | jsonify }} || '');
+  const razorpayButtonId = {{ page.razorpay_button_id | jsonify }} || '';
+  const useRazorpay = Boolean(razorpayButtonId);
   const dFormat = "{{ page.highlights.format | default: 'Social deduction' | escape }}";
   const dDuration = "{{ page.highlights.duration | default: '3–4 hours' | escape }}";
   const dGroup = "{{ page.highlights.group_size | default: '8–25 players' | escape }}";
   const dDiff = "{{ page.highlights.difficulty | default: 'Beginner-friendly' | escape }}";
   const dPrice = "{{ page.highlights.price | default: '₹ 350/-' | escape }}";
+
+  function replaceWithRazorpay(element){
+    if (!element || !razorpayButtonId) return null;
+    const form = document.createElement('form');
+    if (element.id) form.id = element.id;
+
+    const preservedClasses = [];
+    element.classList.forEach(cls => {
+      if (cls.startsWith('btn')) return;
+      preservedClasses.push(cls);
+    });
+    preservedClasses.push('razorpay-host');
+    if (preservedClasses.length) form.className = preservedClasses.join(' ');
+
+    if (element.hasAttribute('hidden')) form.setAttribute('hidden', '');
+    if (element.getAttribute('aria-label')) form.setAttribute('aria-label', element.getAttribute('aria-label'));
+    if (element.getAttribute('title')) form.setAttribute('title', element.getAttribute('title'));
+
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/payment-button.js';
+    script.async = true;
+    script.dataset.payment_button_id = razorpayButtonId;
+    form.appendChild(script);
+
+    element.replaceWith(form);
+    return form;
+  }
+
+  if (useRazorpay){
+    const swappedDesktop = replaceWithRazorpay(scBook);
+    if (swappedDesktop) scBook = swappedDesktop;
+    const swappedFab = replaceWithRazorpay(fabBook);
+    if (swappedFab) fabBook = swappedFab;
+  }
 
   function assignText(el, value){
     if (!el) return;
