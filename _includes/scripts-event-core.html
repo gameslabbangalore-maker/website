@@ -189,17 +189,68 @@
   const whenText = scheduleDate ? fmtDateOnly(scheduleDate, timezone) : '';
   const ticket = fallbackTicket;
 
+  const razorpayContainer = document.getElementById('razorpayCheckoutContainer');
+
   function getRazorpayButton(){
-    return document.querySelector('#razorpayCheckoutContainer .razorpay-payment-button');
+    return razorpayContainer?.querySelector('.razorpay-payment-button') || null;
+  }
+
+  let waitForRazorpayPromise = null;
+  function waitForRazorpayButton(timeoutMs = 5000){
+    const existing = getRazorpayButton();
+    if (existing) return Promise.resolve(existing);
+    if (!razorpayContainer) return Promise.resolve(null);
+    if (waitForRazorpayPromise) return waitForRazorpayPromise;
+
+    waitForRazorpayPromise = new Promise((resolve) => {
+      let observer = null;
+      let timer = null;
+
+      const finish = (button) => {
+        if (observer) observer.disconnect();
+        if (timer) clearTimeout(timer);
+        waitForRazorpayPromise = null;
+        resolve(button || null);
+      };
+
+      observer = new MutationObserver(() => {
+        const button = getRazorpayButton();
+        if (button) finish(button);
+      });
+
+      observer.observe(razorpayContainer, { childList: true, subtree: true });
+
+      timer = setTimeout(() => {
+        finish(getRazorpayButton());
+      }, timeoutMs);
+    });
+
+    return waitForRazorpayPromise;
+  }
+
+  function openFallback(element){
+    if (!element) return;
+    const href = element.getAttribute('href');
+    if (!href || href === '#') return;
+    const target = element.getAttribute('target');
+    if (target === '_blank'){
+      const win = window.open(href, '_blank');
+      if (win) win.opener = null;
+    } else {
+      window.location.href = href;
+    }
   }
 
   function attachRazorpayTrigger(element){
     if (!element || !useRazorpay) return;
-    element.addEventListener('click', (event) => {
-      const button = getRazorpayButton();
-      if (!button) return;
+    element.addEventListener('click', async (event) => {
       event.preventDefault();
-      button.click();
+      const button = await waitForRazorpayButton();
+      if (button){
+        button.click();
+      } else {
+        openFallback(element);
+      }
     });
   }
 
