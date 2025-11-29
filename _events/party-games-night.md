@@ -9,7 +9,7 @@ intro: "An evening of lighthearted, quick-fire games designed to break the ice a
 
 # Highlights
 highlights:
-  format: "Casual & social games"
+  format: "Casual and social games"
   duration: "2–3 hours"
   group_size: "8–30 players"
   difficulty: "Beginner-friendly"
