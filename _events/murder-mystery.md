@@ -14,7 +14,6 @@ highlights:
   group_size: "12–20 players"
   difficulty: "Easy to Moderate"
   age: "16+"
-  price: "₹ 550/-"
 
 # CTA
 ticket_link: "https://rzp.io/rzp/Murder-Mystery"
