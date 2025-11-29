@@ -14,7 +14,6 @@ highlights:
   group_size: "8–30 players"
   difficulty: "Beginner-friendly"
   age: "12+"
-  price: "₹ 400/-"
 
 # CTA
 ticket_link: "https://rzp.io/rzp/Party-Game-Night"   
