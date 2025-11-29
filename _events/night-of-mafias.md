@@ -14,7 +14,6 @@ highlights:
   group_size: "8–25 players"
   difficulty: "Beginner-friendly"
   age: "14+"
-  price: "₹ 350/-"
 
 # CTA
 ticket_link: "https://rzp.io/rzp/Night-of-mafias"   
