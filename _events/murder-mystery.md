@@ -9,7 +9,7 @@ intro: "An Immersive Roleplay Game where you become part of a thrilling investig
 
 # Highlights (uniform fields across all events)
 highlights:
-  format: "Roleplay & deduction"
+  format: "Roleplay and deduction"
   duration: "3–4 hours"
   group_size: "12–20 players"
   difficulty: "Easy to Moderate"
