@@ -14,7 +14,6 @@ highlights:
   group_size: "8–16 players"
   difficulty: "Beginner-friendly"
   age: "16+"
-  price: "₹ 500/-"
 
 # CTA
 ticket_link: "https://rzp.io/rzp/Game-Set-Switch"   
@@ -51,3 +50,4 @@ closing: |
 
   **Join us for Game, Set, Switch! — where every swing brings you closer to glory.**
 ---
+
