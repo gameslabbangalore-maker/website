@@ -1,28 +1,17 @@
 {
-  "generated_at": "2025-11-04T05:14:03.958Z",
+  "generated_at": "2025-12-01T07:09:53.052Z",
   "timezone": "Asia/Kolkata",
   "events": [
     {
-      "title": "Board Game Night",
-      "slug": "board-game-night",
-      "start": "2025-11-07T13:30:00Z",
-      "day_key": "2025-11-07",
-      "timezone": "Asia/Kolkata",
-      "location_name": "Dialogues Cafe",
-      "location_map_url": "https://maps.app.goo.gl/iL4GWxFT7PQ13xtCA",
-      "location_warning": false,
-      "raw_location": "Dialogues Cafe\nDialogues\n21, 20th Main Road, KHB Colony, Block 5, Koramangala, Bengaluru, 560095, Karnataka, India"
-    },
-    {
       "title": "Night of Mafias !",
       "slug": "night-of-mafias",
-      "start": "2025-11-14T14:00:00Z",
-      "day_key": "2025-11-14",
+      "start": "2025-12-05T14:00:00Z",
+      "day_key": "2025-12-05",
       "timezone": "Asia/Kolkata",
-      "location_name": "Buddiezz Cafe",
-      "location_map_url": "https://maps.app.goo.gl/uio6gTTufNMuribs5",
+      "location_name": "Big Bean Cafe",
+      "location_map_url": "https://maps.app.goo.gl/SN7w4itJnqGMP2Qw9",
       "location_warning": false,
-      "raw_location": "Buddiezz Cafe\nBuddiezz Cafe\n615, 80 Feet Road, Block 6, Koramangala, Bengaluru, 560095, Karnataka, India"
+      "raw_location": "Big Bean Cafe\nBig Bean Cafe\n29, 80 Feet Road, Block 4, Koramangala, Bengaluru, 560034, Karnataka, India"
     }
   ]
 }
