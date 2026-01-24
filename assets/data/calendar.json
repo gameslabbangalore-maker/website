@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-01-19T14:36:54.807Z",
+  "generated_at": "2026-01-24T05:39:49.234Z",
   "timezone": "Asia/Kolkata",
   "events": [
     {
-      "title": "Night of Mafias !",
-      "slug": "night-of-mafias",
-      "start": "2026-01-23T14:00:00Z",
-      "day_key": "2026-01-23",
+      "title": "Board Game Night",
+      "slug": "board-game-night",
+      "start": "2026-01-30T14:00:00Z",
+      "day_key": "2026-01-30",
       "timezone": "Asia/Kolkata",
       "location_name": "Big Bean Cafe",
       "location_map_url": "https://maps.app.goo.gl/SN7w4itJnqGMP2Qw9",
