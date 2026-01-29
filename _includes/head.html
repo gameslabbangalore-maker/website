@@ -36,9 +36,11 @@ content="
 <link rel="canonical" href="{{ page.url | absolute_url }}" />
 <meta property="og:title" content="{{ page.og_title | default: page.title | default: 'Games Lab — Events & Experiences' }}" />
 <meta property="og:description" content="{{ page.og_description | default: page.seo_description | default: 'Fun events in Bangalore where friends meet, play, and celebrate together.' }}" />
-<meta property="og:image" content="{{ page.og_image | default: 'https://ik.imagekit.io/gameslab/tr:w-1200,h-630,f-auto/og-cover.png' }}" />
+{% assign og_image = page.og_image | default: 'https://ik.imagekit.io/gameslab/tr:w-1200,h-630,f-auto/og-cover.png' %}
+<meta property="og:image" content="{{ og_image | absolute_url }}" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="{{ og_image | absolute_url }}" />
 <link rel="preconnect" href="https://phosphor.utils.elfsightcdn.com" crossorigin>
 
 <!-- Preconnects -->
