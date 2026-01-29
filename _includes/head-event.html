@@ -10,11 +10,11 @@
 
 {% assign meta_title = page.og_title | default: page.title | default: site.title | default: "Games Lab — Events & Experiences" %}
 {% assign meta_description = page.seo_description | default: page.description | default: page.intro | default: page.tagline | default: site.description | default: "Games Lab hosts fun, alcohol-free social events and workshops—Mafia nights, game nights, and more." %}
-{% assign raw_meta_image = page.og_image | default: page.banner | default: "https://ik.imagekit.io/gameslab/tr:w-1200,h-630,f-auto/og-cover.png" %}
+{% assign raw_meta_image = page.og_image | default: page.banner | default: "https://ik.imagekit.io/gameslab/tr:w-1200,h-630,fo-auto,f-jpg,q-80/og-cover.png" %}
 {% assign meta_image = raw_meta_image %}
 {% if raw_meta_image contains 'ik.imagekit.io/gameslab/' and raw_meta_image contains '/tr:' == false %}
   {% assign image_path = raw_meta_image | split: 'ik.imagekit.io/gameslab/' | last %}
-  {% assign meta_image = 'https://ik.imagekit.io/gameslab/tr:w-1200,h-630,f-auto/' | append: image_path %}
+  {% assign meta_image = 'https://ik.imagekit.io/gameslab/tr:w-1200,h-630,fo-auto,f-jpg,q-80/' | append: image_path %}
 {% endif %}
 {% assign meta_image = meta_image | absolute_url %}
 
