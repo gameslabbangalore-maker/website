@@ -55,6 +55,9 @@
   <h2 class="heading" id="eventTitle">{{ page.title }}</h2>
 </div>
 <p class="tagline">{{ page.tagline }}</p>
+{% if page.intro %}
+  <p class="intro">{{ page.intro }}</p>
+{% endif %}
 
 <!-- MOBILE highlights header (shown only when scheduled) -->
 <div class="highlights-mobile" id="highlightsMobile" hidden>
