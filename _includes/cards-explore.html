@@ -41,7 +41,7 @@
     if (url.includes('imagekit.io')){
       return url.replace(/(imagekit\.io\/[^/]+)/, '$1/tr:w-800,h-450,fo-auto');
     }
-    return url + (url.includes('?') ? '&' : '?') + 'tr=w-800,h-450,fo-auto';
+    return url;
   }
 
   function renderCards(scheduledSet){
