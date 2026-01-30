@@ -3,8 +3,7 @@ title: "Trivia Takedown"
 slug: trivia-takedown
 
 # Hero
-banner: "/assets/images/events/trivia-takedown.jpg"
-og_image: "/assets/images/events/trivia-takedown.jpg"
+banner: "https://ik.imagekit.io/gameslab/Trivia_Takedown_3.png"
 tagline: "Test your brain, battle the buzzer, and claim trivia glory."
 intro: "A high-energy quiz night with rounds full of twists, wildcards, and bragging rights."
 

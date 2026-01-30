@@ -3,8 +3,8 @@ title: "Murder Mystery"
 slug: murder-mystery
 
 # Hero
-banner: "/assets/images/events/murder-mystery.jpg"
-og_image: "/assets/images/events/murder-mystery.jpg"
+banner: "https://ik.imagekit.io/gameslab/Murder_Mystery.png"
+og_image: "https://ik.imagekit.io/gameslab/tr:w-1200,h-630,fo-auto,f-jpg,q-80/Murder_Mystery.png"
 tagline: "Step into a world of secrets, clues, and suspense—where every guest could be the killer."
 intro: "An Immersive Roleplay Game where you become part of a thrilling investigation filled with twists and betrayals."
 
