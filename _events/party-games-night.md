@@ -4,7 +4,7 @@ slug: party-games-night
 
 # Hero
 banner: "https://ik.imagekit.io/gameslab/Party_Games_Night.png"
-og_image: "/assets/images/events/party-games-night.png"
+og_image: "/assets/images/events/party-games-night.jpg"
 tagline: "Fast, fun, and full of laughs—where every round brings a new surprise."
 intro: "An evening of lighthearted, quick-fire games designed to break the ice and bring the energy up."
 

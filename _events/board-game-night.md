@@ -4,7 +4,7 @@ slug: board-game-night
 
 # Hero
 banner: "https://ik.imagekit.io/gameslab/Board_Game_Night_3.png"
-og_image: "/assets/images/events/board-game-night.png"
+og_image: "/assets/images/events/board-game-night.jpg"
 tagline: "From strategy to silliness—discover new worlds one game at a time."
 intro: "An open-table evening featuring a wide selection of modern board and card games for all moods."
 

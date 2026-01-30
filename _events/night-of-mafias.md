@@ -4,7 +4,7 @@ slug: night-of-mafias
 
 # Hero
 banner: "https://ik.imagekit.io/gameslab/Night_of_Mafias.png"
-og_image: "/assets/images/events/night-of-mafias.png"
+og_image: "/assets/images/events/night-of-mafias.jpg"
 tagline: "Read faces, trade lies, and outlast the table in a social deduction showdown."
 intro: "A Social Deception Game with exciting Characters created by us for crazy fun."
 

@@ -4,7 +4,7 @@ slug: game-set-switch
 
 # Hero
 banner: "https://ik.imagekit.io/gameslab/Tennis.png"
-og_image: "/assets/images/events/game-set-switch.png"
+og_image: "/assets/images/events/game-set-switch.jpg"
 tagline: "Swing, smash, and rally your way to victory in a digital tennis showdown."
 intro: "An interactive motion-sensor tennis tournament where every swing counts."
 
