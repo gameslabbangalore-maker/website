@@ -1,17 +1,5 @@
 {
-  "generated_at": "2026-01-24T05:39:49.234Z",
+  "generated_at": "2026-02-17T16:41:40.488Z",
   "timezone": "Asia/Kolkata",
-  "events": [
-    {
-      "title": "Board Game Night",
-      "slug": "board-game-night",
-      "start": "2026-01-30T14:00:00Z",
-      "day_key": "2026-01-30",
-      "timezone": "Asia/Kolkata",
-      "location_name": "Big Bean Cafe",
-      "location_map_url": "https://maps.app.goo.gl/SN7w4itJnqGMP2Qw9",
-      "location_warning": false,
-      "raw_location": "Big Bean Cafe\nBig Bean Cafe\n29, 80 Feet Road, Block 4, Koramangala, Bengaluru, 560034, Karnataka, India"
-    }
-  ]
+  "events": []
 }
