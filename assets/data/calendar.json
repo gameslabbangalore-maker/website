@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-02-24T14:25:14.387Z",
+  "generated_at": "2026-03-02T17:27:43.329Z",
   "timezone": "Asia/Kolkata",
   "events": [
     {
-      "title": "Night of Mafias !",
-      "slug": "night-of-mafias",
-      "start": "2026-02-27T14:00:00Z",
-      "day_key": "2026-02-27",
+      "title": "Board Game Night",
+      "slug": "board-game-night",
+      "start": "2026-03-06T14:00:00Z",
+      "day_key": "2026-03-06",
       "timezone": "Asia/Kolkata",
       "location_name": "Bagelstein",
       "location_map_url": "https://maps.app.goo.gl/5sPfiUZsgoZFxo73A",
