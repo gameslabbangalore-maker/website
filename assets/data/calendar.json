@@ -1,17 +1,5 @@
 {
-  "generated_at": "2026-03-02T17:27:43.329Z",
+  "generated_at": "2026-03-10T11:27:23.590Z",
   "timezone": "Asia/Kolkata",
-  "events": [
-    {
-      "title": "Board Game Night",
-      "slug": "board-game-night",
-      "start": "2026-03-06T14:00:00Z",
-      "day_key": "2026-03-06",
-      "timezone": "Asia/Kolkata",
-      "location_name": "Bagelstein",
-      "location_map_url": "https://maps.app.goo.gl/5sPfiUZsgoZFxo73A",
-      "location_warning": false,
-      "raw_location": "Bagelstein\nThe Coffee Brewery\nMahakavi Vemana Rd, Bengaluru, India"
-    }
-  ]
+  "events": []
 }
