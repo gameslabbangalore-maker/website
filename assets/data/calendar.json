@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-05T07:57:19.040Z",
+  "generated_at": "2026-05-05T08:17:25.902Z",
   "timezone": "Asia/Kolkata",
   "events": [
     {
@@ -8,10 +8,10 @@
       "start": "2026-05-08T14:00:00Z",
       "day_key": "2026-05-08",
       "timezone": "Asia/Kolkata",
-      "location_name": "Big Bean Cafe",
-      "location_map_url": "https://maps.app.goo.gl/SN7w4itJnqGMP2Qw9",
+      "location_name": "Big Bean Cafe, HSR",
+      "location_map_url": "https://maps.app.goo.gl/T7xLc4NvQr9XgqiJ7",
       "location_warning": false,
-      "raw_location": "Big Bean Cafe\nBIG Bean Cafe\n1500, 19th Main Road, Sector 1, HSR Layout, Bengaluru, 560102, Karnataka, India"
+      "raw_location": "Big Bean Cafe, HSR\nBIG Bean Cafe\n1500, 19th Main Road, Sector 1, HSR Layout, Bengaluru, 560102, Karnataka, India"
     }
   ]
 }
