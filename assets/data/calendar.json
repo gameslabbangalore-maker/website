@@ -1,17 +1,5 @@
 {
-  "generated_at": "2026-05-12T07:50:36.469Z",
+  "generated_at": "2026-05-14T15:52:12.307Z",
   "timezone": "Asia/Kolkata",
-  "events": [
-    {
-      "title": "Murder Mystery",
-      "slug": "murder-mystery",
-      "start": "2026-05-15T14:00:00Z",
-      "day_key": "2026-05-15",
-      "timezone": "Asia/Kolkata",
-      "location_name": "Big Bean Cafe",
-      "location_map_url": "https://maps.app.goo.gl/SN7w4itJnqGMP2Qw9",
-      "location_warning": false,
-      "raw_location": "Big Bean Cafe, Koramangala \nBIG Bean Cafe\n29, 80 Feet Road, Block 4, Koramangala, Bengaluru, 560034, Karnataka, India"
-    }
-  ]
+  "events": []
 }
