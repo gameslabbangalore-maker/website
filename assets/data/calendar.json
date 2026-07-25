@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-07-16T12:22:49.783Z",
+  "generated_at": "2026-07-25T12:57:39.805Z",
   "timezone": "Asia/Kolkata",
   "events": [
     {
       "title": "Night of Mafias !",
       "slug": "night-of-mafias",
-      "start": "2026-07-24T14:00:00Z",
-      "day_key": "2026-07-24",
+      "start": "2026-08-07T14:00:00Z",
+      "day_key": "2026-08-07",
       "timezone": "Asia/Kolkata",
       "location_name": "Big Bean Cafe",
       "location_map_url": "https://maps.app.goo.gl/SN7w4itJnqGMP2Qw9",
