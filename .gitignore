@@ -1,0 +1,11 @@
+_site/
+.jekyll-cache/
+.jekyll-metadata
+.sass-cache/
+node_modules/
+vendor/bundle/
+.bundle/
+.DS_Store
+
+# Local Jekyll overrides (points ticketing at localhost). Never commit.
+_config.dev.yml

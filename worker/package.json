@@ -1,0 +1,25 @@
+{
+  "name": "gameslab-ticketing-worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx wrangler dev",
+    "deploy": "npx wrangler deploy",
+    "migrate:local": "npx wrangler d1 migrations apply gameslab-ticketing --local",
+    "migrate:remote": "npx wrangler d1 migrations apply gameslab-ticketing --remote",
+    "seed:local": "npx wrangler d1 execute gameslab-ticketing --local --file=./seed/events.sql",
+    "seed:remote": "npx wrangler d1 execute gameslab-ticketing --remote --file=./seed/events.sql",
+    "test": "npm run test:signature && npm run test:hold",
+    "test:signature": "node test/verify-signature.mjs",
+    "test:hold": "python3 test/seat-hold.test.py",
+    "webhook:sign": "node test/sign-webhook.mjs",
+    "tail": "npx wrangler tail",
+    "pay:latest": "bash test/pay-latest.sh"
+  },
+  "devDependencies": {
+    "wrangler": "^4.114.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

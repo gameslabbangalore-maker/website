@@ -1,0 +1,38 @@
+name: Sync event defaults
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '_events/**'
+      - 'scripts/sync-event-defaults.mjs'
+      - '.github/workflows/sync-event-defaults.yml'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check secrets are configured
+        env:
+          API: ${{ secrets.TICKETING_API_BASE }}
+          TOKEN: ${{ secrets.TICKETING_ADMIN_TOKEN }}
+        run: |
+          if [ -z "$API" ] || [ -z "$TOKEN" ]; then
+            echo "::error::TICKETING_API_BASE and TICKETING_ADMIN_TOKEN must be set as repository secrets"
+            exit 1
+          fi
+
+      - name: Sync event defaults
+        env:
+          TICKETING_API_BASE: ${{ secrets.TICKETING_API_BASE }}
+          TICKETING_ADMIN_TOKEN: ${{ secrets.TICKETING_ADMIN_TOKEN }}
+        run: node scripts/sync-event-defaults.mjs

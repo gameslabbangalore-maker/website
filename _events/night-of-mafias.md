@@ -1,6 +1,8 @@
 ---
 title: "Night of Mafias !"
 slug: night-of-mafias
+price: 350
+capacity: 30
 
 # Hero
 banner: "https://ik.imagekit.io/gameslab/Night_of_Mafias.png"

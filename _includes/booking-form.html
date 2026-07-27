@@ -1,0 +1,62 @@
+<form class="gl-book{% if include.compact %} gl-book--compact{% endif %}" data-gl-book novalidate>
+  {% if include.heading %}
+    <h3 class="gl-book__title">{{ include.heading }}</h3>
+  {% endif %}
+
+  <div class="book-field">
+    <label>Full name
+      <input data-gl-field="name" type="text" autocomplete="name"
+             required minlength="2" maxlength="80" placeholder="Ananya Rao" />
+    </label>
+    <p class="book-error" data-gl-error="name" hidden></p>
+  </div>
+
+  <div class="book-field">
+    <label>Email
+      <input data-gl-field="email" type="email" autocomplete="email"
+             inputmode="email" required maxlength="160" placeholder="you@example.com" />
+    </label>
+    <p class="book-hint">Your ticket is sent here.</p>
+    <p class="book-error" data-gl-error="email" hidden></p>
+  </div>
+
+  <div class="book-field">
+    <label>Mobile number
+      <span class="book-phone">
+        <span class="book-phone-cc" aria-hidden="true">+91</span>
+        <input data-gl-field="phone" type="tel" autocomplete="tel-national"
+               inputmode="numeric" required maxlength="13" placeholder="98765 43210" />
+      </span>
+    </label>
+    <p class="book-error" data-gl-error="phone" hidden></p>
+  </div>
+
+  <div class="book-field">
+    <label>Number of tickets
+      <span class="book-stepper">
+        <button type="button" class="book-step" data-gl-step="-1" aria-label="One ticket fewer">&minus;</button>
+        <input data-gl-field="qty" type="number" value="1" min="1" max="10"
+               step="1" inputmode="numeric" required />
+        <button type="button" class="book-step" data-gl-step="1" aria-label="One more ticket">+</button>
+      </span>
+    </label>
+    <p class="book-error" data-gl-error="qty" hidden></p>
+  </div>
+
+  <div class="book-total">
+    <span>Total</span>
+    <strong data-gl-total>—</strong>
+  </div>
+
+  <button class="book-btn book-pay" type="submit" data-gl-pay>
+    <span data-gl-pay-label>Pay securely</span>
+  </button>
+
+  <button class="gl-book__cancel" type="button" data-gl-cancel hidden>Back</button>
+
+  <p class="book-error book-error--form" data-gl-form-error role="alert" hidden></p>
+
+  <p class="book-legal">
+    Payments are processed by Razorpay. Games Lab never sees your card or UPI details.
+  </p>
+</form>

@@ -1,6 +1,8 @@
 ---
 title: "Game, Set, Switch !"
 slug: game-set-switch
+price: 500
+capacity: 20
 
 # Hero
 banner: "https://ik.imagekit.io/gameslab/Tennis.png"

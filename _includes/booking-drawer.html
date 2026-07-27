@@ -1,0 +1,25 @@
+<div class="book-drawer" id="bookDrawer" hidden aria-hidden="true">
+  <div class="book-drawer__backdrop" data-drawer-close></div>
+
+  <div class="book-drawer__sheet" role="dialog" aria-modal="true"
+       aria-labelledby="bookDrawerTitle" tabindex="-1" id="bookDrawerSheet">
+    <div class="book-drawer__grabber" aria-hidden="true"></div>
+
+    <header class="book-drawer__head">
+      <div class="book-drawer__headings">
+        <h2 class="book-drawer__title" id="bookDrawerTitle">Book your seats</h2>
+        <p class="book-drawer__meta" id="bookDrawerMeta"></p>
+      </div>
+      <button class="book-drawer__close" type="button" data-drawer-close
+              aria-label="Close booking form">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path fill="currentColor" d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.4l-6.3 6.3-1.41-1.42L9.17 12 2.88 5.71 4.29 4.29l6.3 6.3 6.3-6.3z"/>
+        </svg>
+      </button>
+    </header>
+
+    <div class="book-drawer__body">
+      {% include booking-form.html %}
+    </div>
+  </div>
+</div>

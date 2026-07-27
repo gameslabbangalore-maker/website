@@ -9,34 +9,48 @@
     <h3 id="scheduleHeading" hidden>Schedule</h3>
     <!-- schedule block toggled by JS -->
     <div id="scheduleBlock" hidden>
-      <div class="schedule-list">
-        <div class="schedule-row">
-          <div class="when" id="scWhen">—</div>
-          <a id="scAddCal" class="inline-link" href="#" download>Add to Calendar</a>
-        </div>
-        <div class="schedule-row">
-          <div class="where" id="scWhere">—</div>
-          <a id="scDir" class="inline-link" href="#" target="_blank" rel="noopener">Get directions</a>
+      <div class="sched-flip" id="schedFlip">
+        <div class="sched-flip__inner" id="schedFlipInner">
+
+          <section class="sched-flip__face sched-flip__front" id="schedFront">
+            <div class="schedule-list">
+              <div class="schedule-row">
+                <div class="when" id="scWhen">—</div>
+                <a id="scAddCal" class="inline-link" href="#" download>Add to Calendar</a>
+              </div>
+              <div class="schedule-row">
+                <div class="where" id="scWhere">—</div>
+                <a id="scDir" class="inline-link" href="#" target="_blank" rel="noopener">Get directions</a>
+              </div>
+            </div>
+            <a id="scBook" class="btn btn-primary wide-cta" href="#" target="_blank" rel="noopener">Book Now</a>
+          </section>
+
+          <section class="sched-flip__face sched-flip__back" id="schedBack" aria-hidden="true" inert>
+            {% include booking-form.html compact=true heading="Your details" %}
+          </section>
+
         </div>
       </div>
-      <a id="scBook" class="btn btn-primary wide-cta" href="#" target="_blank" rel="noopener">Book Now</a>
-      <div class="row-div" aria-hidden="true"></div>
+      <div class="row-div" id="scheduleDivider" aria-hidden="true"></div>
     </div>
 
-    <h3>Highlights</h3>
-    <div class="facts" id="factsList">
-      <div class="fact"><span class="label">Format</span><span>{{ page.highlights.format | default: 'Social deduction' }}</span></div>
-      <div class="fact"><span class="label">Duration</span><span>{{ page.highlights.duration | default: '3–4 hours' }}</span></div>
-      <div class="fact"><span class="label">Group size</span><span>{{ page.highlights.group_size | default: '8–25 players' }}</span></div>
-      <div class="fact"><span class="label">Difficulty</span><span>{{ page.highlights.difficulty | default: 'Beginner-friendly' }}</span></div>
-      <div class="fact"><span class="label">Age</span><span>{{ page.highlights.age | default: '14+' }}</span></div>
-    </div>
+    <div class="info-card__extras" id="cardExtras">
+      <h3>Highlights</h3>
+      <div class="facts" id="factsList">
+        <div class="fact"><span class="label">Format</span><span>{{ page.highlights.format | default: 'Social deduction' }}</span></div>
+        <div class="fact"><span class="label">Duration</span><span>{{ page.highlights.duration | default: '3–4 hours' }}</span></div>
+        <div class="fact"><span class="label">Group size</span><span>{{ page.highlights.group_size | default: '8–25 players' }}</span></div>
+        <div class="fact"><span class="label">Difficulty</span><span>{{ page.highlights.difficulty | default: 'Beginner-friendly' }}</span></div>
+        <div class="fact"><span class="label">Age</span><span>{{ page.highlights.age | default: '14+' }}</span></div>
+      </div>
 
-    <div class="share-row">
-      <button class="btn" id="shareBtnSide" aria-label="Share this event">
-        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7a3.27 3.27 0 000-1.39l7.02-4.11A2.99 2.99 0 0018 7.91a3 3 0 10-2.82-4H15a3 3 0 00.04 1.5l-7.02 4.11a3 3 0 10.01 4.96l7.02 4.11A3 3 0 1018 16.09z"/></svg>
-        <span>Share</span>
-      </button>
+      <div class="share-row">
+        <button class="btn" id="shareBtnSide" aria-label="Share this event">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7a3.27 3.27 0 000-1.39l7.02-4.11A2.99 2.99 0 0018 7.91a3 3 0 10-2.82-4H15a3 3 0 00.04 1.5l-7.02 4.11a3 3 0 10.01 4.96l7.02 4.11A3 3 0 1018 16.09z"/></svg>
+          <span>Share</span>
+        </button>
+      </div>
     </div>
   </div>
 </aside>

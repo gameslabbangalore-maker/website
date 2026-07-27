@@ -1,6 +1,8 @@
 ---
 title: "Trivia Takedown"
 slug: trivia-takedown
+price: 250
+capacity: 30
 
 # Hero
 banner: "https://ik.imagekit.io/gameslab/Trivia_Takedown_3.png"

@@ -1,6 +1,8 @@
 ---
 title: "Party Games Night"
 slug: party-games-night
+price: 400
+capacity: 30
 
 # Hero
 banner: "https://ik.imagekit.io/gameslab/Party_Games_Night.png"
