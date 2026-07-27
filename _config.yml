@@ -74,7 +74,7 @@ exclude:
   - worker/
 
 ticketing:
-  enabled: false
+  enabled: true
   api_base: "https://gameslab-ticketing.gameslab-events.workers.dev"
 
 # ---- Kramdown (Markdown engine) tweaks ----

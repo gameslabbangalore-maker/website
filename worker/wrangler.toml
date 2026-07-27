@@ -13,7 +13,7 @@ database_id = "12713527-2751-4bc6-ad84-a6c67ba08d6c"
 
 [vars]
 CALENDAR_ICS_URL = "https://calendar.google.com/calendar/ical/gameslab.bangalore%40gmail.com/public/basic.ics"
-SITE_ORIGIN = "https://gameslab.co.in,https://www.gameslab.co.in,http://localhost:4000"
+SITE_ORIGIN = "https://gameslab.co.in,https://www.gameslab.co.in"
 TIMEZONE = "Asia/Kolkata"
 HOLD_MINUTES = "10"
 MAX_QTY_PER_BOOKING = "10"
