@@ -1,0 +1,66 @@
+---
+layout: null
+title: Book your seats
+permalink: /book/
+seo_description: Reserve your seats for an upcoming Games Lab event.
+og_image: /assets/images/Logo.jpg
+sitemap: false
+robots: noindex, nofollow
+---
+<!doctype html>
+<html lang="en">
+<head>
+  {% include head.html %}
+  <link rel="stylesheet" href="{{ '/assets/css/book.css' | relative_url }}">
+</head>
+<body class="book-page">
+  {% include topbar-bleed.html %}
+  {% include header.html %}
+
+  <main id="main" class="wrap book-main" role="main">
+    <h1 class="sr-only">Book your seats</h1>
+
+    <section id="bookLoading" class="book-state" aria-live="polite">
+      <div class="book-spinner" aria-hidden="true"></div>
+      <p>Checking availability…</p>
+    </section>
+
+    <section id="bookUnavailable" class="book-state" hidden>
+      <h2 id="bookUnavailableTitle">This event isn’t open for booking</h2>
+      <p id="bookUnavailableBody" class="book-muted"></p>
+      <a class="book-btn" href="{{ '/' | relative_url }}">See all upcoming events</a>
+    </section>
+
+    <section id="bookForm" class="book-grid" hidden>
+      <div class="book-summary" aria-labelledby="bookEventTitle">
+        <p class="book-eyebrow">YOU’RE BOOKING</p>
+        <h2 id="bookEventTitle" class="book-title"></h2>
+        <dl class="book-facts">
+          <div><dt>When</dt><dd id="bookWhen">—</dd></div>
+          <div><dt>Where</dt><dd id="bookWhere">—</dd></div>
+          <div><dt>Price</dt><dd id="bookPrice">—</dd></div>
+        </dl>
+        <p id="bookScarcity" class="book-scarcity" hidden></p>
+        <a id="bookDirections" class="book-inline-link" href="#" target="_blank" rel="noopener" hidden>Get directions</a>
+      </div>
+
+      <div class="book-card">
+        {% include booking-form.html heading="Your details" %}
+      </div>
+    </section>
+  </main>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    window.__TICKETING__ = {
+      apiBase: {{ site.ticketing.api_base | default: '' | jsonify }},
+      enabled: {{ site.ticketing.enabled | default: false | jsonify }},
+      timezone: {{ site.timezone | default: 'Asia/Kolkata' | jsonify }},
+      ticketPath: {{ '/ticket/' | relative_url | jsonify }},
+      calendarPath: {{ '/assets/data/calendar.json' | relative_url | jsonify }}
+    };
+  </script>
+  <script src="{{ '/assets/js/booking-core.js' | relative_url }}"></script>
+  <script src="{{ '/assets/js/book.js' | relative_url }}"></script>
+</body>
+</html>

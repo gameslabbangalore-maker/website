@@ -1,6 +1,8 @@
 ---
 title: "Board Game Night"
 slug: board-game-night
+price: 300
+capacity: 30
 
 # Hero
 banner: "https://ik.imagekit.io/gameslab/Board_Game_Night_3.png"

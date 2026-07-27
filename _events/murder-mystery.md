@@ -1,6 +1,8 @@
 ---
 title: "Murder Mystery"
 slug: murder-mystery
+price: 500
+capacity: 20
 
 # Hero
 banner: "https://ik.imagekit.io/gameslab/Murder_Mystery.png"

@@ -64,6 +64,18 @@ exclude:
   - .github/
   - .vscode/
   - .idea/
+  # Local Jekyll toolchain (GitHub Pages ignores these already; needed so a
+  # local `bundle install --path vendor/bundle` isn't treated as site content).
+  - vendor/
+  - .bundle/
+  - Gemfile
+  - Gemfile.lock
+  - scripts/
+  - worker/
+
+ticketing:
+  enabled: false
+  api_base: "https://gameslab-ticketing.gameslab-events.workers.dev"
 
 # ---- Kramdown (Markdown engine) tweaks ----
 kramdown:

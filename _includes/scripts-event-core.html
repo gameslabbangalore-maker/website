@@ -131,6 +131,14 @@
   };
 
   const fallbackTicket = {{ page.ticket_link | jsonify }} || '';
+
+  const TICKETING = {
+    enabled: {{ site.ticketing.enabled | default: false | jsonify }},
+    apiBase: String({{ site.ticketing.api_base | default: '' | jsonify }} || '').replace(/\/+$/, ''),
+    bookPath: {{ '/book/' | relative_url | jsonify }},
+    ticketPath: {{ '/ticket/' | relative_url | jsonify }}
+  };
+
   const dFormat = "{{ page.highlights.format | default: '' | escape }}";
   const dDuration = "{{ page.highlights.duration | default: '' | escape }}";
   const dGroup = "{{ page.highlights.group_size | default: '' | escape }}";
@@ -185,7 +193,23 @@
   const locationUrl = match?.location_map_url || '';
   const timeStr = scheduleDate ? fmtTime(scheduleDate, timezone) : '';
   const whenText = scheduleDate ? fmtDateOnly(scheduleDate, timezone) : '';
-  const ticket = fallbackTicket;
+
+  const occurrenceSlug = normalizeSlug(match?.slug || match?.title || PAGE_SLUG);
+  const occurrenceDay = (match?.day_key || eventDayKey || '').replace(/-/g, '');
+  const occurrenceId = (occurrenceSlug && occurrenceDay) ? (occurrenceSlug + '-' + occurrenceDay) : '';
+
+  const useInHouse = Boolean(TICKETING.enabled && TICKETING.apiBase && occurrenceId);
+  const ticket = useInHouse
+    ? (TICKETING.bookPath + '?o=' + encodeURIComponent(occurrenceId))
+    : fallbackTicket;
+
+  if (useInHouse){
+    [scBook, fabBook].forEach(el => {
+      if (!el) return;
+      el.setAttribute('target', '_self');
+      el.removeAttribute('rel');
+    });
+  }
 
   if (M.title) M.title.textContent = titleFallback;
 
@@ -273,6 +297,292 @@
     if (M.L3){ M.L3.textContent = ''; }
     assignText(M.R3, '');
     M.line3?.setAttribute('hidden','');
+  }
+
+  if (useInHouse && isUpcoming){
+    (async function(){
+      const DESKTOP_MIN = 960;
+      const flip      = document.getElementById('schedFlip');
+      const flipInner = document.getElementById('schedFlipInner');
+      const frontFace = document.getElementById('schedFront');
+      const backFace  = document.getElementById('schedBack');
+      const bookForm  = backFace ? backFace.querySelector('[data-gl-book]') : null;
+
+      const cardExtras = document.getElementById('cardExtras');
+      const schedDivider = document.getElementById('scheduleDivider');
+
+      const isDesktop = () => window.innerWidth >= DESKTOP_MIN;
+      const canFlip = Boolean(flip && flipInner && frontFace && backFace && bookForm && window.GLBooking);
+
+      function setExtrasCollapsed(collapsed){
+        [cardExtras, schedDivider].forEach(el => {
+          if (!el) return;
+          if (collapsed){
+            if (el === cardExtras) el.style.maxHeight = el.scrollHeight + 'px';
+            void el.offsetHeight;
+            el.setAttribute('data-collapsed', '');
+          } else {
+            el.removeAttribute('data-collapsed');
+            if (el === cardExtras){
+              el.style.maxHeight = el.scrollHeight + 'px';
+              setTimeout(() => {
+                if (!el.hasAttribute('data-collapsed')) el.style.maxHeight = 'none';
+              }, 520);
+            }
+          }
+        });
+      }
+
+      let occ = null;
+      let mounted = null;
+      let flipped = false;
+
+      function faceHeight(face){
+        return Math.ceil(face.getBoundingClientRect().height);
+      }
+
+      function syncHeight(animate){
+        if (!flipInner) return;
+        const target = flipped ? backFace : frontFace;
+        const to = faceHeight(target);
+        if (!to) return;
+        if (!animate){
+          flipInner.style.height = to + 'px';
+          return;
+        }
+        const from = flipInner.offsetHeight;
+        flipInner.style.height = from + 'px';
+        void flipInner.offsetHeight;
+        flipInner.style.height = to + 'px';
+      }
+
+      function watchFaces(){
+        if (typeof ResizeObserver === 'undefined') return;
+        let raf = null;
+        const observer = new ResizeObserver(() => {
+          if (raf) cancelAnimationFrame(raf);
+          raf = requestAnimationFrame(() => syncHeight(false));
+        });
+        observer.observe(frontFace);
+        observer.observe(backFace);
+      }
+
+      function setFaceActive(face, active){
+        if (!face) return;
+        face.setAttribute('aria-hidden', active ? 'false' : 'true');
+        if (active) face.removeAttribute('inert');
+        else face.setAttribute('inert', '');
+      }
+
+      function showForm(){
+        if (!canFlip) return false;
+        flipped = true;
+        flip.classList.add('is-flipped');
+        setFaceActive(frontFace, false);
+        setFaceActive(backFace, true);
+        setExtrasCollapsed(true);
+        if (scHeading) scHeading.setAttribute('hidden', '');
+        syncHeight(true);
+
+        if (!mounted){
+          mounted = window.GLBooking.mount(bookForm, {
+            api: TICKETING.apiBase,
+            occurrence: occ,
+            timezone: timezone,
+            ticketPath: TICKETING.ticketPath,
+            onCancel: showSchedule,
+            onResize: () => { if (flipped) syncHeight(true); },
+            onSoldOut: () => { markSoldOut(); showSchedule(); }
+          });
+        } else {
+          mounted.setOccurrence(occ);
+        }
+
+        setTimeout(() => { if (flipped && mounted) mounted.focus(); }, 380);
+        return true;
+      }
+
+      function showSchedule(){
+        if (!canFlip) return;
+        flipped = false;
+        flip.classList.remove('is-flipped');
+        setFaceActive(backFace, false);
+        setFaceActive(frontFace, true);
+        setExtrasCollapsed(false);
+        if (scHeading) scHeading.removeAttribute('hidden');
+        syncHeight(true);
+        if (scBook) scBook.focus();
+      }
+
+      const drawer      = document.getElementById('bookDrawer');
+      const drawerSheet = document.getElementById('bookDrawerSheet');
+      const drawerMeta  = document.getElementById('bookDrawerMeta');
+      const drawerForm  = drawer ? drawer.querySelector('[data-gl-book]') : null;
+      const canDrawer   = Boolean(drawer && drawerSheet && drawerForm && window.GLBooking);
+
+      let drawerMounted = null;
+      let drawerOpen = false;
+      let lastFocus = null;
+
+      function openDrawer(){
+        if (!canDrawer || drawerOpen) return false;
+        lastFocus = document.activeElement;
+        drawerOpen = true;
+
+        drawer.hidden = false;
+        drawer.setAttribute('aria-hidden', 'false');
+        void drawer.offsetHeight;
+        drawer.classList.add('is-open');
+        document.documentElement.classList.add('book-drawer-open');
+
+        if (!drawerMounted){
+          drawerMounted = window.GLBooking.mount(drawerForm, {
+            api: TICKETING.apiBase,
+            occurrence: occ,
+            timezone: timezone,
+            ticketPath: TICKETING.ticketPath,
+            onSoldOut: () => { markSoldOut(); closeDrawer(); }
+          });
+        } else {
+          drawerMounted.setOccurrence(occ);
+        }
+
+        drawerSheet.focus({ preventScroll: true });
+        return true;
+      }
+
+      function closeDrawer(){
+        if (!canDrawer || !drawerOpen) return;
+        drawerOpen = false;
+        drawer.classList.remove('is-open');
+        drawer.setAttribute('aria-hidden', 'true');
+        document.documentElement.classList.remove('book-drawer-open');
+
+        setTimeout(() => {
+          if (!drawerOpen) drawer.hidden = true;
+        }, 380);
+
+        if (lastFocus && typeof lastFocus.focus === 'function'){
+          lastFocus.focus({ preventScroll: true });
+        }
+      }
+
+      function trapFocus(e){
+        if (!drawerOpen || e.key !== 'Tab') return;
+        const focusables = drawerSheet.querySelectorAll(
+          'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusables.length) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first){
+          e.preventDefault(); last.focus();
+        } else if (!e.shiftKey && document.activeElement === last){
+          e.preventDefault(); first.focus();
+        }
+      }
+
+      function markSoldOut(){
+        [scBook, fabBook].forEach(el => {
+          if (!el) return;
+          el.textContent = 'Sold out';
+          el.setAttribute('aria-disabled','true');
+          el.removeAttribute('href');
+          el.style.opacity = '.6';
+          el.style.pointerEvents = 'none';
+        });
+      }
+
+      try {
+        const res = await fetch(TICKETING.apiBase + '/api/occurrences/' + encodeURIComponent(occurrenceId), { cache:'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        occ = data && data.occurrence;
+        if (!occ) return;
+
+        const priceText = occ.price_paise > 0
+          ? '₹' + (occ.price_paise / 100).toLocaleString('en-IN')
+          : '';
+
+        if (priceText){
+          assignText(M.R2, priceText);
+          M.line2?.removeAttribute('hidden');
+        }
+
+        const soldOut = !occ.on_sale || Number(occ.available) <= 0;
+        if (soldOut){
+          markSoldOut();
+        } else if (priceText){
+          [scBook, fabBook].forEach(el => {
+            if (el) el.textContent = 'Book Now · ' + priceText;
+          });
+        }
+
+        const left = Number(occ.available) || 0;
+        if (!soldOut && left > 0 && left <= 6 && scWhere){
+          const note = document.createElement('span');
+          note.textContent = '  ·  only ' + left + ' left';
+          note.style.color = 'var(--accent)';
+          note.style.fontWeight = '700';
+          scWhere.appendChild(note);
+        }
+
+        const isPlainClick = (e) =>
+          !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && e.button === 0;
+
+        if (!soldOut && canFlip){
+          setFaceActive(backFace, false);
+          setFaceActive(frontFace, true);
+          syncHeight(false);
+          watchFaces();
+
+          if (document.fonts && document.fonts.ready){
+            document.fonts.ready.then(() => syncHeight(false));
+          }
+
+          scBook?.addEventListener('click', (e) => {
+            if (!isDesktop() || !isPlainClick(e)) return;
+            if (showForm()) e.preventDefault();
+          });
+
+          let hTimer = null;
+          window.addEventListener('resize', () => {
+            if (hTimer) clearTimeout(hTimer);
+            hTimer = setTimeout(() => syncHeight(false), 150);
+          });
+        }
+
+        if (!soldOut && canDrawer){
+          fabBook?.addEventListener('click', (e) => {
+            if (isDesktop() || !isPlainClick(e)) return;
+            if (openDrawer()) e.preventDefault();
+          });
+
+          drawer.querySelectorAll('[data-drawer-close]').forEach((el) => {
+            el.addEventListener('click', closeDrawer);
+          });
+
+          if (drawerMeta){
+            const bits = [];
+            if (whenText) bits.push(whenText + (timeStr ? ' · ' + timeStr : ''));
+            if (locationText) bits.push(locationText);
+            if (occ.price_paise > 0) bits.push('₹' + (occ.price_paise / 100).toLocaleString('en-IN') + ' per ticket');
+            drawerMeta.textContent = bits.join('  ·  ');
+          }
+
+          window.addEventListener('keydown', trapFocus);
+        }
+
+        window.addEventListener('keydown', (e) => {
+          if (e.key !== 'Escape') return;
+          if (drawerOpen) closeDrawer();
+          else if (flipped) showSchedule();
+        });
+
+        requestAnimationFrame(updateFabSpacing);
+      } catch (e) {
+      }
+    })();
   }
 
   (function(){

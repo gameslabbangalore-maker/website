@@ -1,0 +1,103 @@
+---
+layout: null
+title: Your ticket
+permalink: /ticket/
+seo_description: Your Games Lab ticket details.
+og_image: /assets/images/Logo.jpg
+sitemap: false
+robots: noindex, nofollow
+---
+<!doctype html>
+<html lang="en">
+<head>
+  {% include head.html %}
+  <link rel="stylesheet" href="{{ '/assets/css/book.css' | relative_url }}">
+</head>
+<body class="book-page">
+  {% include topbar-bleed.html %}
+  {% include header.html %}
+
+  <main id="main" class="wrap book-main" role="main">
+    <h1 class="sr-only">Your ticket</h1>
+    <div class="ticket-wrap">
+
+      <section id="ticketPending" class="book-state" aria-live="polite">
+        <div class="book-spinner" aria-hidden="true"></div>
+        <h2>Confirming your payment…</h2>
+        <p class="book-muted">
+          This usually takes a few seconds. Please don’t close this page.
+        </p>
+      </section>
+
+      <section id="ticketConfirmed" class="ticket-card" hidden>
+        <span class="ticket-badge">CONFIRMED</span>
+        <h2 class="ticket-heading">You’re in 🎉</h2>
+        <p id="ticketEvent" class="ticket-event"></p>
+
+        <dl class="ticket-facts">
+          <div><dt>When</dt><dd id="ticketWhen">—</dd></div>
+          <div><dt>Where</dt><dd id="ticketWhere">—</dd></div>
+          <div><dt>Name</dt><dd id="ticketName">—</dd></div>
+          <div><dt>Tickets</dt><dd id="ticketQty">—</dd></div>
+          <div><dt>Paid</dt><dd id="ticketPaid">—</dd></div>
+        </dl>
+
+        <p class="book-muted" style="margin-bottom:10px">Show this at the door:</p>
+        <ul id="ticketCodes" class="ticket-codes"></ul>
+
+        <div class="ticket-actions">
+          <a id="ticketDirections" class="book-btn" href="#" target="_blank" rel="noopener" hidden>Get directions</a>
+          <a id="ticketAddCal" class="book-btn" href="#" hidden>Add to calendar</a>
+          <button id="ticketPrint" class="book-btn" type="button">Save / print</button>
+        </div>
+
+        <p class="ticket-note" id="ticketEmailNote"></p>
+      </section>
+
+      <section id="ticketFailed" class="book-state" hidden>
+        <h2 id="ticketFailedTitle">Payment didn’t go through</h2>
+        <p id="ticketFailedBody" class="book-muted"></p>
+        <div class="ticket-actions">
+          <a id="ticketRetry" class="book-btn" href="{{ '/' | relative_url }}">Try booking again</a>
+          <a class="book-btn" href="https://wa.me/917676099857" target="_blank" rel="noopener">WhatsApp us</a>
+        </div>
+      </section>
+
+      <section id="ticketMissing" class="book-state" hidden>
+        <h2>We can’t find that ticket</h2>
+        <p class="book-muted">
+          This link looks incomplete. If you’ve paid and haven’t received your ticket,
+          message us and we’ll sort it out right away.
+        </p>
+        <div class="ticket-actions">
+          <a class="book-btn" href="https://wa.me/917676099857" target="_blank" rel="noopener">WhatsApp us</a>
+          <a class="book-btn" href="{{ '/' | relative_url }}">Back to events</a>
+        </div>
+      </section>
+
+      <section id="ticketSlow" class="book-state" hidden>
+        <h2>Still confirming</h2>
+        <p class="book-muted">
+          Your payment is taking longer than usual to confirm. If money has left your
+          account, your seat is safe — we’ll email your ticket shortly. Keep this link:
+        </p>
+        <p id="ticketSlowLink" class="book-muted" style="word-break:break-all;font-size:12.5px"></p>
+        <div class="ticket-actions">
+          <button id="ticketRecheck" class="book-btn" type="button">Check again</button>
+          <a class="book-btn" href="https://wa.me/917676099857" target="_blank" rel="noopener">WhatsApp us</a>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    window.__TICKETING__ = {
+      apiBase: {{ site.ticketing.api_base | default: '' | jsonify }},
+      enabled: {{ site.ticketing.enabled | default: false | jsonify }},
+      timezone: {{ site.timezone | default: 'Asia/Kolkata' | jsonify }}
+    };
+  </script>
+  <script src="{{ '/assets/js/ticket.js' | relative_url }}"></script>
+</body>
+</html>

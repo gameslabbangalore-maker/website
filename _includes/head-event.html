@@ -36,15 +36,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
 
 <!-- CSP tuned for events (images, calendar JSON, YouTube) -->
+{% assign ticket_api = site.ticketing.api_base | default: '' %}
 <meta http-equiv="Content-Security-Policy"
 content="
   default-src 'self';
-  img-src 'self' https://ik.imagekit.io https://via.placeholder.com data:;
-  script-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline';
+  img-src 'self' https://ik.imagekit.io https://via.placeholder.com
+          https://cdn.razorpay.com https://*.rzp.io data:;
+  script-src 'self' https://cdnjs.cloudflare.com https://checkout.razorpay.com 'unsafe-inline';
   style-src  'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src   https://fonts.gstatic.com data:;
-  connect-src 'self' https://docs.google.com https://*.googleusercontent.com;
-  frame-src   https://www.youtube.com https://player.vimeo.com;
+  connect-src 'self' https://docs.google.com https://*.googleusercontent.com
+              https://api.razorpay.com https://lumberjack.razorpay.com
+              https://lumberjack-cx.razorpay.com{% if ticket_api != '' %}
+              {{ ticket_api }}{% endif %};
+  frame-src   https://www.youtube.com https://player.vimeo.com
+              https://api.razorpay.com https://checkout.razorpay.com;
   object-src 'none';
   base-uri 'self';
 ">
+
+<link rel="stylesheet" href="{{ '/assets/css/book.css' | relative_url }}">
