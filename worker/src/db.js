@@ -40,6 +40,34 @@ export async function listAvailability(db, now) {
   return results || [];
 }
 
+/**
+ * Every upcoming date with its seat maths broken out, for the staff dashboard.
+ * `sold` counts paid seats, `held` counts live (unexpired) pending holds.
+ */
+export async function listOccurrencesForStaff(db, now) {
+  const { results } = await db
+    .prepare(
+      `SELECT o.id, o.event_slug, o.starts_at_utc, o.timezone, o.venue_name,
+              o.venue_map_url, o.capacity, o.price_paise, o.status,
+              e.title AS event_title,
+              COALESCE((SELECT SUM(b.qty) FROM bookings b
+                         WHERE b.occurrence_id = o.id AND b.status = 'paid'), 0) AS sold,
+              COALESCE((SELECT SUM(b.qty) FROM bookings b
+                         WHERE b.occurrence_id = o.id AND b.status = 'pending'
+                           AND b.hold_expires_at > ?1), 0) AS held,
+              COALESCE((SELECT SUM(b.amount_paise) FROM bookings b
+                         WHERE b.occurrence_id = o.id AND b.status = 'paid'), 0) AS revenue_paise,
+              o.capacity - (${COMMITTED_SEATS}) AS available
+         FROM occurrences o
+         JOIN events e ON e.slug = o.event_slug
+        WHERE o.starts_at_utc >= ?1
+        ORDER BY o.starts_at_utc ASC`,
+    )
+    .bind(now)
+    .all();
+  return results || [];
+}
+
 export async function createHold(db, {
   id, token, occurrenceId, qty, name, email, phone, now, holdExpiresAt,
 }) {

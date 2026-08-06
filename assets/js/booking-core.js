@@ -46,6 +46,7 @@
     var ticketPath = opts.ticketPath || '/ticket/';
     var occurrence = opts.occurrence || null;
     var submitting = false;
+    var touched = false;
 
     var field = function (name) { return form.querySelector('[data-gl-field="' + name + '"]'); };
     var els = {
@@ -53,6 +54,7 @@
       email: field('email'),
       phone: field('phone'),
       qty: field('qty'),
+      seats: form.querySelector('[data-gl-seats]'),
       total: form.querySelector('[data-gl-total]'),
       pay: form.querySelector('[data-gl-pay]'),
       payLabel: form.querySelector('[data-gl-pay-label]'),
@@ -113,6 +115,22 @@
       return 'Pay ' + rupees(occurrence.price_paise * currentQty());
     }
 
+    function renderSeats() {
+      if (!els.seats) return;
+      var left = occurrence ? Math.max(0, Number(occurrence.available) || 0) : 0;
+      if (!occurrence || left <= 0) {
+        els.seats.textContent = '';
+        els.seats.hidden = true;
+        return;
+      }
+      var capacity = Number(occurrence.capacity) || 0;
+      els.seats.textContent = left === 1
+        ? 'Only 1 ticket left'
+        : left + (capacity ? ' of ' + capacity : '') + ' tickets left';
+      els.seats.hidden = false;
+      els.seats.classList.toggle('book-seats--low', left <= 6);
+    }
+
     function renderTotal() {
       if (!occurrence) return;
       var qty = currentQty();
@@ -122,6 +140,26 @@
       }
       if (els.total) els.total.textContent = rupees(occurrence.price_paise * qty);
       if (els.payLabel && !submitting) els.payLabel.textContent = defaultPayLabel();
+      renderSeats();
+    }
+
+    /**
+     * Start every booking from a blank slate. Bookings are frequently made for
+     * someone else, so a remembered name/email/phone is a liability. The
+     * deferred pass catches Chrome, which autofills after first paint.
+     */
+    function blankIdentityFields() {
+      if (touched) return;
+      ['name', 'email', 'phone'].forEach(function (key) {
+        if (els[key]) els[key].value = '';
+      });
+      if (els.qty) els.qty.value = '1';
+    }
+
+    function scheduleBlank() {
+      blankIdentityFields();
+      setTimeout(function () { blankIdentityFields(); renderTotal(); }, 0);
+      setTimeout(blankIdentityFields, 300);
     }
 
     function values() {
@@ -172,7 +210,15 @@
         description: (session.event && session.event.title) || 'Event ticket',
         image: 'https://ik.imagekit.io/gameslab/Games_Lab_Logo.png',
         prefill: session.prefill || {},
-        notes: { booking_id: session.booking_id },
+        // We already collected and validated these, so show them filled in and
+        // locked. This is also what puts the customer's name on the Razorpay
+        // payment record instead of leaving it blank.
+        readonly: { name: true, email: true, contact: true },
+        notes: {
+          booking_id: session.booking_id,
+          name: (session.prefill && session.prefill.name) || '',
+          tickets: String((session.event && session.event.qty) || '')
+        },
         theme: { color: '#0b6ea8' },
 
         handler: function (response) {
@@ -294,7 +340,22 @@
       els.qty.addEventListener('input', renderTotal);
       els.qty.addEventListener('change', renderTotal);
     }
+    ['name', 'email', 'phone'].forEach(function (key) {
+      if (!els[key]) return;
+      els[key].addEventListener('input', function () { touched = true; });
+      els[key].addEventListener('focus', function () { touched = true; });
+    });
     form.addEventListener('submit', submit);
+
+    scheduleBlank();
+    window.addEventListener('pageshow', function (event) {
+      // A bfcache restore (browser Back) hands the form back with its old
+      // values; treat that as a fresh booking too.
+      if (!event.persisted || submitting) return;
+      touched = false;
+      scheduleBlank();
+      renderTotal();
+    });
 
     if (els.cancel) {
       if (typeof opts.onCancel === 'function') {

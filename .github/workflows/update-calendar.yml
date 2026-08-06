@@ -1,6 +1,11 @@
 name: Update calendar feed
 
 on:
+  # The site reads dates from the committed calendar.json, so a new Google
+  # Calendar entry only becomes bookable once this has run. Keep it on a timer
+  # rather than relying on someone remembering to trigger it.
+  schedule:
+    - cron: '23 */6 * * *'
   workflow_dispatch:
 
 jobs:

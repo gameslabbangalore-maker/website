@@ -42,13 +42,14 @@ robots: noindex, nofollow
           <div><dt>Paid</dt><dd id="ticketPaid">—</dd></div>
         </dl>
 
-        <p class="book-muted" style="margin-bottom:10px">Show this at the door:</p>
+        <p class="book-muted" style="margin-bottom:10px">Show this QR at the event:</p>
         <ul id="ticketCodes" class="ticket-codes"></ul>
 
         <div class="ticket-actions">
-          <a id="ticketDirections" class="book-btn" href="#" target="_blank" rel="noopener" hidden>Get directions</a>
-          <a id="ticketAddCal" class="book-btn" href="#" hidden>Add to calendar</a>
-          <button id="ticketPrint" class="book-btn" type="button">Save / print</button>
+          <a id="ticketDirections" class="book-btn book-btn--ghost" href="#" target="_blank" rel="noopener" hidden>Get directions</a>
+          <a id="ticketAddCal" class="book-btn book-btn--ghost" href="#" hidden>Add to calendar</a>
+          <button id="ticketPrint" class="book-btn book-btn--ghost" type="button">Save / print</button>
+          <a class="book-btn" href="{{ '/' | relative_url }}">Back to home</a>
         </div>
 
         <p class="ticket-note" id="ticketEmailNote"></p>
@@ -84,7 +85,8 @@ robots: noindex, nofollow
         <p id="ticketSlowLink" class="book-muted" style="word-break:break-all;font-size:12.5px"></p>
         <div class="ticket-actions">
           <button id="ticketRecheck" class="book-btn" type="button">Check again</button>
-          <a class="book-btn" href="https://wa.me/917676099857" target="_blank" rel="noopener">WhatsApp us</a>
+          <a class="book-btn book-btn--ghost" href="https://wa.me/917676099857" target="_blank" rel="noopener">WhatsApp us</a>
+          <a class="book-btn book-btn--ghost" href="{{ '/' | relative_url }}">Back to home</a>
         </div>
       </section>
 

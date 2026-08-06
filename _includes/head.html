@@ -18,7 +18,8 @@ content="
            https://via.placeholder.com
            https://*.elfsightcdn.com
            https://cdn.razorpay.com
-           https://*.rzp.io
+           https://*.rzp.io{% if ticket_api != '' %}
+           {{ ticket_api }}{% endif %}
            data:;
   script-src 'self'
              https://*.elfsight.com

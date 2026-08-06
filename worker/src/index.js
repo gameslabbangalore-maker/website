@@ -3,6 +3,7 @@ import { createOrder, verifyWebhookSignature, verifyPaymentSignature } from './r
 import { bookingId, accessToken } from './ids.js';
 import { syncCalendar } from './calendar-sync.js';
 import { sendTicketEmail } from './email.js';
+import { qrSvg, qrPng } from './qr.js';
 
 const JSON_HEADERS = { 'Content-Type': 'application/json; charset=utf-8' };
 
@@ -114,6 +115,38 @@ async function handleOccurrence(env, request, id) {
   return json(env, request, { occurrence: publicOccurrence(row) });
 }
 
+/**
+ * Render a QR for a ticket code. Deliberately dumb: it draws whatever short
+ * payload it is handed, so the same URL works from the ticket page (SVG) and
+ * from the ticket email (PNG, because mail clients will not render SVG).
+ */
+function handleQr(env, request, url) {
+  const data = (url.searchParams.get('d') || '').trim();
+  if (!data || data.length > 96) {
+    return json(env, request, { error: 'bad_payload' }, 400);
+  }
+
+  const format = (url.searchParams.get('f') || 'svg').toLowerCase() === 'png' ? 'png' : 'svg';
+  const scale = Math.min(16, Math.max(2, Number(url.searchParams.get('s')) || 8));
+  const headers = {
+    'Cache-Control': 'public, max-age=31536000, immutable',
+    'Access-Control-Allow-Origin': '*',
+  };
+
+  try {
+    if (format === 'png') {
+      return new Response(qrPng(data, { scale }), {
+        headers: { ...headers, 'Content-Type': 'image/png' },
+      });
+    }
+    return new Response(qrSvg(data, { scale }), {
+      headers: { ...headers, 'Content-Type': 'image/svg+xml; charset=utf-8' },
+    });
+  } catch (err) {
+    return json(env, request, { error: 'qr_failed', detail: err.message }, 400);
+  }
+}
+
 async function handleBook(env, request) {
   let payload;
   try {
@@ -187,6 +220,12 @@ async function handleBook(env, request) {
         occurrence_id: booking.occurrence_id,
         event: occurrence.event_title,
         qty: String(booking.qty),
+        // Razorpay Checkout does not always collect a name, so carry the one we
+        // already validated into the order. It shows on the payment in the
+        // dashboard and in Razorpay's exports.
+        name: booking.name,
+        email: booking.email,
+        phone: booking.phone,
       },
     });
   } catch (err) {
@@ -294,7 +333,9 @@ async function handleWebhook(env, request) {
           const booking = await db.getBookingByToken(env.DB, result.booking.id, result.booking.access_token);
           const tickets = await db.listTickets(env.DB, result.booking.id);
           const ticketUrl = `${(env.SITE_ORIGIN || '').split(',')[0]}/ticket/?b=${result.booking.id}&t=${result.booking.access_token}`;
-          const emailStatus = await sendTicketEmail(env, { booking, tickets, ticketUrl });
+          const emailStatus = await sendTicketEmail(env, {
+            booking, tickets, ticketUrl, qrOrigin: new URL(request.url).origin,
+          });
           console.log(`booking ${result.booking.id} paid, ${tickets.length} tickets, email=${emailStatus}`);
         }
       }
@@ -397,6 +438,32 @@ async function handleEventDefaults(env, request) {
   return json(env, request, { ok: true, report }, 200, { 'Cache-Control': 'no-store' });
 }
 
+async function handleStaffOccurrences(env, request) {
+  if (!isStaff(env, request)) return json(env, request, { error: 'unauthorized' }, 401);
+
+  const rows = await db.listOccurrencesForStaff(env.DB, nowIso());
+
+  return json(env, request, {
+    generated_at: nowIso(),
+    occurrences: rows.map((row) => ({
+      id: row.id,
+      event_slug: row.event_slug,
+      title: row.event_title,
+      starts_at: row.starts_at_utc,
+      timezone: row.timezone,
+      venue_name: row.venue_name,
+      capacity: Number(row.capacity) || 0,
+      price_paise: Number(row.price_paise) || 0,
+      sold: Number(row.sold) || 0,
+      held: Number(row.held) || 0,
+      left: Math.max(0, Number(row.available) || 0),
+      revenue_paise: Number(row.revenue_paise) || 0,
+      status: row.status,
+      on_sale: row.status === 'open' && row.price_paise > 0 && Number(row.available) > 0,
+    })),
+  }, 200, { 'Cache-Control': 'no-store' });
+}
+
 async function handleAttendees(env, request, url) {
   if (!isStaff(env, request)) return json(env, request, { error: 'unauthorized' }, 401);
 
@@ -471,6 +538,14 @@ export default {
 
       if (pathname === '/api/confirm-hint' && request.method === 'POST') {
         return await handleConfirmHint(env, request);
+      }
+
+      if (pathname === '/api/qr' && request.method === 'GET') {
+        return handleQr(env, request, url);
+      }
+
+      if (pathname === '/api/admin/occurrences' && request.method === 'GET') {
+        return await handleStaffOccurrences(env, request);
       }
 
       if (pathname === '/api/admin/attendees' && request.method === 'GET') {

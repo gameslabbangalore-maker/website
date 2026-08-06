@@ -1,11 +1,17 @@
-<form class="gl-book{% if include.compact %} gl-book--compact{% endif %}" data-gl-book novalidate>
+{%- comment -%}
+  autocomplete is off on every field on purpose: each booking is usually for a
+  different person, so a browser-remembered name/email/phone is more often wrong
+  than right. booking-core.js also blanks the fields on mount.
+{%- endcomment -%}
+<form class="gl-book{% if include.compact %} gl-book--compact{% endif %}" data-gl-book novalidate
+      autocomplete="off">
   {% if include.heading %}
     <h3 class="gl-book__title">{{ include.heading }}</h3>
   {% endif %}
 
   <div class="book-field">
     <label>Full name
-      <input data-gl-field="name" type="text" autocomplete="name"
+      <input data-gl-field="name" type="text" autocomplete="off"
              required minlength="2" maxlength="80" placeholder="Ananya Rao" />
     </label>
     <p class="book-error" data-gl-error="name" hidden></p>
@@ -13,7 +19,7 @@
 
   <div class="book-field">
     <label>Email
-      <input data-gl-field="email" type="email" autocomplete="email"
+      <input data-gl-field="email" type="email" autocomplete="off"
              inputmode="email" required maxlength="160" placeholder="you@example.com" />
     </label>
     <p class="book-hint">Your ticket is sent here.</p>
@@ -24,7 +30,7 @@
     <label>Mobile number
       <span class="book-phone">
         <span class="book-phone-cc" aria-hidden="true">+91</span>
-        <input data-gl-field="phone" type="tel" autocomplete="tel-national"
+        <input data-gl-field="phone" type="tel" autocomplete="off"
                inputmode="numeric" required maxlength="13" placeholder="98765 43210" />
       </span>
     </label>
@@ -36,12 +42,14 @@
       <span class="book-stepper">
         <button type="button" class="book-step" data-gl-step="-1" aria-label="One ticket fewer">&minus;</button>
         <input data-gl-field="qty" type="number" value="1" min="1" max="10"
-               step="1" inputmode="numeric" required />
+               step="1" inputmode="numeric" autocomplete="off" required />
         <button type="button" class="book-step" data-gl-step="1" aria-label="One more ticket">+</button>
       </span>
     </label>
     <p class="book-error" data-gl-error="qty" hidden></p>
   </div>
+
+  <p class="book-seats" data-gl-seats hidden></p>
 
   <div class="book-total">
     <span>Total</span>

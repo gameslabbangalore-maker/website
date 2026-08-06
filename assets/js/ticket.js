@@ -94,13 +94,29 @@
       tickets.forEach(function (ticket, index) {
         var li = document.createElement('li');
         li.className = 'ticket-code';
-        if (tickets.length > 1) {
-          var seat = document.createElement('span');
-          seat.className = 'ticket-code-seat';
-          seat.textContent = 'TICKET ' + (index + 1) + ' OF ' + tickets.length;
-          li.appendChild(seat);
+
+        var label = document.createElement('span');
+        label.className = 'ticket-code-seat';
+        label.textContent = tickets.length > 1
+          ? 'TICKET ID ' + (index + 1) + ' OF ' + tickets.length
+          : 'TICKET ID';
+        li.appendChild(label);
+
+        if (API) {
+          var qr = document.createElement('img');
+          qr.className = 'ticket-qr';
+          qr.width = 190;
+          qr.height = 190;
+          qr.alt = 'QR code for ticket ' + ticket.code;
+          qr.src = API + '/api/qr?s=8&d=' + encodeURIComponent(ticket.code);
+          li.appendChild(qr);
         }
-        li.appendChild(document.createTextNode(ticket.code));
+
+        var value = document.createElement('span');
+        value.className = 'ticket-code-value';
+        value.textContent = ticket.code;
+        li.appendChild(value);
+
         list.appendChild(li);
       });
     }
@@ -124,8 +140,8 @@
     var note = document.getElementById('ticketEmailNote');
     if (note) {
       note.textContent = booking.email
-        ? 'A copy is on its way to ' + booking.email + '. Screenshot this page as a backup.'
-        : 'Screenshot this page — you’ll need the code at the door.';
+        ? 'A copy is on its way to ' + booking.email + '.'
+        : '';
     }
 
     showOnly('confirmed');
