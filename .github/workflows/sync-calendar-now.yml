@@ -1,0 +1,98 @@
+name: Sync calendar now
+
+# Force the ticketing Worker to re-read the Google Calendar immediately, instead
+# of waiting for its 15-minute cron. Use this right after adding a last-minute
+# date. Runnable from the GitHub mobile app — no terminal needed.
+#
+# The job summary lists every upcoming date afterwards, so you can confirm the
+# new one is on sale without opening anything else.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check secrets are configured
+        env:
+          API: ${{ secrets.TICKETING_API_BASE }}
+          TOKEN: ${{ secrets.TICKETING_ADMIN_TOKEN }}
+        run: |
+          if [ -z "$API" ] || [ -z "$TOKEN" ]; then
+            echo "::error::TICKETING_API_BASE and TICKETING_ADMIN_TOKEN must be set as repository secrets"
+            exit 1
+          fi
+
+      - name: Ask the Worker to re-read the calendar
+        env:
+          API: ${{ secrets.TICKETING_API_BASE }}
+          TOKEN: ${{ secrets.TICKETING_ADMIN_TOKEN }}
+        run: |
+          base="${API%/}"
+          status=$(curl -sS -o /tmp/sync.json -w '%{http_code}' \
+            -X POST -H "Authorization: Bearer $TOKEN" "$base/api/admin/sync")
+
+          echo "HTTP $status"
+          cat /tmp/sync.json
+          echo
+
+          if [ "$status" != "200" ]; then
+            echo "::error::Calendar sync failed with HTTP $status"
+            exit 1
+          fi
+
+      - name: Report what is on sale
+        env:
+          API: ${{ secrets.TICKETING_API_BASE }}
+        run: |
+          base="${API%/}"
+          curl -sS -o /tmp/availability.json "$base/api/availability"
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+
+          with open('/tmp/sync.json') as fh:
+              report = (json.load(fh) or {}).get('report', {})
+          with open('/tmp/availability.json') as fh:
+              rows = list((json.load(fh) or {}).get('occurrences', {}).values())
+
+          print('## Calendar sync\n')
+          print(f"Read **{report.get('seen', 0)}** calendar entries, "
+                f"wrote **{report.get('upserted', 0)}** upcoming date(s), "
+                f"skipped **{report.get('skippedPast', 0)}** past.\n")
+
+          unmatched = report.get('unmatched') or []
+          if unmatched:
+              print('> [!WARNING]')
+              print('> These calendar entries matched no event in `_events/`, so they '
+                    'were ignored. Check the title spelling:\n>')
+              for title in unmatched:
+                  print(f'> - `{title}`')
+              print()
+
+          print('## Upcoming dates\n')
+          if not rows:
+              print('_Nothing upcoming. Add dates to the Google Calendar._')
+          else:
+              rows.sort(key=lambda r: r.get('starts_at') or '')
+              print('| Date | Event | Price | Left | Status |')
+              print('|---|---|---|---:|---|')
+              for r in rows:
+                  price = r.get('price_paise') or 0
+                  state = 'On sale' if r.get('on_sale') else (r.get('status') or '?').title()
+                  print(f"| {(r.get('starts_at') or '')[:10]} "
+                        f"| {r.get('title') or r.get('event_slug')} "
+                        f"| {'₹' + str(price // 100) if price else '—'} "
+                        f"| {r.get('available', 0)}/{r.get('capacity', 0)} "
+                        f"| {state} |")
+              print()
+
+              unpriced = [r for r in rows if not r.get('price_paise')]
+              if unpriced:
+                  print('> [!WARNING]')
+                  print('> These dates have no price, so they cannot be sold. Run the '
+                        '**Sync event defaults** workflow to apply the `price:` from '
+                        '`_events/*.md`:\n>')
+                  for r in unpriced:
+                      print(f"> - `{r.get('id')}`")
+          PY
