@@ -67,9 +67,13 @@
       els.directions.hidden = false;
     }
 
-    var left = Number(occurrence.available) || 0;
+    // The live seat count is rendered by booking-core.js inside the form, next
+    // to the quantity stepper — no need to repeat it in the summary.
+    var left = Math.max(0, Number(occurrence.available) || 0);
     if (els.scarcity && left > 0 && left <= 6) {
-      els.scarcity.textContent = left === 1 ? 'Only 1 seat left' : 'Only ' + left + ' seats left';
+      els.scarcity.textContent = left === 1
+        ? 'Last ticket — book now'
+        : 'Selling fast — ' + left + ' tickets left';
       els.scarcity.hidden = false;
     }
 

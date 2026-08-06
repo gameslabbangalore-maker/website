@@ -1,0 +1,168 @@
+---
+layout: null
+title: Ticket desk
+permalink: /admin/
+seo_description: Games Lab staff ticket desk.
+sitemap: false
+robots: noindex, nofollow
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex, nofollow" />
+  {% include head.html %}
+  <link rel="stylesheet" href="{{ '/assets/css/book.css' | relative_url }}">
+  <style>
+    .desk-main { max-width: 1100px; margin: 0 auto; padding-bottom: 60px; }
+    .desk-head { display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline; justify-content: space-between; margin: 0 0 6px; }
+    .desk-head h1 { margin: 0; font-size: clamp(21px, 5vw, 28px); }
+    .desk-sub { margin: 0 0 22px; color: var(--muted); font-size: 13.5px; }
+
+    .desk-locked { color: var(--muted); font-size: 14px; }
+
+    /* Token gate: a modal, because there is nothing useful to show behind it. */
+    .gate { position: fixed; inset: 0; z-index: 10050; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .gate[hidden] { display: none; }
+    .gate__backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, .68); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+
+    .gate__sheet {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      max-height: calc(100dvh - 40px);
+      overflow-y: auto;
+      background: var(--card);
+      border-radius: 16px;
+      padding: 26px 24px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, .55);
+      display: grid;
+      gap: 14px;
+      animation: gate-in .22s cubic-bezier(.2, .75, .2, 1);
+    }
+    .gate__sheet:focus { outline: none; }
+
+    @keyframes gate-in { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) { .gate__sheet { animation: none; } }
+
+    .gate__title { margin: 0; font-size: 19px; }
+    .gate__hint { margin: 0; font-size: 13.5px; line-height: 1.6; color: var(--muted); }
+    .gate__form { display: grid; gap: 14px; }
+    .gate__form .book-btn { width: 100%; padding: 13px 18px; }
+    .gate__form .book-btn:disabled { opacity: .6; cursor: progress; }
+    .gate__foot { margin: 0; font-size: 11.5px; line-height: 1.65; color: var(--muted); }
+    .gate__foot code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; }
+
+    .gate-open, .gate-open body { overflow: hidden; }
+
+    @media (prefers-color-scheme: light) {
+      .gate__backdrop { background: rgba(0, 0, 0, .45); }
+      .gate__sheet { box-shadow: 0 24px 60px rgba(0, 0, 0, .28); }
+    }
+
+    .desk-tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 0 0 18px; }
+    .desk-tools .book-btn { padding: 8px 15px; font-size: 14px; }
+
+    .desk-cards { display: grid; gap: 12px; }
+
+    .occ {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 16px 18px;
+      display: grid;
+      gap: 12px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, .35);
+    }
+
+    .occ__top { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; justify-content: space-between; }
+    .occ__title { margin: 0; font-size: 17px; }
+    .occ__when { color: var(--muted); font-size: 13.5px; }
+
+    .occ__bar { height: 8px; border-radius: 999px; background: color-mix(in srgb, var(--muted) 24%, transparent); overflow: hidden; display: flex; }
+    .occ__bar i { display: block; height: 100%; }
+    .occ__bar .is-sold { background: #4ec27b; }
+    .occ__bar .is-held { background: var(--accent); }
+
+    .occ__stats { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+    .occ__stat { display: grid; gap: 2px; }
+    .occ__stat b { font-size: 19px; line-height: 1.1; }
+    .occ__stat span { font-size: 11.5px; letter-spacing: .06em; color: var(--muted); text-transform: uppercase; }
+    .occ__stat.is-left b { color: var(--accent); }
+
+    .occ__flags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pill { font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: color-mix(in srgb, var(--muted) 20%, transparent); }
+    .pill--warn { background: color-mix(in srgb, #ff8a5c 30%, transparent); }
+
+    .occ__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .att { margin: 0; border-collapse: collapse; width: 100%; font-size: 13.5px; }
+    .att th, .att td { text-align: left; padding: 8px 10px; border-bottom: 1px solid color-mix(in srgb, var(--muted) 18%, transparent); vertical-align: top; }
+    .att th { color: var(--muted); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; font-weight: 700; }
+    .att td.num { text-align: right; }
+    .att-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .att code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
+    .att tr.is-dim td { color: var(--muted); }
+  </style>
+</head>
+<body class="book-page">
+  {% include topbar-bleed.html %}
+  {% include header.html %}
+
+  <main id="main" class="wrap book-main desk-main" role="main">
+    <div class="desk-head">
+      <h1>Ticket desk</h1>
+      <p class="desk-sub" id="deskStamp"></p>
+    </div>
+
+    <p class="desk-locked" id="deskLocked" hidden>Enter the staff token to see ticket numbers.</p>
+
+    <section id="deskBody" hidden>
+      <div class="desk-tools">
+        <button class="book-btn" type="button" id="deskRefresh">Refresh</button>
+        <button class="book-btn book-btn--ghost" type="button" id="deskForget">Sign out</button>
+        <span class="book-muted" style="font-size:13px" id="deskCount"></span>
+      </div>
+      <div class="desk-cards" id="deskCards"></div>
+      <p class="book-muted" id="deskEmpty" hidden style="margin-top:18px">
+        No upcoming dates. Add them to the Google Calendar, then run a calendar sync.
+      </p>
+    </section>
+  </main>
+
+  <!-- Token prompt. Nothing below it renders until the API accepts the token. -->
+  <div class="gate" id="deskGate" hidden aria-hidden="true">
+    <div class="gate__backdrop"></div>
+    <div class="gate__sheet" role="dialog" aria-modal="true" aria-labelledby="gateTitle"
+         aria-describedby="gateHint" id="deskGateSheet" tabindex="-1">
+      <h2 class="gate__title" id="gateTitle">Staff access</h2>
+      <p class="gate__hint" id="gateHint">
+        Paste the ticketing admin token. It is checked against the ticketing API
+        and kept in this browser only.
+      </p>
+
+      <form class="gate__form" id="deskGateForm" autocomplete="off" novalidate>
+        <div class="book-field">
+          <label>Admin token
+            <input id="deskToken" type="password" autocomplete="off" spellcheck="false"
+                   autocapitalize="off" enterkeyhint="go" />
+          </label>
+        </div>
+        <p class="book-error" id="deskGateError" role="alert" hidden></p>
+        <button class="book-btn" type="submit" id="deskUnlock">Unlock</button>
+      </form>
+
+      <p class="gate__foot">
+        Lost the token? Set a new one with <code>wrangler secret put ADMIN_TOKEN</code>,
+        then update the <code>TICKETING_ADMIN_TOKEN</code> repo secret to match.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    window.__TICKETING__ = {
+      apiBase: {{ site.ticketing.api_base | default: '' | jsonify }},
+      timezone: {{ site.timezone | default: 'Asia/Kolkata' | jsonify }}
+    };
+  </script>
+  <script src="{{ '/assets/js/admin.js' | relative_url }}"></script>
+</body>
+</html>

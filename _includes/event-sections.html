@@ -1,4 +1,14 @@
 <article class="content">
+  {%- comment -%}
+    Unhidden by scripts-event-core.html when the calendar has no upcoming date
+    for this event, so the page never just silently drops the Book Now button.
+  {%- endcomment -%}
+  <div class="no-date" id="noDateNotice" hidden>
+    <p class="no-date__text">No date announced for {{ page.title }} yet — new dates go up every few weeks.</p>
+    <a class="book-btn" href="https://wa.me/917676099857?text={{ 'Hi Games Lab! When is the next ' | append: page.title | append: '?' | url_encode }}"
+       target="_blank" rel="noopener">Ask us when it&rsquo;s next</a>
+  </div>
+
   {% assign about_copy = page.about | default: nil %}
   {% assign has_sections = false %}
 

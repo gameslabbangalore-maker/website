@@ -226,6 +226,29 @@
   margin: 0;
 }
 
+/* Live seat count, so nobody has to guess how full a sitting is. */
+.book-seats {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.book-seats::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ec27b;
+  flex: 0 0 auto;
+}
+
+.book-seats--low { color: var(--accent); }
+.book-seats--low::before { background: currentColor; }
+
 .book-total {
   display: flex;
   justify-content: space-between;
@@ -291,24 +314,59 @@
 .ticket-codes { display: grid; gap: 10px; margin: 0 0 22px; padding: 0; list-style: none; }
 
 .ticket-code {
-  padding: 15px;
+  padding: 18px 15px 15px;
   border-radius: 12px;
   border: 2px dashed var(--accent);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: clamp(20px, 5.5vw, 26px);
   font-weight: 700;
+}
+
+.ticket-code-seat {
+  display: block;
+  font-family: inherit;
+  font-size: 11.5px;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.ticket-qr {
+  width: min(190px, 62vw);
+  height: auto;
+  aspect-ratio: 1 / 1;
+  display: block;
+  margin: 0 auto 12px;
+  border-radius: 10px;
+  background: #fff;
+  padding: 6px;
+  box-sizing: border-box;
+}
+
+.ticket-code-value {
+  display: block;
+  font-size: clamp(19px, 5vw, 24px);
   letter-spacing: .12em;
 }
 
-.ticket-code-seat { display: block; font-family: inherit; font-size: 11.5px; letter-spacing: .08em; color: var(--muted); margin-bottom: 4px; }
-
 .ticket-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+
+.book-btn--ghost {
+  background: transparent;
+  color: var(--text-main);
+  border: 1.5px solid color-mix(in srgb, var(--muted) 45%, transparent);
+}
+
+.book-btn--ghost:hover {
+  background: color-mix(in srgb, var(--muted) 14%, transparent) !important;
+  color: var(--text-main);
+}
 
 .ticket-note { margin: 20px 0 0; font-size: 13px; color: var(--muted); line-height: 1.6; }
 
 @media print {
   .topbar, .topbar-bleed, .site-footer, .ticket-actions { display: none !important; }
   .ticket-card { box-shadow: none; border: 1px solid #999; }
+  .ticket-qr { padding: 0; }
 }
 
 @media (prefers-color-scheme: light) {

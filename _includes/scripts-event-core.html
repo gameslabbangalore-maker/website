@@ -109,9 +109,11 @@
   const scWhere   = document.getElementById('scWhere');
   const scAdd     = document.getElementById('scAddCal');
   const scDir     = document.getElementById('scDir');
+  const scSeats   = document.getElementById('scSeats');
   const scBook    = document.getElementById('scBook');
   const fabBook   = document.getElementById('fabBook');
   const shareFab  = document.getElementById('shareFab');
+  const noDateNotice = document.getElementById('noDateNotice');
 
   const M = {
     bar: document.getElementById('mobileInfoBar'),
@@ -143,7 +145,6 @@
   const dDuration = "{{ page.highlights.duration | default: '' | escape }}";
   const dGroup = "{{ page.highlights.group_size | default: '' | escape }}";
   const dDiff = "{{ page.highlights.difficulty | default: '' | escape }}";
-  const dPrice = "{{ page.highlights.price | default: '' | escape }}";
 
   function assignText(el, value){
     if (!el) return;
@@ -157,15 +158,26 @@
     }
   }
 
+  let fabMeasureRetries = 0;
   function updateFabSpacing(){
     const docEl = document.documentElement;
-    const bookVisible = fabBook && !fabBook.hasAttribute('hidden');
+    // getClientRects() is empty for a display:none element. Without that check
+    // the desktop breakpoint (where .fab-book is display:none but carries no
+    // hidden attribute) measures 0 and re-queues itself forever.
+    const bookVisible = fabBook
+      && !fabBook.hasAttribute('hidden')
+      && fabBook.getClientRects().length > 0;
     let bookHeight = 0;
     if (bookVisible){
       const rect = fabBook.getBoundingClientRect();
       bookHeight = rect.height || fabBook.offsetHeight || 0;
-      if (!bookHeight){ requestAnimationFrame(updateFabSpacing); return; }
+      if (!bookHeight && fabMeasureRetries < 10){
+        fabMeasureRetries += 1;
+        requestAnimationFrame(updateFabSpacing);
+        return;
+      }
     }
+    fabMeasureRetries = 0;
 
     let shareBottom = 12;
     if (shareFab){
@@ -243,6 +255,7 @@
     scHeading && scHeading.setAttribute('hidden','');
     if (scBlock) scBlock.hidden = true;
     if (fabBook){ fabBook.setAttribute('hidden',''); }
+    if (noDateNotice) noDateNotice.removeAttribute('hidden');
     updateFabSpacing();
   }
 
@@ -285,13 +298,13 @@
     assignText(M.R1, dDuration);
     if (M.A1){ M.A1.hidden = true; M.A1.removeAttribute('href'); }
 
-    const hasLine2 = Boolean((dDiff || '').trim() || (dPrice || '').trim());
+    const hasLine2 = Boolean((dDiff || '').trim());
     if (M.line2){
       if (hasLine2){ M.line2.removeAttribute('hidden'); }
       else { M.line2.setAttribute('hidden',''); }
     }
     if (M.L2) M.L2.textContent = dDiff;
-    assignText(M.R2, dPrice);
+    assignText(M.R2, '');
     if (M.A2){ M.A2.hidden = true; M.A2.removeAttribute('href'); }
 
     if (M.L3){ M.L3.textContent = ''; }
@@ -504,11 +517,6 @@
           ? '₹' + (occ.price_paise / 100).toLocaleString('en-IN')
           : '';
 
-        if (priceText){
-          assignText(M.R2, priceText);
-          M.line2?.removeAttribute('hidden');
-        }
-
         const soldOut = !occ.on_sale || Number(occ.available) <= 0;
         if (soldOut){
           markSoldOut();
@@ -518,13 +526,22 @@
           });
         }
 
-        const left = Number(occ.available) || 0;
-        if (!soldOut && left > 0 && left <= 6 && scWhere){
-          const note = document.createElement('span');
-          note.textContent = '  ·  only ' + left + ' left';
-          note.style.color = 'var(--accent)';
-          note.style.fontWeight = '700';
-          scWhere.appendChild(note);
+        // Live seat count on the schedule card, so nobody has to guess.
+        const left = Math.max(0, Number(occ.available) || 0);
+        const capacity = Number(occ.capacity) || 0;
+        if (scSeats){
+          if (soldOut){
+            scSeats.textContent = 'Sold out';
+            scSeats.setAttribute('data-low','');
+            scSeats.removeAttribute('hidden');
+          } else if (left > 0){
+            scSeats.textContent = left === 1
+              ? 'Only 1 ticket left'
+              : left + (capacity ? ' of ' + capacity : '') + ' tickets left';
+            if (left <= 6) scSeats.setAttribute('data-low','');
+            else scSeats.removeAttribute('data-low');
+            scSeats.removeAttribute('hidden');
+          }
         }
 
         const isPlainClick = (e) =>

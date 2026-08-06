@@ -41,10 +41,20 @@ occurrences ──┐
    POST /api/razorpay/webhook  (HMAC-SHA256 verified)
               │  → booking = paid, mint one ticket row per seat, email
               ▼
-   /ticket/?b=…&t=…   polls until paid, then shows codes
-              │
+   /ticket/?b=…&t=…   polls until paid, then shows a QR per ticket
+              │        (QR images come from GET /api/qr)
               ▼
 ```
+
+Staff-facing, both behind `ADMIN_TOKEN`:
+
+```
+GET /api/admin/occurrences  → every upcoming date with capacity/sold/held/left
+GET /api/admin/attendees    → who booked a given date
+```
+
+Both back the `/admin/` page on the site, which is where "how many tickets are
+left?" gets answered without opening the database.
 
 ### Why seat holds are one SQL statement
 
@@ -97,8 +107,13 @@ npx wrangler secret put RAZORPAY_KEY_ID          # start with rzp_test_…
 npx wrangler secret put RAZORPAY_KEY_SECRET
 npx wrangler secret put RAZORPAY_WEBHOOK_SECRET  # invent one, paste the same into Razorpay
 npx wrangler secret put ADMIN_TOKEN              # openssl rand -hex 24
-npx wrangler secret put RESEND_API_KEY           # optional; email stays off without it
+npx wrangler secret put RESEND_API_KEY           # without it NO ticket email is sent
 ```
+
+Without `RESEND_API_KEY` the buyer gets only Razorpay's payment receipt — never
+a Games Lab ticket. `/api/health` shows `email_configured: false` when that is
+the case, and the Worker logs `email=skipped:no-key` for each paid booking.
+Set the secret and verify the sending domain in Resend before selling tickets.
 
 ### Deploy
 

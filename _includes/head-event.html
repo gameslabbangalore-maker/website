@@ -41,7 +41,8 @@
 content="
   default-src 'self';
   img-src 'self' https://ik.imagekit.io https://via.placeholder.com
-          https://cdn.razorpay.com https://*.rzp.io data:;
+          https://cdn.razorpay.com https://*.rzp.io{% if ticket_api != '' %}
+          {{ ticket_api }}{% endif %} data:;
   script-src 'self' https://cdnjs.cloudflare.com https://checkout.razorpay.com 'unsafe-inline';
   style-src  'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src   https://fonts.gstatic.com data:;
