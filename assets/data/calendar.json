@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-07T00:20:48.755Z",
+  "generated_at": "2026-08-07T01:40:37.861Z",
   "timezone": "Asia/Kolkata",
   "events": [
     {
@@ -7,17 +7,6 @@
       "slug": "night-of-mafias",
       "start": "2026-08-07T14:00:00Z",
       "day_key": "2026-08-07",
-      "timezone": "Asia/Kolkata",
-      "location_name": "Big Bean Cafe",
-      "location_map_url": "https://maps.app.goo.gl/SN7w4itJnqGMP2Qw9",
-      "location_warning": false,
-      "raw_location": "Big Bean Cafe\nBIG Bean Cafe\n29, 80 Feet Road, Block 4, Koramangala, Bengaluru, 560034, Karnataka, India"
-    },
-    {
-      "title": "Party Games Night",
-      "slug": "party-games-night",
-      "start": "2026-08-09T12:30:00Z",
-      "day_key": "2026-08-09",
       "timezone": "Asia/Kolkata",
       "location_name": "Big Bean Cafe",
       "location_map_url": "https://maps.app.goo.gl/SN7w4itJnqGMP2Qw9",
