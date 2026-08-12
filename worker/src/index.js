@@ -1,7 +1,7 @@
 import * as db from './db.js';
 import { createOrder, verifyWebhookSignature, verifyPaymentSignature } from './razorpay.js';
 import { bookingId, accessToken } from './ids.js';
-import { syncCalendar } from './calendar-sync.js';
+import { syncCalendar, occurrenceIsInCalendar } from './calendar-sync.js';
 import { sendTicketEmail } from './email.js';
 import { qrSvg, qrPng } from './qr.js';
 
@@ -29,6 +29,14 @@ function json(env, request, body, status = 200, extraHeaders = {}) {
 
 function nowIso() {
   return new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
+}
+
+function localDayKey(value, timezone) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    year: 'numeric', month: '2-digit', day: '2-digit', timeZone: timezone,
+  }).formatToParts(new Date(value));
+  const get = (type) => parts.find((part) => part.type === type)?.value || '';
+  return `${get('year')}-${get('month')}-${get('day')}`;
 }
 
 function isStaff(env, request) {
@@ -443,25 +451,59 @@ async function handleStaffOccurrences(env, request) {
 
   const rows = await db.listOccurrencesForStaff(env.DB, nowIso());
 
+  const occurrences = rows.map((row) => ({
+    id: row.id,
+    event_slug: row.event_slug,
+    title: row.event_title,
+    starts_at: row.starts_at_utc,
+    timezone: row.timezone,
+    venue_name: row.venue_name,
+    capacity: Number(row.capacity) || 0,
+    price_paise: Number(row.price_paise) || 0,
+    sold: Number(row.sold) || 0,
+    held: Number(row.held) || 0,
+    left: Math.max(0, Number(row.available) || 0),
+    revenue_paise: Number(row.revenue_paise) || 0,
+    status: row.status,
+    on_sale: row.status === 'open' && row.price_paise > 0 && Number(row.available) > 0,
+  }));
+
+  const timezone = env.TIMEZONE || 'Asia/Kolkata';
+  const today = localDayKey(new Date(), timezone);
+
   return json(env, request, {
     generated_at: nowIso(),
-    occurrences: rows.map((row) => ({
-      id: row.id,
-      event_slug: row.event_slug,
-      title: row.event_title,
-      starts_at: row.starts_at_utc,
-      timezone: row.timezone,
-      venue_name: row.venue_name,
-      capacity: Number(row.capacity) || 0,
-      price_paise: Number(row.price_paise) || 0,
-      sold: Number(row.sold) || 0,
-      held: Number(row.held) || 0,
-      left: Math.max(0, Number(row.available) || 0),
-      revenue_paise: Number(row.revenue_paise) || 0,
-      status: row.status,
-      on_sale: row.status === 'open' && row.price_paise > 0 && Number(row.available) > 0,
-    })),
+    occurrences: {
+      active: occurrences.filter((o) => o.status !== 'cancelled' && localDayKey(o.starts_at, timezone) >= today),
+      past: occurrences.filter((o) => o.status !== 'cancelled' && localDayKey(o.starts_at, timezone) < today).reverse(),
+      cancelled: occurrences.filter((o) => o.status === 'cancelled').reverse(),
+    },
   }, 200, { 'Cache-Control': 'no-store' });
+}
+
+async function handleCancelOccurrence(env, request, occurrenceId) {
+  if (!isStaff(env, request)) return json(env, request, { error: 'unauthorized' }, 401);
+  const occurrence = await db.getOccurrenceForStaff(env.DB, occurrenceId, nowIso());
+  if (!occurrence || occurrence.status === 'hidden') return json(env, request, { error: 'not_found' }, 404);
+  if (occurrence.status === 'cancelled') return json(env, request, { error: 'already_cancelled' }, 409);
+
+  let stillScheduled;
+  try {
+    stillScheduled = await occurrenceIsInCalendar(env, occurrence);
+  } catch (err) {
+    console.error('calendar cancellation check failed', occurrenceId, err.message);
+    return json(env, request, { error: 'calendar_check_failed' }, 503);
+  }
+  if (stillScheduled) return json(env, request, { error: 'still_in_calendar' }, 409);
+
+  const changed = await db.cancelOccurrence(env.DB, occurrenceId);
+  return json(env, request, { ok: changed }, changed ? 200 : 409);
+}
+
+async function handleHideOccurrence(env, request, occurrenceId) {
+  if (!isStaff(env, request)) return json(env, request, { error: 'unauthorized' }, 401);
+  const changed = await db.hideOccurrence(env.DB, occurrenceId);
+  return json(env, request, changed ? { ok: true } : { error: 'not_cancelled' }, changed ? 200 : 409);
 }
 
 async function handleAttendees(env, request, url) {
@@ -550,6 +592,16 @@ export default {
 
       if (pathname === '/api/admin/attendees' && request.method === 'GET') {
         return await handleAttendees(env, request, url);
+      }
+
+      const cancelMatch = pathname.match(/^\/api\/admin\/occurrences\/([a-z0-9-]{3,80})\/cancel$/);
+      if (cancelMatch && request.method === 'POST') {
+        return await handleCancelOccurrence(env, request, cancelMatch[1]);
+      }
+
+      const hideMatch = pathname.match(/^\/api\/admin\/occurrences\/([a-z0-9-]{3,80})\/hide$/);
+      if (hideMatch && request.method === 'POST') {
+        return await handleHideOccurrence(env, request, hideMatch[1]);
       }
 
       if (pathname === '/api/admin/sync' && request.method === 'POST') {

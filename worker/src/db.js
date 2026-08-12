@@ -60,12 +60,47 @@ export async function listOccurrencesForStaff(db, now) {
               o.capacity - (${COMMITTED_SEATS}) AS available
          FROM occurrences o
          JOIN events e ON e.slug = o.event_slug
-        WHERE o.starts_at_utc >= ?1
+        WHERE o.status != 'hidden'
         ORDER BY o.starts_at_utc ASC`,
     )
     .bind(now)
     .all();
   return results || [];
+}
+
+export async function getOccurrenceForStaff(db, occurrenceId, now) {
+  return await db
+    .prepare(
+      `SELECT o.id, o.event_slug, o.starts_at_utc, o.timezone, o.venue_name,
+              o.venue_map_url, o.capacity, o.price_paise, o.status, o.gcal_uid,
+              e.title AS event_title,
+              COALESCE((SELECT SUM(b.qty) FROM bookings b
+                         WHERE b.occurrence_id = o.id AND b.status = 'paid'), 0) AS sold,
+              COALESCE((SELECT SUM(b.amount_paise) FROM bookings b
+                         WHERE b.occurrence_id = o.id AND b.status = 'paid'), 0) AS revenue_paise,
+              o.capacity - (${COMMITTED_SEATS}) AS available
+         FROM occurrences o
+         JOIN events e ON e.slug = o.event_slug
+        WHERE o.id = ?2`,
+    )
+    .bind(now, occurrenceId)
+    .first();
+}
+
+export async function cancelOccurrence(db, occurrenceId) {
+  const result = await db.prepare(
+    `UPDATE occurrences SET status = 'cancelled'
+      WHERE id = ?1 AND status NOT IN ('cancelled', 'hidden')`,
+  ).bind(occurrenceId).run();
+  return Boolean(result.meta && result.meta.changes === 1);
+}
+
+export async function hideOccurrence(db, occurrenceId) {
+  const result = await db.prepare(
+    `UPDATE occurrences SET status = 'hidden'
+      WHERE id = ?1 AND status = 'cancelled'`,
+  ).bind(occurrenceId).run();
+  return Boolean(result.meta && result.meta.changes === 1);
 }
 
 export async function createHold(db, {

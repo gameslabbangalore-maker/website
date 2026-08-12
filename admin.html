@@ -63,6 +63,9 @@ robots: noindex, nofollow
     .desk-tools .book-btn { padding: 8px 15px; font-size: 14px; }
 
     .desk-cards { display: grid; gap: 12px; }
+    .desk-tabs { display: flex; gap: 6px; margin: 0 0 16px; padding: 4px; border-radius: 12px; background: var(--card); }
+    .desk-tab { flex: 1; border: 0; border-radius: 9px; padding: 9px 8px; background: transparent; color: var(--muted); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .desk-tab[aria-selected="true"] { background: var(--accent); color: #000; }
 
     .occ {
       background: var(--card);
@@ -93,6 +96,12 @@ robots: noindex, nofollow
     .pill--warn { background: color-mix(in srgb, #ff8a5c 30%, transparent); }
 
     .occ__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .occ__menu { position: relative; margin-left: auto; }
+    .occ__menu summary { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 999px; cursor: pointer; list-style: none; font-size: 22px; border: 1px solid color-mix(in srgb, var(--muted) 30%, transparent); }
+    .occ__menu summary::-webkit-details-marker { display: none; }
+    .occ__menu-panel { position: absolute; right: 0; bottom: calc(100% + 6px); z-index: 5; min-width: 190px; padding: 6px; border-radius: 10px; background: var(--card); box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+    .occ__menu-panel button { width: 100%; border: 0; border-radius: 8px; padding: 10px; text-align: left; background: transparent; color: #ff9b78; font: inherit; cursor: pointer; }
+    .occ__menu-panel button:hover { background: color-mix(in srgb, var(--muted) 16%, transparent); }
 
     .att { margin: 0; border-collapse: collapse; width: 100%; font-size: 13.5px; }
     .att th, .att td { text-align: left; padding: 8px 10px; border-bottom: 1px solid color-mix(in srgb, var(--muted) 18%, transparent); vertical-align: top; }
@@ -101,6 +110,20 @@ robots: noindex, nofollow
     .att-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .att code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
     .att tr.is-dim td { color: var(--muted); }
+    .att-mobile { display: none; }
+    @media (max-width: 700px) {
+      .att-wrap { display: none; }
+      .att-mobile { display: grid; }
+      .att-mobile__item { border-bottom: 1px solid color-mix(in srgb, var(--muted) 18%, transparent); padding: 10px 2px; }
+      .att-mobile__summary { display: grid; grid-template-columns: minmax(0,1fr) auto 42px; gap: 8px; align-items: center; }
+      .att-mobile__name { min-width: 0; font-weight: 700; overflow-wrap: anywhere; }
+      .att-mobile__meta { color: var(--muted); font-size: 12px; margin-top: 3px; }
+      .att-mobile__qty { white-space: nowrap; font-size: 12.5px; }
+      .att-mobile__toggle { width: 40px; height: 40px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--muted) 35%, transparent); background: transparent; color: inherit; font: 700 20px/1 inherit; cursor: pointer; }
+      .att-mobile__details { display: grid; grid-template-columns: auto minmax(0,1fr); gap: 7px 12px; margin-top: 10px; padding: 10px; border-radius: 9px; background: color-mix(in srgb, var(--muted) 10%, transparent); font-size: 12.5px; overflow-wrap: anywhere; }
+      .att-mobile__details[hidden] { display: none; }
+      .att-mobile__label { color: var(--muted); }
+    }
   </style>
 </head>
 <body class="book-page">
@@ -120,6 +143,11 @@ robots: noindex, nofollow
         <button class="book-btn" type="button" id="deskRefresh">Refresh</button>
         <button class="book-btn book-btn--ghost" type="button" id="deskForget">Sign out</button>
         <span class="book-muted" style="font-size:13px" id="deskCount"></span>
+      </div>
+      <div class="desk-tabs" role="tablist" aria-label="Event records">
+        <button class="desk-tab" type="button" role="tab" aria-selected="true" data-desk-view="active">Active (0)</button>
+        <button class="desk-tab" type="button" role="tab" aria-selected="false" data-desk-view="past">Past (0)</button>
+        <button class="desk-tab" type="button" role="tab" aria-selected="false" data-desk-view="cancelled">Cancelled (0)</button>
       </div>
       <div class="desk-cards" id="deskCards"></div>
       <p class="book-muted" id="deskEmpty" hidden style="margin-top:18px">
@@ -163,6 +191,8 @@ robots: noindex, nofollow
       timezone: {{ site.timezone | default: 'Asia/Kolkata' | jsonify }}
     };
   </script>
-  <script src="{{ '/assets/js/admin.js' | relative_url }}"></script>
+  <!-- Bump the query when dashboard JS changes so cached HTML and JS cannot
+       run different API response contracts on different devices. -->
+  <script src="{{ '/assets/js/admin.js?v=2' | relative_url }}"></script>
 </body>
 </html>
