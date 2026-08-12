@@ -235,6 +235,12 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
 @media (min-width:960px){.fab-book,.fab-share{display:none}}
 @media (prefers-reduced-motion:reduce){.fab-no-date{transition:none}}
 
+/* Override the slide-out treatment without editing its shared definition.
+   Moving a fixed element below the viewport paints its accent background into
+   iOS Safari's bottom safe area; fading in place avoids that browser artifact. */
+.fab-no-date{transition:opacity .2s ease,visibility 0s linear .2s}
+.fab-no-date.is-scroll-hidden{transform:none;opacity:0;visibility:hidden;pointer-events:none}
+
 .book-drawer{position:fixed;inset:0;z-index:10030}
 .book-drawer[hidden]{display:none}
 
