@@ -56,6 +56,39 @@ export const VENUES = [
   { name: 'Bagelstein',          map_url: 'https://maps.app.goo.gl/5sPfiUZsgoZFxo73A' },
 ];
 
+/**
+ * Cancellation is a dashboard archive operation, never the source of truth for
+ * scheduling. Prove the exact occurrence is absent from the complete current
+ * Calendar feed before allowing it. No date filtering is applied here.
+ */
+export async function occurrenceIsInCalendar(env, occurrence) {
+  const res = await fetch(env.CALENDAR_ICS_URL);
+  if (!res.ok) throw new Error(`ICS fetch failed (${res.status})`);
+
+  const icsText = await res.text();
+  if (!/BEGIN:VCALENDAR/i.test(icsText) || !/END:VCALENDAR/i.test(icsText)) {
+    throw new Error('ICS response was not a calendar');
+  }
+  const entries = parseIcs(icsText);
+  const timezone = occurrence.timezone || env.TIMEZONE || 'Asia/Kolkata';
+  const occurrenceDay = dayKeyInZone(new Date(occurrence.starts_at_utc), timezone);
+  const uid = String(occurrence.gcal_uid || '').trim();
+
+  return entries.some((entry) => {
+    const sameDay = dayKeyInZone(entry.start, timezone) === occurrenceDay;
+    // Recurring Calendar instances can share a UID, so the local date is part
+    // of the identity even for the preferred UID match.
+    if (uid && entry.uid && entry.uid === uid) return sameDay;
+    if (uid) return false;
+    const candidate = slugify(entry.summary);
+    const slugMatches = candidate === occurrence.event_slug
+      || candidate.startsWith(occurrence.event_slug)
+      || candidate.endsWith(occurrence.event_slug)
+      || candidate.includes(occurrence.event_slug);
+    return slugMatches && sameDay;
+  });
+}
+
 export async function syncCalendar(env) {
   const timezone = env.TIMEZONE || 'Asia/Kolkata';
   const res = await fetch(env.CALENDAR_ICS_URL);
