@@ -112,6 +112,7 @@
   const scSeats   = document.getElementById('scSeats');
   const scBook    = document.getElementById('scBook');
   const fabBook   = document.getElementById('fabBook');
+  const fabNoDate = document.getElementById('fabNoDate');
   const shareFab  = document.getElementById('shareFab');
   const noDateNotice = document.getElementById('noDateNotice');
 
@@ -164,13 +165,15 @@
     // getClientRects() is empty for a display:none element. Without that check
     // the desktop breakpoint (where .fab-book is display:none but carries no
     // hidden attribute) measures 0 and re-queues itself forever.
-    const bookVisible = fabBook
-      && !fabBook.hasAttribute('hidden')
-      && fabBook.getClientRects().length > 0;
+    const activeFab = [fabBook, fabNoDate].find(el => el
+      && !el.hasAttribute('hidden')
+      && !el.classList.contains('is-scroll-hidden')
+      && el.getClientRects().length > 0);
+    const bookVisible = Boolean(activeFab);
     let bookHeight = 0;
     if (bookVisible){
-      const rect = fabBook.getBoundingClientRect();
-      bookHeight = rect.height || fabBook.offsetHeight || 0;
+      const rect = activeFab.getBoundingClientRect();
+      bookHeight = rect.height || activeFab.offsetHeight || 0;
       if (!bookHeight && fabMeasureRetries < 10){
         fabMeasureRetries += 1;
         requestAnimationFrame(updateFabSpacing);
@@ -256,7 +259,37 @@
     if (scBlock) scBlock.hidden = true;
     if (fabBook){ fabBook.setAttribute('hidden',''); }
     if (noDateNotice) noDateNotice.removeAttribute('hidden');
+    if (fabNoDate) fabNoDate.removeAttribute('hidden');
     updateFabSpacing();
+  }
+
+  // The unscheduled-event CTA is useful on mobile but should not cover the
+  // page while somebody reads downward. Reveal it again as soon as they scroll
+  // upward. Scheduled events continue to use the always-visible Book Now FAB.
+  if (fabNoDate && !isUpcoming){
+    let lastScrollY = Math.max(0, window.scrollY);
+    let scrollTicking = false;
+
+    function updateNoDateFabOnScroll(){
+      const currentY = Math.max(0, window.scrollY);
+      const delta = currentY - lastScrollY;
+
+      if (currentY <= 12 || delta < -4){
+        fabNoDate.classList.remove('is-scroll-hidden');
+      } else if (delta > 4){
+        fabNoDate.classList.add('is-scroll-hidden');
+      }
+
+      lastScrollY = currentY;
+      scrollTicking = false;
+      updateFabSpacing();
+    }
+
+    window.addEventListener('scroll', () => {
+      if (scrollTicking) return;
+      scrollTicking = true;
+      requestAnimationFrame(updateNoDateFabOnScroll);
+    }, { passive:true });
   }
 
   if (isUpcoming && scheduleDate){

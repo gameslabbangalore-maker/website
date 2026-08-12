@@ -224,6 +224,8 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
 .fab-book,.fab-share{position:fixed;z-index:10000;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.35);display:flex;align-items:center;gap:10px;padding:12px 16px;text-decoration:none}
 .fab-book{left:12px;right:12px;bottom:6px;background:var(--accent);color:#000;font-weight:900;justify-content:center;text-align:center}
 .fab-book[hidden]{display:none}
+.fab-no-date{transition:transform .24s ease,opacity .24s ease}
+.fab-no-date.is-scroll-hidden{transform:translateY(calc(100% + 18px));opacity:0;pointer-events:none}
 .fab-share{right:12px;bottom:var(--fab-share-bottom,12px);background:rgba(24,24,24,.35);color:var(--text-main);border:1px solid rgba(255,255,255,.25);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .fab-share .fab-share-label{font-weight:900;font-size:.95rem}
 @media (prefers-color-scheme: light){
@@ -231,6 +233,7 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
   .fab-share{background:rgba(255,255,255,.65);border-color:rgba(0,0,0,.15);color:inherit}
 }
 @media (min-width:960px){.fab-book,.fab-share{display:none}}
+@media (prefers-reduced-motion:reduce){.fab-no-date{transition:none}}
 
 .book-drawer{position:fixed;inset:0;z-index:10030}
 .book-drawer[hidden]{display:none}
