@@ -191,6 +191,8 @@ robots: noindex, nofollow
       timezone: {{ site.timezone | default: 'Asia/Kolkata' | jsonify }}
     };
   </script>
-  <script src="{{ '/assets/js/admin.js' | relative_url }}"></script>
+  <!-- Bump the query when dashboard JS changes so cached HTML and JS cannot
+       run different API response contracts on different devices. -->
+  <script src="{{ '/assets/js/admin.js?v=2' | relative_url }}"></script>
 </body>
 </html>

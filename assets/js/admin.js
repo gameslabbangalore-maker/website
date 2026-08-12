@@ -56,6 +56,43 @@
     return day + ' · ' + time.toUpperCase();
   }
 
+  function localDayKey(value) {
+    var date = new Date(value);
+    if (isNaN(date.getTime())) return '';
+    var parts = new Intl.DateTimeFormat('en-US', {
+      year: 'numeric', month: '2-digit', day: '2-digit', timeZone: TZ
+    }).formatToParts(date);
+    function part(type) {
+      var found = parts.filter(function (item) { return item.type === type; })[0];
+      return found ? found.value : '';
+    }
+    return part('year') + '-' + part('month') + '-' + part('day');
+  }
+
+  // During a site/Worker rollout, GitHub Pages can update before the Worker.
+  // Accept the former flat-array response so the desk stays usable until the
+  // grouped API deployment reaches production.
+  function normalizeOccurrenceGroups(value) {
+    if (!Array.isArray(value)) {
+      return {
+        active: Array.isArray(value && value.active) ? value.active : [],
+        past: Array.isArray(value && value.past) ? value.past : [],
+        cancelled: Array.isArray(value && value.cancelled) ? value.cancelled : []
+      };
+    }
+
+    var today = localDayKey(new Date());
+    return {
+      active: value.filter(function (item) {
+        return item.status !== 'cancelled' && item.status !== 'hidden' && localDayKey(item.starts_at) >= today;
+      }),
+      past: value.filter(function (item) {
+        return item.status !== 'cancelled' && item.status !== 'hidden' && localDayKey(item.starts_at) < today;
+      }).reverse(),
+      cancelled: value.filter(function (item) { return item.status === 'cancelled'; }).reverse()
+    };
+  }
+
   function api(path) {
     return fetch(API + path, {
       cache: 'no-store',
@@ -384,6 +421,7 @@
 
     api('/api/admin/occurrences')
       .then(function (data) {
+        occurrenceGroups = normalizeOccurrenceGroups(data && data.occurrences);
         occurrenceGroups = (data && data.occurrences) || { active: [], past: [], cancelled: [] };
         writeToken(token);
         hideGate();
