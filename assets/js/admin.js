@@ -422,6 +422,7 @@
     api('/api/admin/occurrences')
       .then(function (data) {
         occurrenceGroups = normalizeOccurrenceGroups(data && data.occurrences);
+        occurrenceGroups = (data && data.occurrences) || { active: [], past: [], cancelled: [] };
         writeToken(token);
         hideGate();
         if (els.body) els.body.hidden = false;
