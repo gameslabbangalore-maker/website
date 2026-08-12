@@ -45,6 +45,7 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
 
 /* "No date yet" notice (event has no upcoming calendar entry) */
 .no-date{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;margin:0 0 22px;padding:20px 18px;border-radius:14px;background:var(--card);border:1.5px solid rgba(255,255,255,.08)}
+.no-date[hidden]{display:none}
 .no-date__text{margin:0;font-size:1rem;line-height:1.6;color:var(--muted)}
 @media (prefers-color-scheme: light){.no-date{border-color:rgba(0,0,0,.06);box-shadow:0 6px 22px rgba(0,0,0,.08)}}
 
