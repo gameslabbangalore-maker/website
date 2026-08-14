@@ -266,21 +266,28 @@
     updateFabSpacing();
   }
 
-  // The unscheduled-event CTA is useful on mobile but should not cover the
-  // page while somebody reads downward. Reveal it again as soon as they scroll
-  // upward. Scheduled events continue to use the always-visible Book Now FAB.
-  if (fabNoDate && !isUpcoming){
+  // Notice-style mobile CTAs should not cover the page while somebody reads
+  // downward. This applies to both the no-date CTA and a Book button that is
+  // later converted into a sold-out notice by the availability request.
+  if (fabNoDate || fabBook){
     let lastScrollY = Math.max(0, window.scrollY);
     let scrollTicking = false;
 
-    function updateNoDateFabOnScroll(){
+    function scrollAwareFabs(){
+      return [fabNoDate, fabBook].filter(el => el
+        && !el.hasAttribute('hidden')
+        && (el === fabNoDate || el.classList.contains('fab-sold-out')));
+    }
+
+    function updateNoticeFabsOnScroll(){
       const currentY = Math.max(0, window.scrollY);
       const delta = currentY - lastScrollY;
+      const noticeFabs = scrollAwareFabs();
 
       if (currentY <= 12 || delta < -4){
-        fabNoDate.classList.remove('is-scroll-hidden');
+        noticeFabs.forEach(el => el.classList.remove('is-scroll-hidden'));
       } else if (delta > 4){
-        fabNoDate.classList.add('is-scroll-hidden');
+        noticeFabs.forEach(el => el.classList.add('is-scroll-hidden'));
       }
 
       lastScrollY = currentY;
@@ -291,7 +298,7 @@
     window.addEventListener('scroll', () => {
       if (scrollTicking) return;
       scrollTicking = true;
-      requestAnimationFrame(updateNoDateFabOnScroll);
+      requestAnimationFrame(updateNoticeFabsOnScroll);
     }, { passive:true });
   }
 
@@ -537,9 +544,15 @@
           el.textContent = 'We’re sold out for this date';
           el.setAttribute('aria-disabled','true');
           el.removeAttribute('href');
-          el.style.opacity = '.6';
           el.style.pointerEvents = 'none';
+          if (el === fabBook){
+            el.classList.add('fab-sold-out');
+            el.style.removeProperty('opacity');
+          } else {
+            el.style.opacity = '.6';
+          }
         });
+        updateFabSpacing();
       }
 
       try {
