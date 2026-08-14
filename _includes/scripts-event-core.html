@@ -196,9 +196,12 @@
   }
 
   const scheduleDate = parseStart(match);
+  const scheduleEnd = parseStart({ start: match?.end });
   const todayKey = dayKey(new Date(), timezone);
   const eventDayKey = scheduleDate ? dayKey(scheduleDate, timezone) : '';
-  const isUpcoming = Boolean(scheduleDate) && eventDayKey >= todayKey;
+  const isUpcoming = Boolean(scheduleDate) && (scheduleEnd
+    ? scheduleEnd.getTime() > Date.now()
+    : eventDayKey >= todayKey);
 
   if (match?.location_warning && match.raw_location){
     console.warn('Calendar location mismatch for "%s": "%s"', titleFallback, match.raw_location);
@@ -531,7 +534,7 @@
       function markSoldOut(){
         [scBook, fabBook].forEach(el => {
           if (!el) return;
-          el.textContent = 'Sold out';
+          el.textContent = 'We’re sold out for this date';
           el.setAttribute('aria-disabled','true');
           el.removeAttribute('href');
           el.style.opacity = '.6';

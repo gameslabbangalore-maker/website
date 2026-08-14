@@ -83,8 +83,8 @@
     const now = Date.now();
     list = list.filter(entry => {
       if (!entry || !entry.start) return false;
-      const start = Date.parse(entry.start);
-      return !Number.isNaN(start) && start >= now;
+      const end = Date.parse(entry.end || entry.start);
+      return !Number.isNaN(end) && end > now;
     });
 
     list.sort((a, b) => {

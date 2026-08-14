@@ -1,6 +1,8 @@
 import { parseIcs, parseTicketDirectives, dayKeyInZone, toIsoUtc } from './ics.js';
 import { occurrenceId, slugify } from './ids.js';
-import { upsertOccurrence, applyCalendarOverrides, knownEventSlugs } from './db.js';
+import {
+  upsertOccurrence, applyCalendarOverrides, closeEndedOccurrences, knownEventSlugs,
+} from './db.js';
 
 function resolveEventSlug(summary, slugs) {
   const candidate = slugify(summary);
@@ -99,17 +101,23 @@ export async function syncCalendar(env) {
   const entries = parseIcs(icsText);
 
   const now = new Date();
-  const todayKey = dayKeyInZone(now, timezone);
   const nowIso = toIsoUtc(now);
 
-  const report = { seen: 0, upserted: 0, unmatched: [], skippedPast: 0, collisions: [] };
+  const report = {
+    seen: 0,
+    upserted: 0,
+    closedEnded: await closeEndedOccurrences(env.DB, nowIso),
+    unmatched: [],
+    skippedPast: 0,
+    collisions: [],
+  };
   const claimed = new Set();
 
   for (const entry of entries) {
     report.seen += 1;
 
     const dayKey = dayKeyInZone(entry.start, timezone);
-    if (dayKey < todayKey) { report.skippedPast += 1; continue; }
+    if ((entry.end || entry.start) <= now) { report.skippedPast += 1; continue; }
 
     const event = resolveEventSlug(entry.summary, slugs);
     if (!event) { report.unmatched.push(entry.summary); continue; }
@@ -129,6 +137,7 @@ export async function syncCalendar(env) {
       id,
       event_slug: event.slug,
       starts_at_utc: toIsoUtc(entry.start),
+      ends_at_utc: toIsoUtc(entry.end || entry.start),
       timezone,
       venue_name: venue.name,
       venue_map_url: venue.mapUrl,
@@ -146,7 +155,7 @@ export async function syncCalendar(env) {
 
     if (directives.closed) {
       await env.DB.prepare(
-        `UPDATE occurrences SET status = 'closed' WHERE id = ?1 AND status != 'cancelled'`,
+        `UPDATE occurrences SET status = 'closed' WHERE id = ?1 AND status NOT IN ('cancelled', 'hidden')`,
       ).bind(id).run();
     }
 

@@ -1,4 +1,5 @@
 import { occurrenceIsInCalendar } from '../src/calendar-sync.js';
+import { parseIcs } from '../src/ics.js';
 
 const originalFetch = globalThis.fetch;
 const failures = [];
@@ -38,6 +39,11 @@ const occurrence = {
 };
 
 console.log('admin cancellation calendar evidence\n');
+
+const timed = parseIcs(calendar([
+  `${vevent({ uid: 'timed', summary: 'Timed Event', start: '20260814T193000' }).replace('END:VEVENT', 'DTEND;TZID=Asia/Kolkata:20260814T223000\r\nEND:VEVENT')}`,
+]))[0];
+check('parses the hidden event end time', timed.end.toISOString(), '2026-08-14T17:00:00.000Z');
 
 await withFeed(calendar([
   vevent({ uid: 'old-event', summary: 'Old Event', start: '20250101T190000' }),

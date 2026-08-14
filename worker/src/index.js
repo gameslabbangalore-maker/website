@@ -75,18 +75,22 @@ function validateBookingInput(payload, maxQty) {
 function publicOccurrence(row) {
   if (!row) return null;
   const available = Math.max(0, Number(row.available) || 0);
+  const endsAt = row.ends_at_utc || row.starts_at_utc;
+  const ended = !endsAt || endsAt <= nowIso();
   return {
     id: row.id,
     event_slug: row.event_slug,
     title: row.event_title,
     starts_at: row.starts_at_utc,
+    ends_at: endsAt,
     timezone: row.timezone,
     venue_name: row.venue_name,
     venue_map_url: row.venue_map_url,
     price_paise: row.price_paise,
     capacity: row.capacity,
     available,
-    on_sale: row.status === 'open' && row.price_paise > 0 && available > 0,
+    on_sale: !ended && row.status === 'open' && row.price_paise > 0 && available > 0,
+    ended,
     status: row.status,
   };
 }
@@ -102,6 +106,7 @@ async function handleAvailability(env, request) {
       id: row.id,
       event_slug: row.event_slug,
       starts_at: row.starts_at_utc,
+      ends_at: row.ends_at_utc || row.starts_at_utc,
       price_paise: row.price_paise,
       capacity: row.capacity,
       available,
@@ -456,6 +461,7 @@ async function handleStaffOccurrences(env, request) {
     event_slug: row.event_slug,
     title: row.event_title,
     starts_at: row.starts_at_utc,
+    ends_at: row.ends_at_utc || row.starts_at_utc,
     timezone: row.timezone,
     venue_name: row.venue_name,
     capacity: Number(row.capacity) || 0,
@@ -468,12 +474,15 @@ async function handleStaffOccurrences(env, request) {
     on_sale: row.status === 'open' && row.price_paise > 0 && Number(row.available) > 0,
   }));
 
+  const now = nowIso();
   const timezone = env.TIMEZONE || 'Asia/Kolkata';
   const today = localDayKey(new Date(), timezone);
 
   return json(env, request, {
     generated_at: nowIso(),
     occurrences: {
+      active: occurrences.filter((o) => o.status !== 'cancelled' && o.ends_at > now),
+      past: occurrences.filter((o) => o.status !== 'cancelled' && o.ends_at <= now).reverse(),
       active: occurrences.filter((o) => o.status !== 'cancelled' && localDayKey(o.starts_at, timezone) >= today),
       past: occurrences.filter((o) => o.status !== 'cancelled' && localDayKey(o.starts_at, timezone) < today).reverse(),
       cancelled: occurrences.filter((o) => o.status === 'cancelled').reverse(),
@@ -504,6 +513,35 @@ async function handleHideOccurrence(env, request, occurrenceId) {
   if (!isStaff(env, request)) return json(env, request, { error: 'unauthorized' }, 401);
   const changed = await db.hideOccurrence(env.DB, occurrenceId);
   return json(env, request, changed ? { ok: true } : { error: 'not_cancelled' }, changed ? 200 : 409);
+}
+
+async function handleOccurrenceAction(env, request, occurrenceId, action) {
+  if (!isStaff(env, request)) return json(env, request, { error: 'unauthorized' }, 401);
+  const now = nowIso();
+  const changed = action === 'pause'
+    ? await db.pauseOccurrence(env.DB, occurrenceId, now)
+    : await db.resumeOccurrence(env.DB, occurrenceId, now);
+  return json(env, request, changed ? { ok: true } : { error: 'invalid_transition' }, changed ? 200 : 409);
+}
+
+async function handleOccurrenceSettings(env, request, occurrenceId) {
+  if (!isStaff(env, request)) return json(env, request, { error: 'unauthorized' }, 401);
+  let payload;
+  try { payload = await request.json(); } catch { return json(env, request, { error: 'bad_json' }, 400); }
+  const priceRupees = payload.price_rupees == null ? null : Number(payload.price_rupees);
+  const capacity = payload.capacity == null ? null : Number(payload.capacity);
+  const pricePaise = Number.isFinite(priceRupees) && priceRupees > 0 && priceRupees <= 100000
+    ? Math.round(priceRupees * 100) : null;
+  const validCapacity = Number.isInteger(capacity) && capacity > 0 && capacity <= 10000 ? capacity : null;
+  if ((payload.price_rupees != null && pricePaise === null)
+      || (payload.capacity != null && validCapacity === null)
+      || (pricePaise === null && validCapacity === null)) {
+    return json(env, request, { error: 'invalid_settings' }, 400);
+  }
+  const result = await db.updateOccurrenceSettings(env.DB, occurrenceId, {
+    pricePaise, capacity: validCapacity, now: nowIso(),
+  });
+  return json(env, request, result.changed ? { ok: true } : { error: result.reason }, result.changed ? 200 : 409);
 }
 
 async function handleAttendees(env, request, url) {
@@ -602,6 +640,16 @@ export default {
       const hideMatch = pathname.match(/^\/api\/admin\/occurrences\/([a-z0-9-]{3,80})\/hide$/);
       if (hideMatch && request.method === 'POST') {
         return await handleHideOccurrence(env, request, hideMatch[1]);
+      }
+
+      const actionMatch = pathname.match(/^\/api\/admin\/occurrences\/([a-z0-9-]{3,80})\/(pause|resume)$/);
+      if (actionMatch && request.method === 'POST') {
+        return await handleOccurrenceAction(env, request, actionMatch[1], actionMatch[2]);
+      }
+
+      const settingsMatch = pathname.match(/^\/api\/admin\/occurrences\/([a-z0-9-]{3,80})\/settings$/);
+      if (settingsMatch && request.method === 'POST') {
+        return await handleOccurrenceSettings(env, request, settingsMatch[1]);
       }
 
       if (pathname === '/api/admin/sync' && request.method === 'POST') {

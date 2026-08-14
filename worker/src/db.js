@@ -9,10 +9,12 @@ const COMMITTED_SEATS = `
                 AND b.hold_expires_at > ?1), 0)
 `;
 
+const COMMITTED_SEATS_FOR_UPDATE = COMMITTED_SEATS.replaceAll('o.id', 'occurrences.id');
+
 export async function getOccurrence(db, occurrenceId, now) {
   return await db
     .prepare(
-      `SELECT o.id, o.event_slug, o.starts_at_utc, o.timezone, o.venue_name,
+      `SELECT o.id, o.event_slug, o.starts_at_utc, o.ends_at_utc, o.timezone, o.venue_name,
               o.venue_map_url, o.capacity, o.price_paise, o.status,
               e.title AS event_title,
               o.capacity - (${COMMITTED_SEATS}) AS available
@@ -27,12 +29,12 @@ export async function getOccurrence(db, occurrenceId, now) {
 export async function listAvailability(db, now) {
   const { results } = await db
     .prepare(
-      `SELECT o.id, o.event_slug, o.starts_at_utc, o.venue_name, o.price_paise,
+      `SELECT o.id, o.event_slug, o.starts_at_utc, o.ends_at_utc, o.venue_name, o.price_paise,
               o.capacity, o.status,
               o.capacity - (${COMMITTED_SEATS}) AS available
          FROM occurrences o
-        WHERE o.starts_at_utc >= ?1
-          AND o.status != 'cancelled'
+        WHERE COALESCE(o.ends_at_utc, o.starts_at_utc) > ?1
+          AND o.status NOT IN ('cancelled', 'hidden')
         ORDER BY o.starts_at_utc ASC`,
     )
     .bind(now)
@@ -47,8 +49,9 @@ export async function listAvailability(db, now) {
 export async function listOccurrencesForStaff(db, now) {
   const { results } = await db
     .prepare(
-      `SELECT o.id, o.event_slug, o.starts_at_utc, o.timezone, o.venue_name,
+      `SELECT o.id, o.event_slug, o.starts_at_utc, o.ends_at_utc, o.timezone, o.venue_name,
               o.venue_map_url, o.capacity, o.price_paise, o.status,
+              o.price_overridden, o.capacity_overridden,
               e.title AS event_title,
               COALESCE((SELECT SUM(b.qty) FROM bookings b
                          WHERE b.occurrence_id = o.id AND b.status = 'paid'), 0) AS sold,
@@ -71,6 +74,9 @@ export async function listOccurrencesForStaff(db, now) {
 export async function getOccurrenceForStaff(db, occurrenceId, now) {
   return await db
     .prepare(
+      `SELECT o.id, o.event_slug, o.starts_at_utc, o.ends_at_utc, o.timezone, o.venue_name,
+              o.venue_map_url, o.capacity, o.price_paise, o.status, o.gcal_uid,
+              o.price_overridden, o.capacity_overridden,
       `SELECT o.id, o.event_slug, o.starts_at_utc, o.timezone, o.venue_name,
               o.venue_map_url, o.capacity, o.price_paise, o.status, o.gcal_uid,
               e.title AS event_title,
@@ -103,6 +109,52 @@ export async function hideOccurrence(db, occurrenceId) {
   return Boolean(result.meta && result.meta.changes === 1);
 }
 
+export async function closeEndedOccurrences(db, now) {
+  const result = await db.prepare(
+    `UPDATE occurrences SET status = 'closed'
+      WHERE status = 'open'
+        AND COALESCE(ends_at_utc, starts_at_utc) <= ?1`,
+  ).bind(now).run();
+  return result.meta ? result.meta.changes : 0;
+}
+
+export async function pauseOccurrence(db, occurrenceId, now) {
+  const result = await db.prepare(
+    `UPDATE occurrences SET status = 'closed'
+      WHERE id = ?1 AND status = 'open'
+        AND COALESCE(ends_at_utc, starts_at_utc) > ?2`,
+  ).bind(occurrenceId, now).run();
+  return Boolean(result.meta && result.meta.changes === 1);
+}
+
+export async function resumeOccurrence(db, occurrenceId, now) {
+  const result = await db.prepare(
+    `UPDATE occurrences SET status = 'open'
+      WHERE id = ?2 AND status = 'closed' AND price_paise > 0
+        AND COALESCE(ends_at_utc, starts_at_utc) > ?1
+        AND (capacity - (${COMMITTED_SEATS_FOR_UPDATE})) > 0`,
+  ).bind(now, occurrenceId).run();
+  return Boolean(result.meta && result.meta.changes === 1);
+}
+
+export async function updateOccurrenceSettings(db, occurrenceId, { pricePaise, capacity, now }) {
+  const validPrice = Number.isInteger(pricePaise) && pricePaise > 0 ? pricePaise : null;
+  const validCapacity = Number.isInteger(capacity) && capacity > 0 ? capacity : null;
+  if (validPrice === null && validCapacity === null) return { changed: false, reason: 'no_changes' };
+  const result = await db.prepare(
+    `UPDATE occurrences
+        SET price_paise = CASE WHEN ?2 IS NULL THEN price_paise ELSE ?2 END,
+            capacity = CASE WHEN ?3 IS NULL THEN capacity ELSE ?3 END,
+            price_overridden = CASE WHEN ?2 IS NULL THEN price_overridden ELSE 1 END,
+            capacity_overridden = CASE WHEN ?3 IS NULL THEN capacity_overridden ELSE 1 END
+      WHERE COALESCE(ends_at_utc, starts_at_utc) > ?1
+        AND id = ?4
+        AND status NOT IN ('cancelled', 'hidden')
+        AND (?3 IS NULL OR ?3 >= (${COMMITTED_SEATS_FOR_UPDATE}))`,
+  ).bind(now, validPrice, validCapacity, occurrenceId).run();
+  return { changed: Boolean(result.meta && result.meta.changes === 1), reason: 'unsafe_or_missing' };
+}
+
 export async function createHold(db, {
   id, token, occurrenceId, qty, name, email, phone, now, holdExpiresAt,
 }) {
@@ -118,7 +170,7 @@ export async function createHold(db, {
         WHERE o.id = ?9
           AND o.status = 'open'
           AND o.price_paise > 0
-          AND o.starts_at_utc > ?1
+          AND COALESCE(o.ends_at_utc, o.starts_at_utc) > ?1
           AND (o.capacity - (${COMMITTED_SEATS})) >= ?4`,
     )
     .bind(now, id, token, qty, name, email, phone, holdExpiresAt, occurrenceId)
@@ -270,18 +322,19 @@ export async function upsertOccurrence(db, occ) {
   await db
     .prepare(
       `INSERT INTO occurrences (
-         id, event_slug, starts_at_utc, timezone, venue_name, venue_map_url,
+         id, event_slug, starts_at_utc, ends_at_utc, timezone, venue_name, venue_map_url,
          capacity, price_paise, status, gcal_uid, synced_at
-       ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)
+       ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)
        ON CONFLICT(id) DO UPDATE SET
          starts_at_utc = excluded.starts_at_utc,
+         ends_at_utc   = excluded.ends_at_utc,
          venue_name    = excluded.venue_name,
          venue_map_url = excluded.venue_map_url,
          gcal_uid      = COALESCE(occurrences.gcal_uid, excluded.gcal_uid),
          synced_at     = excluded.synced_at`,
     )
     .bind(
-      occ.id, occ.event_slug, occ.starts_at_utc, occ.timezone, occ.venue_name,
+      occ.id, occ.event_slug, occ.starts_at_utc, occ.ends_at_utc, occ.timezone, occ.venue_name,
       occ.venue_map_url, occ.capacity, occ.price_paise, occ.status,
       occ.gcal_uid || null, occ.synced_at,
     )
@@ -293,10 +346,10 @@ export async function applyCalendarOverrides(db, id, { capacity, pricePaise }) {
   const binds = [];
   let n = 1;
   if (Number.isInteger(capacity) && capacity > 0) {
-    sets.push(`capacity = ?${n}`); binds.push(capacity); n += 1;
+    sets.push(`capacity = CASE WHEN capacity_overridden = 1 THEN capacity ELSE ?${n} END`); binds.push(capacity); n += 1;
   }
   if (Number.isInteger(pricePaise) && pricePaise > 0) {
-    sets.push(`price_paise = ?${n}`); binds.push(pricePaise); n += 1;
+    sets.push(`price_paise = CASE WHEN price_overridden = 1 THEN price_paise ELSE ?${n} END`); binds.push(pricePaise); n += 1;
     sets.push(`status = CASE WHEN status = 'draft' THEN 'open' ELSE status END`);
   }
   if (!sets.length) return;
@@ -348,7 +401,9 @@ export async function applyDefaultsToUnpricedOccurrences(db, slug, { pricePaise,
         WHERE event_slug = ?3
           AND status = 'draft'
           AND price_paise = 0
-          AND starts_at_utc > ?4`,
+          AND COALESCE(ends_at_utc, starts_at_utc) > ?4
+          AND price_overridden = 0
+          AND capacity_overridden = 0`,
     )
     .bind(pricePaise, capacity, slug, now)
     .run();

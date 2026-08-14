@@ -108,6 +108,13 @@
     });
   }
 
+  function apiPost(path, payload) {
+    var headers = { Authorization: 'Bearer ' + token };
+    if (payload) headers['Content-Type'] = 'application/json';
+    return fetch(API + path, {
+      method: 'POST', cache: 'no-store',
+      headers: headers,
+      body: payload ? JSON.stringify(payload) : undefined
   function apiPost(path) {
     return fetch(API + path, {
       method: 'POST', cache: 'no-store',
@@ -300,6 +307,12 @@
       var menu = document.createElement('details'); menu.className = 'occ__menu';
       var summary = document.createElement('summary'); summary.setAttribute('aria-label', 'More actions for ' + (occurrence.title || 'event')); summary.textContent = '⋮';
       var panel = el('div', 'occ__menu-panel');
+
+      function runAction(path, payload, failureMessage) {
+        menu.open = false;
+        apiPost('/api/admin/occurrences/' + encodeURIComponent(occurrence.id) + path, payload)
+          .then(function () { load(); })
+          .catch(function (err) {
       var action = el('button', null, view === 'cancelled' ? 'Remove from dashboard' : (view === 'past' ? 'Mark as cancelled' : 'Cancel event'));
       action.type = 'button';
       action.addEventListener('click', function () {
@@ -319,6 +332,43 @@
               ? 'This event is still present in Google Calendar. Remove it there, wait for the public feed to update, and try again.'
               : err.code === 'calendar_check_failed'
                 ? 'Google Calendar could not be verified. No changes were made; please try again.'
+                : err.code === 'unsafe_or_missing'
+                  ? 'That capacity is below seats already sold or held, or this event has ended.'
+                  : failureMessage || 'The event could not be updated. Please refresh and try again.';
+            window.alert(text);
+          });
+      }
+
+      function menuButton(label, handler, danger) {
+        var button = el('button', danger ? 'is-danger' : null, label); button.type = 'button'; button.addEventListener('click', handler); panel.appendChild(button);
+      }
+
+      if (view === 'active') {
+        if (occurrence.status === 'open') menuButton('Pause registrations', function () {
+          if (window.confirm('Pause website registrations? Existing bookings and tickets remain valid.')) runAction('/pause', null, 'Registrations could not be paused.');
+        });
+        if (occurrence.status === 'closed') menuButton('Resume registrations', function () {
+          if (window.confirm('Resume website registrations for this date?')) runAction('/resume', null, 'Registrations cannot resume because the event ended or no seats remain.');
+        });
+        menuButton('Edit price', function () {
+          var value = window.prompt('New ticket price in rupees for this date:', String((Number(occurrence.price_paise) || 0) / 100));
+          if (value !== null) runAction('/settings', { price_rupees: value }, 'Enter a valid positive price.');
+        });
+        menuButton('Edit capacity', function () {
+          var value = window.prompt('New website ticket limit for this date:', String(occurrence.capacity || ''));
+          if (value !== null) runAction('/settings', { capacity: Number(value) }, 'Enter a valid capacity that is not below sold or held seats.');
+        });
+      }
+
+      var destructiveLabel = view === 'cancelled' ? 'Remove from dashboard' : (view === 'past' ? 'Mark as cancelled' : 'Cancel event');
+      menuButton(destructiveLabel, function () {
+        var hiding = view === 'cancelled';
+        var message = hiding
+          ? 'Remove this cancelled event from the dashboard? Its booking records remain stored. This cannot be undone here.'
+          : 'Mark this event as cancelled? It must already be removed from Google Calendar. Refunds are not automatic.';
+        if (window.confirm(message)) runAction(hiding ? '/hide' : '/cancel');
+      }, true);
+      menu.appendChild(summary); menu.appendChild(panel); actions.appendChild(menu);
                 : 'The event could not be updated. Please refresh and try again.';
             window.alert(text);
           });
