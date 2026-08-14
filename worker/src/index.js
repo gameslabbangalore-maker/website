@@ -475,18 +475,17 @@ async function handleStaffOccurrences(env, request) {
   }));
 
   const now = nowIso();
-  const timezone = env.TIMEZONE || 'Asia/Kolkata';
-  const today = localDayKey(new Date(), timezone);
+  const active = occurrences.filter((occurrence) => (
+    occurrence.status !== 'cancelled' && occurrence.ends_at > now
+  ));
+  const past = occurrences.filter((occurrence) => (
+    occurrence.status !== 'cancelled' && occurrence.ends_at <= now
+  )).reverse();
+  const cancelled = occurrences.filter((occurrence) => occurrence.status === 'cancelled').reverse();
 
   return json(env, request, {
     generated_at: nowIso(),
-    occurrences: {
-      active: occurrences.filter((o) => o.status !== 'cancelled' && o.ends_at > now),
-      past: occurrences.filter((o) => o.status !== 'cancelled' && o.ends_at <= now).reverse(),
-      active: occurrences.filter((o) => o.status !== 'cancelled' && localDayKey(o.starts_at, timezone) >= today),
-      past: occurrences.filter((o) => o.status !== 'cancelled' && localDayKey(o.starts_at, timezone) < today).reverse(),
-      cancelled: occurrences.filter((o) => o.status === 'cancelled').reverse(),
-    },
+    occurrences: { active, past, cancelled },
   }, 200, { 'Cache-Control': 'no-store' });
 }
 

@@ -72,25 +72,19 @@ export async function listOccurrencesForStaff(db, now) {
 }
 
 export async function getOccurrenceForStaff(db, occurrenceId, now) {
-  return await db
-    .prepare(
-      `SELECT o.id, o.event_slug, o.starts_at_utc, o.ends_at_utc, o.timezone, o.venue_name,
-              o.venue_map_url, o.capacity, o.price_paise, o.status, o.gcal_uid,
-              o.price_overridden, o.capacity_overridden,
-      `SELECT o.id, o.event_slug, o.starts_at_utc, o.timezone, o.venue_name,
-              o.venue_map_url, o.capacity, o.price_paise, o.status, o.gcal_uid,
-              e.title AS event_title,
-              COALESCE((SELECT SUM(b.qty) FROM bookings b
-                         WHERE b.occurrence_id = o.id AND b.status = 'paid'), 0) AS sold,
-              COALESCE((SELECT SUM(b.amount_paise) FROM bookings b
-                         WHERE b.occurrence_id = o.id AND b.status = 'paid'), 0) AS revenue_paise,
-              o.capacity - (${COMMITTED_SEATS}) AS available
-         FROM occurrences o
-         JOIN events e ON e.slug = o.event_slug
-        WHERE o.id = ?2`,
-    )
-    .bind(now, occurrenceId)
-    .first();
+  const query = `SELECT o.id, o.event_slug, o.starts_at_utc, o.ends_at_utc, o.timezone,
+                        o.venue_name, o.venue_map_url, o.capacity, o.price_paise, o.status,
+                        o.gcal_uid, o.price_overridden, o.capacity_overridden,
+                        e.title AS event_title,
+                        COALESCE((SELECT SUM(b.qty) FROM bookings b
+                                   WHERE b.occurrence_id = o.id AND b.status = 'paid'), 0) AS sold,
+                        COALESCE((SELECT SUM(b.amount_paise) FROM bookings b
+                                   WHERE b.occurrence_id = o.id AND b.status = 'paid'), 0) AS revenue_paise,
+                        o.capacity - (${COMMITTED_SEATS}) AS available
+                   FROM occurrences o
+                   JOIN events e ON e.slug = o.event_slug
+                  WHERE o.id = ?2`;
+  return await db.prepare(query).bind(now, occurrenceId).first();
 }
 
 export async function cancelOccurrence(db, occurrenceId) {

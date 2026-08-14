@@ -115,10 +115,6 @@
       method: 'POST', cache: 'no-store',
       headers: headers,
       body: payload ? JSON.stringify(payload) : undefined
-  function apiPost(path) {
-    return fetch(API + path, {
-      method: 'POST', cache: 'no-store',
-      headers: { Authorization: 'Bearer ' + token }
     }).then(function (res) {
       return res.json().catch(function () { return {}; }).then(function (body) {
         if (res.status === 401) { var auth = new Error('unauthorized'); auth.unauthorized = true; throw auth; }
@@ -313,20 +309,6 @@
         apiPost('/api/admin/occurrences/' + encodeURIComponent(occurrence.id) + path, payload)
           .then(function () { load(); })
           .catch(function (err) {
-      var action = el('button', null, view === 'cancelled' ? 'Remove from dashboard' : (view === 'past' ? 'Mark as cancelled' : 'Cancel event'));
-      action.type = 'button';
-      action.addEventListener('click', function () {
-        menu.open = false;
-        var hiding = view === 'cancelled';
-        var message = hiding
-          ? 'Remove this cancelled event from the dashboard? Its booking records will remain stored. This cannot be undone here.'
-          : 'Mark this event as cancelled? It must already be removed from Google Calendar. Refunds are not automatic.';
-        if (!window.confirm(message)) return;
-        action.disabled = true;
-        apiPost('/api/admin/occurrences/' + encodeURIComponent(occurrence.id) + (hiding ? '/hide' : '/cancel'))
-          .then(function () { load(); })
-          .catch(function (err) {
-            action.disabled = false;
             if (err.unauthorized) { writeToken(''); token = ''; showGate('Your saved token is no longer valid. Paste it again.'); return; }
             var text = err.code === 'still_in_calendar'
               ? 'This event is still present in Google Calendar. Remove it there, wait for the public feed to update, and try again.'
@@ -369,11 +351,6 @@
         if (window.confirm(message)) runAction(hiding ? '/hide' : '/cancel');
       }, true);
       menu.appendChild(summary); menu.appendChild(panel); actions.appendChild(menu);
-                : 'The event could not be updated. Please refresh and try again.';
-            window.alert(text);
-          });
-      });
-      panel.appendChild(action); menu.appendChild(summary); menu.appendChild(panel); actions.appendChild(menu);
     }
     card.appendChild(actions);
     card.appendChild(attendees);
@@ -472,7 +449,6 @@
     api('/api/admin/occurrences')
       .then(function (data) {
         occurrenceGroups = normalizeOccurrenceGroups(data && data.occurrences);
-        occurrenceGroups = (data && data.occurrences) || { active: [], past: [], cancelled: [] };
         writeToken(token);
         hideGate();
         if (els.body) els.body.hidden = false;
