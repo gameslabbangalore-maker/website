@@ -77,6 +77,8 @@ export async function getOccurrenceForStaff(db, occurrenceId, now) {
       `SELECT o.id, o.event_slug, o.starts_at_utc, o.ends_at_utc, o.timezone, o.venue_name,
               o.venue_map_url, o.capacity, o.price_paise, o.status, o.gcal_uid,
               o.price_overridden, o.capacity_overridden,
+      `SELECT o.id, o.event_slug, o.starts_at_utc, o.timezone, o.venue_name,
+              o.venue_map_url, o.capacity, o.price_paise, o.status, o.gcal_uid,
               e.title AS event_title,
               COALESCE((SELECT SUM(b.qty) FROM bookings b
                          WHERE b.occurrence_id = o.id AND b.status = 'paid'), 0) AS sold,

@@ -31,6 +31,14 @@ function nowIso() {
   return new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
 }
 
+function localDayKey(value, timezone) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    year: 'numeric', month: '2-digit', day: '2-digit', timeZone: timezone,
+  }).formatToParts(new Date(value));
+  const get = (type) => parts.find((part) => part.type === type)?.value || '';
+  return `${get('year')}-${get('month')}-${get('day')}`;
+}
+
 function isStaff(env, request) {
   const header = request.headers.get('Authorization') || '';
   const token = header.replace(/^Bearer\s+/i, '').trim();
@@ -467,12 +475,16 @@ async function handleStaffOccurrences(env, request) {
   }));
 
   const now = nowIso();
+  const timezone = env.TIMEZONE || 'Asia/Kolkata';
+  const today = localDayKey(new Date(), timezone);
 
   return json(env, request, {
     generated_at: nowIso(),
     occurrences: {
       active: occurrences.filter((o) => o.status !== 'cancelled' && o.ends_at > now),
       past: occurrences.filter((o) => o.status !== 'cancelled' && o.ends_at <= now).reverse(),
+      active: occurrences.filter((o) => o.status !== 'cancelled' && localDayKey(o.starts_at, timezone) >= today),
+      past: occurrences.filter((o) => o.status !== 'cancelled' && localDayKey(o.starts_at, timezone) < today).reverse(),
       cancelled: occurrences.filter((o) => o.status === 'cancelled').reverse(),
     },
   }, 200, { 'Cache-Control': 'no-store' });
