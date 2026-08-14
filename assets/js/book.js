@@ -44,7 +44,7 @@
         for (var i = 0; i < events.length; i += 1) {
           var entry = events[i];
           if (!entry || entry.slug !== slug || !entry.start) continue;
-          if (Date.parse(entry.start) < now) continue;
+          if (Date.parse(entry.end || entry.start) <= now) continue;
           if (!match || Date.parse(entry.start) < Date.parse(match.start)) match = entry;
         }
         if (!match || !match.day_key) return '';
@@ -108,9 +108,9 @@
             'We could not find that event date. It may have already happened.');
           return;
         }
-        if (Number(occurrence.available) <= 0) {
+        if (occurrence.ended || occurrence.status === 'closed' || Number(occurrence.available) <= 0) {
           unavailable('Sold out',
-            (occurrence.title || 'This sitting') + ' is fully booked. Keep an eye out for the next date!');
+            'We’re sold out for this date. Keep an eye out for the next one!');
           return;
         }
         if (!occurrence.on_sale) {
