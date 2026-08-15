@@ -45,6 +45,7 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
 
 /* "No date yet" notice (event has no upcoming calendar entry) */
 .no-date{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;margin:0 0 22px;padding:20px 18px;border-radius:14px;background:var(--card);border:1.5px solid rgba(255,255,255,.08)}
+.no-date[hidden]{display:none}
 .no-date__text{margin:0;font-size:1rem;line-height:1.6;color:var(--muted)}
 @media (prefers-color-scheme: light){.no-date{border-color:rgba(0,0,0,.06);box-shadow:0 6px 22px rgba(0,0,0,.08)}}
 
@@ -126,13 +127,21 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
   .info-card h3{margin:0 0 14px;font-size:13px;letter-spacing:.45px;text-transform:uppercase;color:var(--muted);text-align:center}
   .schedule-list{display:grid;gap:10px;margin-bottom:10px}
   .schedule-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
-  .when{font-weight:900;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .when{font-weight:900;font-size:16px;min-width:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .schedule-date-select{width:auto;max-width:175px;padding:6px 30px 6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:color-mix(in srgb,var(--card) 82%,var(--bg));color:var(--text-main);font:inherit;font-size:13.5px;font-weight:900;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+  .schedule-date-select:hover{border-color:rgba(255,255,255,.28)}
+  .schedule-date-select:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-color:transparent}
+  .schedule-date-select[hidden]{display:none}
   .where{font-weight:900;font-size:16px;color:var(--text-main);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:6px}
+  .where-time{font-size:12.5px;color:var(--muted);font-weight:800}
   .inline-link{font-size:12.5px;font-weight:800;color:var(--muted);text-decoration:none}
-  .sched-seats{margin:8px 0 0;font-size:12.5px;font-weight:800;color:var(--muted);display:flex;align-items:center;gap:7px}
+  .sched-commercial{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px}
+  .sched-seats{margin:0;font-size:12.5px;font-weight:800;color:var(--muted);display:flex;align-items:center;gap:7px;min-width:0}
   .sched-seats::before{content:"";width:7px;height:7px;border-radius:50%;background:#4ec27b;flex:0 0 auto}
   .sched-seats[data-low]{color:var(--accent)}
   .sched-seats[data-low]::before{background:currentColor}
+  .sched-price{margin:0;font-size:12.5px;font-weight:900;color:var(--text-main);white-space:nowrap}
+  .sched-more-dates{margin:-4px 0 0;font-size:12px;font-weight:800;color:var(--muted);white-space:nowrap}
   .btn-primary{background:var(--accent);color:#000;border:0;font-weight:900}
   .btn-primary:hover{filter:brightness(1.05)}
   .wide-cta{display:block;width:100%;text-align:center;padding:11px 18px;border-radius:999px;margin:6px 0 8px;box-sizing:border-box;text-decoration:none}
@@ -174,6 +183,7 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
   .gl-book--compact .book-field{display:grid;gap:4px}
   .gl-book--compact .book-field label{display:grid;gap:4px;font-size:12px;font-weight:800;letter-spacing:.02em;color:var(--muted);text-transform:none}
   .gl-book--compact .book-field input{padding:9px 11px;font-size:16px;border-radius:9px}
+  .gl-book--compact .book-field select{padding:9px 11px;font-size:13px;border-radius:9px}
   .gl-book--compact .book-hint{font-size:11.5px}
   .gl-book--compact .book-error{font-size:12px}
   .gl-book--compact .book-phone-cc{padding:0 9px;font-size:14px;border-radius:9px 0 0 9px}
@@ -200,6 +210,10 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
   }
 }
 
+.book-field[hidden]{display:none}
+.book-field select{width:100%;box-sizing:border-box;padding:11px 12px;border-radius:10px;font:inherit;background:var(--card);color:var(--text-main);border:1px solid rgba(255,255,255,.2)}
+.more-dates{margin:0;color:var(--muted);font-size:.82rem;font-weight:800}
+
 /* Microbar (mobile only) */
 .mobile-info-bar{position:fixed;left:0;right:0;top:calc(var(--topbar-height-mobile) + env(safe-area-inset-top,0px));z-index:10001;padding:6px 12px 4px;background:rgba(24,24,24,.07);border-bottom:1px solid rgba(255,255,255,.3);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);transform:translate3d(0,-100%,0);opacity:0;pointer-events:none;transition:transform .2s ease, opacity .15s ease;will-change:transform,opacity}
 @media (prefers-color-scheme: light){.mobile-info-bar{background:rgba(255,255,255,.55);border-bottom:1px solid rgba(0,0,0,.08)}}
@@ -207,11 +221,13 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
 .mobile-info-inner{display:flex;flex-direction:column;align-items:flex-start;gap:4px;max-width:1200px;margin:0 auto}
 .micro-title{font-size:1.02rem;font-weight:900;line-height:1.15;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .micro-line{display:flex;align-items:center;gap:10px;width:100%;flex-wrap:nowrap}
+.micro-title-row{align-items:flex-end}
 .micro-line[hidden]{display:none}
 .micro-meta{font-size:.84rem;color:var(--muted);font-weight:800;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .micro-left{flex:1;min-width:0}
 .micro-right{margin-left:auto;flex-shrink:0;text-align:right}
 .micro-title-row .micro-right{font-size:.88rem;font-weight:900;color:var(--text-main)}
+#microRightTitle{font-size:.84rem;font-weight:800;color:var(--muted);line-height:1.2;align-self:flex-end;padding-bottom:1px}
 .micro-action{font-size:.82rem;color:var(--muted);font-weight:800;text-decoration:underline;text-underline-offset:2px;margin-left:auto;white-space:nowrap}
 .micro-action[hidden]{display:none}
 .micro-line:empty{display:none}
@@ -223,6 +239,9 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
 .fab-book,.fab-share{position:fixed;z-index:10000;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.35);display:flex;align-items:center;gap:10px;padding:12px 16px;text-decoration:none}
 .fab-book{left:12px;right:12px;bottom:6px;background:var(--accent);color:#000;font-weight:900;justify-content:center;text-align:center}
 .fab-book[hidden]{display:none}
+.fab-no-date,.fab-sold-out{transition:transform .24s ease,opacity .24s ease}
+.fab-book.fab-sold-out{opacity:1}
+.fab-no-date.is-scroll-hidden,.fab-sold-out.is-scroll-hidden{transform:translateY(calc(100% + 18px));opacity:0;pointer-events:none}
 .fab-share{right:12px;bottom:var(--fab-share-bottom,12px);background:rgba(24,24,24,.35);color:var(--text-main);border:1px solid rgba(255,255,255,.25);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .fab-share .fab-share-label{font-weight:900;font-size:.95rem}
 @media (prefers-color-scheme: light){
@@ -230,6 +249,13 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
   .fab-share{background:rgba(255,255,255,.65);border-color:rgba(0,0,0,.15);color:inherit}
 }
 @media (min-width:960px){.fab-book,.fab-share{display:none}}
+@media (prefers-reduced-motion:reduce){.fab-no-date,.fab-sold-out{transition:none}}
+
+/* Override the slide-out treatment without editing its shared definition.
+   Moving a fixed element below the viewport paints its accent background into
+   iOS Safari's bottom safe area; fading in place avoids that browser artifact. */
+.fab-no-date,.fab-sold-out{transition:opacity .2s ease,visibility 0s linear .2s}
+.fab-no-date.is-scroll-hidden,.fab-sold-out.is-scroll-hidden{transform:none;opacity:0;visibility:hidden;pointer-events:none}
 
 .book-drawer{position:fixed;inset:0;z-index:10030}
 .book-drawer[hidden]{display:none}
@@ -252,6 +278,7 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
   max-height:92vh;
   max-height:92dvh;
   overflow-y:auto;
+  overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
   overscroll-behavior:contain;
   transform:translateY(101%);
@@ -277,8 +304,11 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
 }
 .book-drawer__close:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-.book-drawer__body .gl-book{display:grid;gap:14px}
-.book-drawer__body .book-field label{display:grid;gap:5px;font-size:12.5px;font-weight:800;color:var(--muted)}
+.book-drawer__body,.book-drawer__body .gl-book,.book-drawer__body .book-field{min-width:0;max-width:100%}
+.book-drawer__body .gl-book{display:grid;gap:14px;overflow-x:hidden}
+.book-drawer__body .book-field label{display:grid;gap:5px;font-size:12.5px;font-weight:800;color:var(--muted);min-width:0;max-width:100%}
+.book-drawer__body input,.book-drawer__body select{width:100%;min-width:0;max-width:100%;box-sizing:border-box;background:var(--bg);color:var(--text-main);border:1.5px solid color-mix(in srgb,var(--muted) 30%,transparent);border-radius:10px;padding:12px 14px;font:inherit;font-size:16px}
+.book-drawer__body select:focus-visible{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
 
 .book-drawer-open .fab-book,
 .book-drawer-open .fab-share{display:none !important}
