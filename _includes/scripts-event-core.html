@@ -64,9 +64,12 @@
     return isNaN(d.getTime()) ? null : d;
   }
 
-  function makeICS({title, start, durationHours=3, locationText='', locationUrl='', description=''}){
+  function makeICS({title, start, endTime=null, durationHours=3, locationText='', locationUrl='', description=''}){
     const dt = new Date(start);
-    const end = new Date(dt.getTime() + durationHours*60*60*1000);
+    const parsedEnd = endTime ? new Date(endTime) : null;
+    const end = parsedEnd && !isNaN(parsedEnd.getTime())
+      ? parsedEnd
+      : new Date(dt.getTime() + durationHours*60*60*1000);
     const pad = n => String(n).padStart(2,'0');
     const stamp = (x)=> x.getUTCFullYear()+pad(x.getUTCMonth()+1)+pad(x.getUTCDate())+'T'+pad(x.getUTCHours())+pad(x.getUTCMinutes())+pad(x.getUTCSeconds())+'Z';
     const loc = locationUrl ? `${locationText} (${locationUrl})` : locationText;
@@ -76,7 +79,7 @@
       `SUMMARY:${title}`,`LOCATION:${loc.replace(/,/g,'\\,')}`,`DESCRIPTION:${description}`,
       'END:VEVENT','END:VCALENDAR'
     ];
-    return 'data:text/calendar;charset=utf8,' + encodeURIComponent(lines.join('\r\n'));
+    return URL.createObjectURL(new Blob([lines.join('\r\n')], { type:'text/calendar;charset=utf-8' }));
   }
 
   let match = null;
@@ -115,7 +118,6 @@
   const scDir     = document.getElementById('scDir');
   const scSeats   = document.getElementById('scSeats');
   const scPrice   = document.getElementById('scPrice');
-  const scMoreDates = document.getElementById('scMoreDates');
   const scBook    = document.getElementById('scBook');
   const fabBook   = document.getElementById('fabBook');
   const fabNoDate = document.getElementById('fabNoDate');
@@ -250,7 +252,7 @@
     scWhen && (scWhen.textContent = whenText);
     scWhere && (scWhere.textContent = locationText || '');
     scTime && (scTime.textContent = timeStr ? ' · ' + timeStr : '');
-    if (scAdd) scAdd.href = makeICS({ title: titleFallback, start: scheduleDate, durationHours: 3, locationText, locationUrl, description: location.href });
+    if (scAdd) scAdd.href = makeICS({ title: titleFallback, start: scheduleDate, endTime:match?.end, durationHours:3, locationText, locationUrl, description:location.href });
     if (scDir){
       if (locationUrl){
         scDir.href = locationUrl;
@@ -327,7 +329,8 @@
     assignText(M.R1, '');
     if (M.A1){
       M.A1.textContent = 'Add to Calendar';
-      M.A1.href = makeICS({ title: titleFallback, start: scheduleDate, durationHours: 3, locationText, locationUrl, description: location.href });
+      M.A1.href = makeICS({ title: titleFallback, start: scheduleDate, endTime:match?.end, durationHours:3, locationText, locationUrl, description:location.href });
+      M.A1.setAttribute('download', 'games-lab-event.ics');
       M.A1.hidden = false;
     }
 
@@ -613,7 +616,7 @@
         if (scWhen) scWhen.textContent = dateOnlyLabel(choice);
         if (scWhere) scWhere.textContent = venue;
         if (scTime) scTime.textContent = fmtTime(start, timezone) ? ' · ' + fmtTime(start, timezone) : '';
-        if (scAdd) scAdd.href = makeICS({ title:titleFallback, start, durationHours:3, locationText:venue, locationUrl:mapUrl, description:location.href });
+        if (scAdd) scAdd.href = makeICS({ title:titleFallback, start, endTime:entry.end, durationHours:3, locationText:venue, locationUrl:mapUrl, description:location.href });
         if (scDir){
           if (mapUrl){ scDir.href = mapUrl; scDir.removeAttribute('hidden'); }
           else { scDir.setAttribute('hidden',''); scDir.removeAttribute('href'); }

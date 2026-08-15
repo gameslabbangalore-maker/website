@@ -66,6 +66,16 @@
     return str.toUpperCase();
   }
 
+  function formatMobileDay(date, timezone){
+    return new Intl.DateTimeFormat('en-US', { weekday:'long', timeZone:timezone }).format(date);
+  }
+
+  function formatMobileTime(date, timezone){
+    return new Intl.DateTimeFormat('en-US', {
+      hour:'numeric', minute:'2-digit', hour12:true, timeZone:timezone
+    }).format(date).replace(/\u202f/g, ' ').toUpperCase();
+  }
+
   try{
     const res = await fetch(CALENDAR_URL + '?v=' + Date.now(), { cache: 'no-store' });
     if (!res.ok) throw new Error('Calendar fetch failed: ' + res.status);
@@ -150,7 +160,16 @@
       if (dateLabel || timeLabel){
         const dateTime = document.createElement('p');
         dateTime.className = 'event-datetime';
-        dateTime.textContent = [dateLabel, timeLabel].filter(Boolean).join(' | ');
+        const desktopDateTime = document.createElement('span');
+        desktopDateTime.className = 'event-datetime__desktop';
+        desktopDateTime.textContent = [dateLabel, timeLabel].filter(Boolean).join(' | ');
+        dateTime.appendChild(desktopDateTime);
+        if (start){
+          const mobileDateTime = document.createElement('span');
+          mobileDateTime.className = 'event-datetime__mobile';
+          mobileDateTime.textContent = formatMobileDay(start, timezone) + ' | ' + formatMobileTime(start, timezone);
+          dateTime.appendChild(mobileDateTime);
+        }
         body.appendChild(dateTime);
       }
 
