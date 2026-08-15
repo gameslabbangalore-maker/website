@@ -64,9 +64,12 @@
     return isNaN(d.getTime()) ? null : d;
   }
 
-  function makeICS({title, start, durationHours=3, locationText='', locationUrl='', description=''}){
+  function makeICS({title, start, endTime=null, durationHours=3, locationText='', locationUrl='', description=''}){
     const dt = new Date(start);
-    const end = new Date(dt.getTime() + durationHours*60*60*1000);
+    const parsedEnd = endTime ? new Date(endTime) : null;
+    const end = parsedEnd && !isNaN(parsedEnd.getTime())
+      ? parsedEnd
+      : new Date(dt.getTime() + durationHours*60*60*1000);
     const pad = n => String(n).padStart(2,'0');
     const stamp = (x)=> x.getUTCFullYear()+pad(x.getUTCMonth()+1)+pad(x.getUTCDate())+'T'+pad(x.getUTCHours())+pad(x.getUTCMinutes())+pad(x.getUTCSeconds())+'Z';
     const loc = locationUrl ? `${locationText} (${locationUrl})` : locationText;
@@ -76,10 +79,11 @@
       `SUMMARY:${title}`,`LOCATION:${loc.replace(/,/g,'\\,')}`,`DESCRIPTION:${description}`,
       'END:VEVENT','END:VCALENDAR'
     ];
-    return 'data:text/calendar;charset=utf8,' + encodeURIComponent(lines.join('\r\n'));
+    return URL.createObjectURL(new Blob([lines.join('\r\n')], { type:'text/calendar;charset=utf-8' }));
   }
 
   let match = null;
+  let matches = [];
   let timezone = 'Asia/Kolkata';
 
   try {
@@ -91,14 +95,15 @@
 
     const pathSlug = normalizeSlug(pagePath.split('/').filter(Boolean).pop());
 
-    match = events.find(entry => {
+    matches = events.filter(entry => {
       if (!entry) return false;
       const entrySlug = normalizeSlug(entry.slug || entry.title);
       if (PAGE_SLUG && entrySlug === normalizeSlug(PAGE_SLUG)) return true;
       if (pathSlug && entrySlug === pathSlug) return true;
       if (titleFallback && entry.title && entry.title.toLowerCase() === titleFallback.toLowerCase()) return true;
       return false;
-    });
+    }).sort((a, b) => Date.parse(a.start || '') - Date.parse(b.start || ''));
+    match = matches[0] || null;
   } catch (e) {
     console.error('Calendar load error', e);
   }
@@ -106,13 +111,21 @@
   const scHeading = document.getElementById('scheduleHeading');
   const scBlock   = document.getElementById('scheduleBlock');
   const scWhen    = document.getElementById('scWhen');
+  const scDateSelect = document.getElementById('scDateSelect');
   const scWhere   = document.getElementById('scWhere');
+  const scTime    = document.getElementById('scTime');
   const scAdd     = document.getElementById('scAddCal');
   const scDir     = document.getElementById('scDir');
   const scSeats   = document.getElementById('scSeats');
+  const scPrice   = document.getElementById('scPrice');
   const scBook    = document.getElementById('scBook');
   const fabBook   = document.getElementById('fabBook');
+  const fabNoDate = document.getElementById('fabNoDate');
   const shareFab  = document.getElementById('shareFab');
+
+  // Older cached event markup included a redundant multi-date note in the
+  // schedule card. The selector now communicates this, so remove that note.
+  document.querySelectorAll('#scheduleBlock .sched-more-dates, #scMoreDates').forEach(el => el.remove());
   const noDateNotice = document.getElementById('noDateNotice');
 
   const M = {
@@ -164,13 +177,15 @@
     // getClientRects() is empty for a display:none element. Without that check
     // the desktop breakpoint (where .fab-book is display:none but carries no
     // hidden attribute) measures 0 and re-queues itself forever.
-    const bookVisible = fabBook
-      && !fabBook.hasAttribute('hidden')
-      && fabBook.getClientRects().length > 0;
+    const activeFab = [fabBook, fabNoDate].find(el => el
+      && !el.hasAttribute('hidden')
+      && !el.classList.contains('is-scroll-hidden')
+      && el.getClientRects().length > 0);
+    const bookVisible = Boolean(activeFab);
     let bookHeight = 0;
     if (bookVisible){
-      const rect = fabBook.getBoundingClientRect();
-      bookHeight = rect.height || fabBook.offsetHeight || 0;
+      const rect = activeFab.getBoundingClientRect();
+      bookHeight = rect.height || activeFab.offsetHeight || 0;
       if (!bookHeight && fabMeasureRetries < 10){
         fabMeasureRetries += 1;
         requestAnimationFrame(updateFabSpacing);
@@ -193,9 +208,12 @@
   }
 
   const scheduleDate = parseStart(match);
+  const scheduleEnd = parseStart({ start: match?.end });
   const todayKey = dayKey(new Date(), timezone);
   const eventDayKey = scheduleDate ? dayKey(scheduleDate, timezone) : '';
-  const isUpcoming = Boolean(scheduleDate) && eventDayKey >= todayKey;
+  const isUpcoming = Boolean(scheduleDate) && (scheduleEnd
+    ? scheduleEnd.getTime() > Date.now()
+    : eventDayKey >= todayKey);
 
   if (match?.location_warning && match.raw_location){
     console.warn('Calendar location mismatch for "%s": "%s"', titleFallback, match.raw_location);
@@ -209,6 +227,13 @@
   const occurrenceSlug = normalizeSlug(match?.slug || match?.title || PAGE_SLUG);
   const occurrenceDay = (match?.day_key || eventDayKey || '').replace(/-/g, '');
   const occurrenceId = (occurrenceSlug && occurrenceDay) ? (occurrenceSlug + '-' + occurrenceDay) : '';
+
+  function occurrenceIdFor(entry){
+    const slug = normalizeSlug(entry?.slug || entry?.title || PAGE_SLUG);
+    const date = parseStart(entry);
+    const key = (entry?.day_key || (date ? dayKey(date, timezone) : '')).replace(/-/g, '');
+    return slug && key ? slug + '-' + key : '';
+  }
 
   const useInHouse = Boolean(TICKETING.enabled && TICKETING.apiBase && occurrenceId);
   const ticket = useInHouse
@@ -230,7 +255,8 @@
     if (scBlock) scBlock.hidden = false;
     scWhen && (scWhen.textContent = whenText);
     scWhere && (scWhere.textContent = locationText || '');
-    if (scAdd) scAdd.href = makeICS({ title: titleFallback, start: scheduleDate, durationHours: 3, locationText, locationUrl, description: location.href });
+    scTime && (scTime.textContent = timeStr ? ' | ' + timeStr : '');
+    if (scAdd) scAdd.href = makeICS({ title: titleFallback, start: scheduleDate, endTime:match?.end, durationHours:3, locationText, locationUrl, description:location.href });
     if (scDir){
       if (locationUrl){
         scDir.href = locationUrl;
@@ -256,7 +282,44 @@
     if (scBlock) scBlock.hidden = true;
     if (fabBook){ fabBook.setAttribute('hidden',''); }
     if (noDateNotice) noDateNotice.removeAttribute('hidden');
+    if (fabNoDate) fabNoDate.removeAttribute('hidden');
     updateFabSpacing();
+  }
+
+  // Notice-style mobile CTAs should not cover the page while somebody reads
+  // downward. This applies to both the no-date CTA and a Book button that is
+  // later converted into a sold-out notice by the availability request.
+  if (fabNoDate || fabBook){
+    let lastScrollY = Math.max(0, window.scrollY);
+    let scrollTicking = false;
+
+    function scrollAwareFabs(){
+      return [fabNoDate, fabBook].filter(el => el
+        && !el.hasAttribute('hidden')
+        && (el === fabNoDate || el.classList.contains('fab-sold-out')));
+    }
+
+    function updateNoticeFabsOnScroll(){
+      const currentY = Math.max(0, window.scrollY);
+      const delta = currentY - lastScrollY;
+      const noticeFabs = scrollAwareFabs();
+
+      if (currentY <= 12 || delta < -4){
+        noticeFabs.forEach(el => el.classList.remove('is-scroll-hidden'));
+      } else if (delta > 4){
+        noticeFabs.forEach(el => el.classList.add('is-scroll-hidden'));
+      }
+
+      lastScrollY = currentY;
+      scrollTicking = false;
+      updateFabSpacing();
+    }
+
+    window.addEventListener('scroll', () => {
+      if (scrollTicking) return;
+      scrollTicking = true;
+      requestAnimationFrame(updateNoticeFabsOnScroll);
+    }, { passive:true });
   }
 
   if (isUpcoming && scheduleDate){
@@ -266,7 +329,8 @@
     assignText(M.R1, '');
     if (M.A1){
       M.A1.textContent = 'Add to Calendar';
-      M.A1.href = makeICS({ title: titleFallback, start: scheduleDate, durationHours: 3, locationText, locationUrl, description: location.href });
+      M.A1.href = makeICS({ title: titleFallback, start: scheduleDate, endTime:match?.end, durationHours:3, locationText, locationUrl, description:location.href });
+      M.A1.setAttribute('download', 'games-lab-event.ics');
       M.A1.hidden = false;
     }
 
@@ -439,6 +503,11 @@
 
       function openDrawer(){
         if (!canDrawer || drawerOpen) return false;
+        if (defaultBookableChoice){
+          setCurrentOccurrence(defaultBookableChoice.occurrence.id);
+          const dateSelect = drawerForm.querySelector('[data-gl-date]');
+          if (dateSelect) dateSelect.value = defaultBookableChoice.occurrence.id;
+        }
         lastFocus = document.activeElement;
         drawerOpen = true;
 
@@ -498,51 +567,156 @@
       function markSoldOut(){
         [scBook, fabBook].forEach(el => {
           if (!el) return;
-          el.textContent = 'Sold out';
+          el.textContent = 'We’re sold out for this date';
           el.setAttribute('aria-disabled','true');
           el.removeAttribute('href');
-          el.style.opacity = '.6';
           el.style.pointerEvents = 'none';
+          if (el === fabBook){
+            el.classList.add('fab-sold-out');
+            el.style.removeProperty('opacity');
+          } else {
+            el.style.opacity = '.6';
+          }
         });
+        updateFabSpacing();
       }
 
-      try {
-        const res = await fetch(TICKETING.apiBase + '/api/occurrences/' + encodeURIComponent(occurrenceId), { cache:'no-store' });
-        if (!res.ok) return;
-        const data = await res.json();
-        occ = data && data.occurrence;
-        if (!occ) return;
+      let occurrenceChoices = [];
+      let defaultBookableChoice = null;
 
-        const priceText = occ.price_paise > 0
-          ? '₹' + (occ.price_paise / 100).toLocaleString('en-IN')
-          : '';
+      function updateDrawerMeta(){
+        if (!drawerMeta || !occ) return;
+        const start = new Date(occ.starts_at);
+        const bits = [occ.venue_name];
+        if (occurrenceChoices.length <= 1) bits.push(fmtDateOnly(start, timezone));
+        bits.push(fmtTime(start, timezone));
+        drawerMeta.textContent = bits.filter(Boolean).join('  ·  ');
+      }
 
-        const soldOut = !occ.on_sale || Number(occ.available) <= 0;
-        if (soldOut){
-          markSoldOut();
-        } else if (priceText){
-          [scBook, fabBook].forEach(el => {
-            if (el) el.textContent = 'Book Now · ' + priceText;
+      function setCurrentOccurrence(id){
+        const choice = occurrenceChoices.find(item => item.occurrence.id === id);
+        if (!choice) return;
+        occ = choice.occurrence;
+        mounted?.setOccurrence(occ);
+        drawerMounted?.setOccurrence(occ);
+        updateDrawerMeta();
+        if (flipped) syncHeight(true);
+      }
+
+      function dateOnlyLabel(choice){
+        return fmtDateOnly(new Date(choice.occurrence.starts_at), timezone);
+      }
+
+      function renderScheduleChoice(choice){
+        const item = choice.occurrence;
+        const entry = choice.entry;
+        const start = new Date(item.starts_at);
+        const mapUrl = item.venue_map_url || entry.location_map_url || '';
+        const venue = item.venue_name || entry.location_name || 'To be Announced';
+        if (scWhen) scWhen.textContent = dateOnlyLabel(choice);
+        if (scWhere) scWhere.textContent = venue;
+        if (scTime) scTime.textContent = fmtTime(start, timezone) ? ' | ' + fmtTime(start, timezone) : '';
+        if (scAdd) scAdd.href = makeICS({ title:titleFallback, start, endTime:entry.end, durationHours:3, locationText:venue, locationUrl:mapUrl, description:location.href });
+        if (scDir){
+          if (mapUrl){ scDir.href = mapUrl; scDir.removeAttribute('hidden'); }
+          else { scDir.setAttribute('hidden',''); scDir.removeAttribute('href'); }
+        }
+
+        const left = Math.max(0, Number(item.available) || 0);
+        const capacity = Number(item.capacity) || 0;
+        if (scSeats){
+          scSeats.textContent = choice.bookable
+            ? (left === 1 ? 'Only 1 ticket left' : left + (capacity ? ' of ' + capacity : '') + ' tickets left')
+            : (item.status === 'closed' && left > 0 ? 'Registrations paused' : 'Sold out');
+          scSeats.toggleAttribute('data-low', !choice.bookable || left <= 6);
+          scSeats.removeAttribute('hidden');
+        }
+        if (scPrice && item.price_paise > 0){
+          scPrice.textContent = '₹' + (item.price_paise / 100).toLocaleString('en-IN') + ' per person';
+          scPrice.removeAttribute('hidden');
+        }
+        if (scBook){
+          scBook.textContent = choice.bookable ? 'Book Now' : 'Unavailable for this date';
+          scBook.toggleAttribute('aria-disabled', !choice.bookable);
+          scBook.style.pointerEvents = choice.bookable ? '' : 'none';
+          scBook.style.opacity = choice.bookable ? '' : '.6';
+          if (choice.bookable) scBook.href = TICKETING.bookPath + '?o=' + encodeURIComponent(item.id);
+          else scBook.removeAttribute('href');
+        }
+      }
+
+      function setupDateSelectors(primaryChoice, defaultChoice){
+        if (scDateSelect){
+          scDateSelect.innerHTML = '';
+          occurrenceChoices.forEach(choice => {
+            const option = document.createElement('option');
+            option.value = choice.occurrence.id;
+            option.textContent = dateOnlyLabel(choice);
+            scDateSelect.appendChild(option);
+          });
+          scDateSelect.hidden = occurrenceChoices.length <= 1;
+          if (scWhen) scWhen.hidden = occurrenceChoices.length > 1;
+          scDateSelect.value = primaryChoice.occurrence.id;
+          scDateSelect.addEventListener('change', () => {
+            const choice = occurrenceChoices.find(item => item.occurrence.id === scDateSelect.value);
+            if (!choice) return;
+            setCurrentOccurrence(choice.occurrence.id);
+            renderScheduleChoice(choice);
           });
         }
 
-        // Live seat count on the schedule card, so nobody has to guess.
-        const left = Math.max(0, Number(occ.available) || 0);
-        const capacity = Number(occ.capacity) || 0;
-        if (scSeats){
-          if (soldOut){
-            scSeats.textContent = 'Sold out';
-            scSeats.setAttribute('data-low','');
-            scSeats.removeAttribute('hidden');
-          } else if (left > 0){
-            scSeats.textContent = left === 1
-              ? 'Only 1 ticket left'
-              : left + (capacity ? ' of ' + capacity : '') + ' tickets left';
-            if (left <= 6) scSeats.setAttribute('data-low','');
-            else scSeats.removeAttribute('data-low');
-            scSeats.removeAttribute('hidden');
-          }
+        if (drawerForm){
+          const field = drawerForm.querySelector('[data-gl-date-field]');
+          const select = drawerForm.querySelector('[data-gl-date]');
+          if (!field || !select) return;
+          field.hidden = occurrenceChoices.length <= 1;
+          select.innerHTML = '';
+          occurrenceChoices.forEach(choice => {
+            const option = document.createElement('option');
+            option.value = choice.occurrence.id;
+            option.textContent = dateOnlyLabel(choice);
+            option.disabled = !choice.bookable;
+            select.appendChild(option);
+          });
+          select.value = defaultChoice.occurrence.id;
+          select.addEventListener('change', () => setCurrentOccurrence(select.value));
         }
+      }
+
+      try {
+        occurrenceChoices = (await Promise.all(matches.map(async entry => {
+          const id = occurrenceIdFor(entry);
+          if (!id) return null;
+          const occurrence = await window.GLBooking.fetchOccurrence(TICKETING.apiBase, id).catch(() => null);
+          if (!occurrence) return null;
+          return {
+            entry,
+            occurrence,
+            bookable: Boolean(occurrence.on_sale) && Number(occurrence.available) > 0,
+          };
+        }))).filter(Boolean);
+        if (!occurrenceChoices.length) return;
+
+        const primaryChoice = occurrenceChoices[0];
+        const defaultChoice = occurrenceChoices.find(choice => choice.bookable) || primaryChoice;
+        const primaryOcc = primaryChoice.occurrence;
+        defaultBookableChoice = defaultChoice.bookable ? defaultChoice : null;
+        occ = primaryOcc;
+        const soldOut = !occurrenceChoices.some(choice => choice.bookable);
+
+        if (primaryOcc.price_paise > 0){
+          assignText(M.R0, '₹' + (primaryOcc.price_paise / 100).toLocaleString('en-IN') + ' / person');
+        }
+
+        if (soldOut){
+          markSoldOut();
+        } else {
+          if (fabBook) fabBook.textContent = 'Book Now';
+        }
+
+        renderScheduleChoice(primaryChoice);
+        setupDateSelectors(primaryChoice, defaultChoice);
+        updateDrawerMeta();
 
         const isPlainClick = (e) =>
           !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && e.button === 0;
@@ -578,14 +752,6 @@
           drawer.querySelectorAll('[data-drawer-close]').forEach((el) => {
             el.addEventListener('click', closeDrawer);
           });
-
-          if (drawerMeta){
-            const bits = [];
-            if (whenText) bits.push(whenText + (timeStr ? ' · ' + timeStr : ''));
-            if (locationText) bits.push(locationText);
-            if (occ.price_paise > 0) bits.push('₹' + (occ.price_paise / 100).toLocaleString('en-IN') + ' per ticket');
-            drawerMeta.textContent = bits.join('  ·  ');
-          }
 
           window.addEventListener('keydown', trapFocus);
         }

@@ -22,8 +22,11 @@
     refresh: document.getElementById('deskRefresh'),
     forget: document.getElementById('deskForget')
   };
+  els.tabs = Array.prototype.slice.call(document.querySelectorAll('[data-desk-view]'));
 
   var token = '';
+  var occurrenceGroups = { active: [], past: [], cancelled: [] };
+  var currentView = 'active';
 
   function readToken() {
     try { return localStorage.getItem(STORE_KEY) || ''; } catch (err) { return ''; }
@@ -53,6 +56,43 @@
     return day + ' · ' + time.toUpperCase();
   }
 
+  function localDayKey(value) {
+    var date = new Date(value);
+    if (isNaN(date.getTime())) return '';
+    var parts = new Intl.DateTimeFormat('en-US', {
+      year: 'numeric', month: '2-digit', day: '2-digit', timeZone: TZ
+    }).formatToParts(date);
+    function part(type) {
+      var found = parts.filter(function (item) { return item.type === type; })[0];
+      return found ? found.value : '';
+    }
+    return part('year') + '-' + part('month') + '-' + part('day');
+  }
+
+  // During a site/Worker rollout, GitHub Pages can update before the Worker.
+  // Accept the former flat-array response so the desk stays usable until the
+  // grouped API deployment reaches production.
+  function normalizeOccurrenceGroups(value) {
+    if (!Array.isArray(value)) {
+      return {
+        active: Array.isArray(value && value.active) ? value.active : [],
+        past: Array.isArray(value && value.past) ? value.past : [],
+        cancelled: Array.isArray(value && value.cancelled) ? value.cancelled : []
+      };
+    }
+
+    var today = localDayKey(new Date());
+    return {
+      active: value.filter(function (item) {
+        return item.status !== 'cancelled' && item.status !== 'hidden' && localDayKey(item.starts_at) >= today;
+      }),
+      past: value.filter(function (item) {
+        return item.status !== 'cancelled' && item.status !== 'hidden' && localDayKey(item.starts_at) < today;
+      }).reverse(),
+      cancelled: value.filter(function (item) { return item.status === 'cancelled'; }).reverse()
+    };
+  }
+
   function api(path) {
     return fetch(API + path, {
       cache: 'no-store',
@@ -65,6 +105,22 @@
       }
       if (!res.ok) throw new Error('request failed: ' + res.status);
       return res.json();
+    });
+  }
+
+  function apiPost(path, payload) {
+    var headers = { Authorization: 'Bearer ' + token };
+    if (payload) headers['Content-Type'] = 'application/json';
+    return fetch(API + path, {
+      method: 'POST', cache: 'no-store',
+      headers: headers,
+      body: payload ? JSON.stringify(payload) : undefined
+    }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (body) {
+        if (res.status === 401) { var auth = new Error('unauthorized'); auth.unauthorized = true; throw auth; }
+        if (!res.ok) { var err = new Error(body.error || 'request_failed'); err.code = body.error; throw err; }
+        return body;
+      });
     });
   }
 
@@ -130,6 +186,38 @@
 
           wrap.appendChild(table);
           container.appendChild(wrap);
+
+          var mobile = el('div', 'att-mobile');
+          live.forEach(function (booking, index) {
+            var item = el('div', 'att-mobile__item');
+            var summary = el('div', 'att-mobile__summary');
+            var identity = el('div');
+            identity.appendChild(el('div', 'att-mobile__name', booking.name || '—'));
+            identity.appendChild(el('div', 'att-mobile__meta', booking.status === 'paid' ? 'Paid' : 'Holding'));
+            summary.appendChild(identity);
+            summary.appendChild(el('div', 'att-mobile__qty', booking.qty + (Number(booking.qty) === 1 ? ' ticket' : ' tickets')));
+
+            var detailId = 'att-detail-' + occurrence.id + '-' + index;
+            var expand = el('button', 'att-mobile__toggle', '+');
+            expand.type = 'button'; expand.setAttribute('aria-expanded', 'false'); expand.setAttribute('aria-controls', detailId);
+            expand.setAttribute('aria-label', 'Show details for ' + (booking.name || 'attendee'));
+            summary.appendChild(expand); item.appendChild(summary);
+
+            var detail = el('div', 'att-mobile__details'); detail.id = detailId; detail.hidden = true;
+            function field(label, value) { detail.appendChild(el('span', 'att-mobile__label', label)); detail.appendChild(el('span', null, value || '—')); }
+            field('Email', booking.email); field('Phone', booking.phone); field('Paid', rupees(booking.amount_paise));
+            field('Status', booking.status); field('Ticket IDs', booking.codes ? String(booking.codes).split(',').join(', ') : '—');
+            if (booking.paid_at) field('Paid at', formatWhen(booking.paid_at));
+            if (booking.razorpay_payment_id) field('Payment ref', booking.razorpay_payment_id);
+            if (booking.notes) field('Notes', booking.notes);
+            expand.addEventListener('click', function () {
+              var opening = detail.hidden; detail.hidden = !opening; expand.textContent = opening ? '−' : '+';
+              expand.setAttribute('aria-expanded', opening ? 'true' : 'false');
+              expand.setAttribute('aria-label', (opening ? 'Hide' : 'Show') + ' details for ' + (booking.name || 'attendee'));
+            });
+            item.appendChild(detail); mobile.appendChild(item);
+          });
+          container.appendChild(mobile);
         }
 
         container.hidden = false;
@@ -148,7 +236,7 @@
       });
   }
 
-  function renderOccurrence(occurrence) {
+  function renderOccurrence(occurrence, view) {
     var card = el('section', 'occ');
 
     var top = el('div', 'occ__top');
@@ -211,10 +299,80 @@
       renderAttendees(occurrence, attendees, toggle);
     });
     actions.appendChild(toggle);
+    if (view === 'active' || view === 'past' || view === 'cancelled') {
+      var menu = document.createElement('details'); menu.className = 'occ__menu';
+      var summary = document.createElement('summary'); summary.setAttribute('aria-label', 'More actions for ' + (occurrence.title || 'event')); summary.textContent = '⋮';
+      var panel = el('div', 'occ__menu-panel');
+
+      function runAction(path, payload, failureMessage) {
+        menu.open = false;
+        apiPost('/api/admin/occurrences/' + encodeURIComponent(occurrence.id) + path, payload)
+          .then(function () { load(); })
+          .catch(function (err) {
+            if (err.unauthorized) { writeToken(''); token = ''; showGate('Your saved token is no longer valid. Paste it again.'); return; }
+            var text = err.code === 'still_in_calendar'
+              ? 'This event is still present in Google Calendar. Remove it there, wait for the public feed to update, and try again.'
+              : err.code === 'calendar_check_failed'
+                ? 'Google Calendar could not be verified. No changes were made; please try again.'
+                : err.code === 'unsafe_or_missing'
+                  ? 'That capacity is below seats already sold or held, or this event has ended.'
+                  : failureMessage || 'The event could not be updated. Please refresh and try again.';
+            window.alert(text);
+          });
+      }
+
+      function menuButton(label, handler, danger) {
+        var button = el('button', danger ? 'is-danger' : null, label); button.type = 'button'; button.addEventListener('click', handler); panel.appendChild(button);
+      }
+
+      if (view === 'active') {
+        if (occurrence.status === 'open') menuButton('Pause registrations', function () {
+          if (window.confirm('Pause website registrations? Existing bookings and tickets remain valid.')) runAction('/pause', null, 'Registrations could not be paused.');
+        });
+        if (occurrence.status === 'closed') menuButton('Resume registrations', function () {
+          if (window.confirm('Resume website registrations for this date?')) runAction('/resume', null, 'Registrations cannot resume because the event ended or no seats remain.');
+        });
+        menuButton('Edit price', function () {
+          var value = window.prompt('New ticket price in rupees for this date:', String((Number(occurrence.price_paise) || 0) / 100));
+          if (value !== null) runAction('/settings', { price_rupees: value }, 'Enter a valid positive price.');
+        });
+        menuButton('Edit capacity', function () {
+          var value = window.prompt('New website ticket limit for this date:', String(occurrence.capacity || ''));
+          if (value !== null) runAction('/settings', { capacity: Number(value) }, 'Enter a valid capacity that is not below sold or held seats.');
+        });
+      }
+
+      var destructiveLabel = view === 'cancelled' ? 'Remove from dashboard' : (view === 'past' ? 'Mark as cancelled' : 'Cancel event');
+      menuButton(destructiveLabel, function () {
+        var hiding = view === 'cancelled';
+        var message = hiding
+          ? 'Remove this cancelled event from the dashboard? Its booking records remain stored. This cannot be undone here.'
+          : 'Mark this event as cancelled? It must already be removed from Google Calendar. Refunds are not automatic.';
+        if (window.confirm(message)) runAction(hiding ? '/hide' : '/cancel');
+      }, true);
+      menu.appendChild(summary); menu.appendChild(panel); actions.appendChild(menu);
+    }
     card.appendChild(actions);
     card.appendChild(attendees);
 
     return card;
+  }
+
+  function renderDashboard() {
+    var list = occurrenceGroups[currentView] || [];
+    els.cards.innerHTML = '';
+    list.forEach(function (occurrence) { els.cards.appendChild(renderOccurrence(occurrence, currentView)); });
+    if (els.empty) { els.empty.hidden = list.length > 0; els.empty.textContent = currentView === 'active'
+      ? 'No active dates.' : currentView === 'past' ? 'No past events.' : 'No cancelled events.'; }
+    els.tabs.forEach(function (tab) {
+      var view = tab.dataset.deskView; var count = (occurrenceGroups[view] || []).length;
+      tab.textContent = view.charAt(0).toUpperCase() + view.slice(1) + ' (' + count + ')';
+      tab.setAttribute('aria-selected', view === currentView ? 'true' : 'false');
+    });
+    if (els.count) {
+      var totalLeft = (occurrenceGroups.active || []).reduce(function (sum, o) { return sum + (Number(o.left) || 0); }, 0);
+      els.count.textContent = (occurrenceGroups.active || []).length + ' active date' + ((occurrenceGroups.active || []).length === 1 ? '' : 's') + ' · ' + totalLeft + ' tickets left';
+    }
   }
 
   /* ------------------------------------------------------------ token gate */
@@ -290,22 +448,12 @@
 
     api('/api/admin/occurrences')
       .then(function (data) {
-        var list = (data && data.occurrences) || [];
+        occurrenceGroups = normalizeOccurrenceGroups(data && data.occurrences);
         writeToken(token);
         hideGate();
         if (els.body) els.body.hidden = false;
 
-        els.cards.innerHTML = '';
-        list.forEach(function (occurrence) {
-          els.cards.appendChild(renderOccurrence(occurrence));
-        });
-
-        if (els.empty) els.empty.hidden = list.length > 0;
-        if (els.count) {
-          var totalLeft = list.reduce(function (sum, o) { return sum + (Number(o.left) || 0); }, 0);
-          els.count.textContent = list.length + ' upcoming date' + (list.length === 1 ? '' : 's')
-            + ' · ' + totalLeft + ' tickets left in total';
-        }
+        renderDashboard();
         if (els.stamp) els.stamp.textContent = 'Updated ' + formatWhen(new Date().toISOString());
       })
       .catch(function (err) {
@@ -339,6 +487,7 @@
     window.addEventListener('keydown', trapFocus);
 
     if (els.refresh) els.refresh.addEventListener('click', function () { load(); });
+    els.tabs.forEach(function (tab) { tab.addEventListener('click', function () { currentView = tab.dataset.deskView; renderDashboard(); }); });
     if (els.forget) {
       els.forget.addEventListener('click', function () {
         writeToken('');

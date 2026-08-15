@@ -111,8 +111,7 @@
     }
 
     function defaultPayLabel() {
-      if (!occurrence) return 'Pay securely';
-      return 'Pay ' + rupees(occurrence.price_paise * currentQty());
+      return 'Proceed to payment';
     }
 
     function renderSeats() {
