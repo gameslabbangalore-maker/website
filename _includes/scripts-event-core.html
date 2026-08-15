@@ -79,15 +79,7 @@
       `SUMMARY:${title}`,`LOCATION:${loc.replace(/,/g,'\\,')}`,`DESCRIPTION:${description}`,
       'END:VEVENT','END:VCALENDAR'
     ];
-    const content = lines.join('\r\n');
-    try {
-      if (URL && typeof URL.createObjectURL === 'function' && typeof Blob === 'function'){
-        return URL.createObjectURL(new Blob([content], { type:'text/calendar;charset=utf-8' }));
-      }
-    } catch (error) {
-      console.warn('Calendar file fallback used', error);
-    }
-    return 'data:text/calendar;charset=utf8,' + encodeURIComponent(content);
+    return URL.createObjectURL(new Blob([lines.join('\r\n')], { type:'text/calendar;charset=utf-8' }));
   }
 
   let match = null;
@@ -425,8 +417,6 @@
       let occ = null;
       let mounted = null;
       let flipped = false;
-      let bookingReady = false;
-      let pendingDesktopOpen = false;
 
       function faceHeight(face){
         return Math.ceil(face.getBoundingClientRect().height);
@@ -504,19 +494,6 @@
         syncHeight(true);
         if (scBook) scBook.focus();
       }
-
-      // Intercept desktop booking immediately, rather than waiting for all
-      // occurrence requests. This prevents the fallback link from navigating
-      // away while the flip-card data is still loading.
-      scBook?.addEventListener('click', (event) => {
-        if (!isDesktop() || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
-        event.preventDefault();
-        if (!bookingReady){
-          pendingDesktopOpen = true;
-          return;
-        }
-        showForm();
-      });
 
       const drawer      = document.getElementById('bookDrawer');
       const drawerSheet = document.getElementById('bookDrawerSheet');
@@ -730,7 +707,6 @@
         defaultBookableChoice = defaultChoice.bookable ? defaultChoice : null;
         occ = primaryOcc;
         const soldOut = !occurrenceChoices.some(choice => choice.bookable);
-        bookingReady = !soldOut && canFlip;
 
         if (primaryOcc.price_paise > 0){
           assignText(M.R0, '₹' + (primaryOcc.price_paise / 100).toLocaleString('en-IN') + ' / person');
@@ -759,16 +735,16 @@
             document.fonts.ready.then(() => syncHeight(false));
           }
 
+          scBook?.addEventListener('click', (e) => {
+            if (!isDesktop() || !isPlainClick(e)) return;
+            if (showForm()) e.preventDefault();
+          });
+
           let hTimer = null;
           window.addEventListener('resize', () => {
             if (hTimer) clearTimeout(hTimer);
             hTimer = setTimeout(() => syncHeight(false), 150);
           });
-
-          if (pendingDesktopOpen){
-            pendingDesktopOpen = false;
-            showForm();
-          }
         }
 
         if (!soldOut && canDrawer){
@@ -792,7 +768,6 @@
 
         requestAnimationFrame(updateFabSpacing);
       } catch (e) {
-        console.error('Booking controls could not be initialised', e);
       }
     })();
   }
