@@ -119,6 +119,7 @@
   const scSeats   = document.getElementById('scSeats');
   const scPrice   = document.getElementById('scPrice');
   const scBook    = document.getElementById('scBook');
+  const scMoreDates = document.getElementById('scMoreDates');
   const fabBook   = document.getElementById('fabBook');
   const fabNoDate = document.getElementById('fabNoDate');
   const shareFab  = document.getElementById('shareFab');
@@ -251,7 +252,7 @@
     if (scBlock) scBlock.hidden = false;
     scWhen && (scWhen.textContent = whenText);
     scWhere && (scWhere.textContent = locationText || '');
-    scTime && (scTime.textContent = timeStr ? ' · ' + timeStr : '');
+    scTime && (scTime.textContent = timeStr ? ' | ' + timeStr : '');
     if (scAdd) scAdd.href = makeICS({ title: titleFallback, start: scheduleDate, endTime:match?.end, durationHours:3, locationText, locationUrl, description:location.href });
     if (scDir){
       if (locationUrl){
@@ -272,6 +273,10 @@
     } else {
       if (fabBook){ fabBook.setAttribute('hidden',''); }
       updateFabSpacing();
+    }
+    if (scMoreDates && matches.length > 1){
+      scMoreDates.textContent = 'and on ' + (matches.length - 1) + ' more date' + (matches.length === 2 ? '' : 's');
+      scMoreDates.removeAttribute('hidden');
     }
   } else {
     scHeading && scHeading.setAttribute('hidden','');
@@ -611,7 +616,7 @@
         const venue = item.venue_name || entry.location_name || 'To be Announced';
         if (scWhen) scWhen.textContent = dateOnlyLabel(choice);
         if (scWhere) scWhere.textContent = venue;
-        if (scTime) scTime.textContent = fmtTime(start, timezone) ? ' · ' + fmtTime(start, timezone) : '';
+        if (scTime) scTime.textContent = fmtTime(start, timezone) ? ' | ' + fmtTime(start, timezone) : '';
         if (scAdd) scAdd.href = makeICS({ title:titleFallback, start, endTime:entry.end, durationHours:3, locationText:venue, locationUrl:mapUrl, description:location.href });
         if (scDir){
           if (mapUrl){ scDir.href = mapUrl; scDir.removeAttribute('hidden'); }
