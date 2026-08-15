@@ -54,6 +54,7 @@
       email: field('email'),
       phone: field('phone'),
       qty: field('qty'),
+      unitPrice: form.querySelector('[data-gl-unit-price]'),
       seats: form.querySelector('[data-gl-seats]'),
       total: form.querySelector('[data-gl-total]'),
       pay: form.querySelector('[data-gl-pay]'),
@@ -138,6 +139,10 @@
         els.qty.max = String(maxSelectable());
       }
       if (els.total) els.total.textContent = rupees(occurrence.price_paise * qty);
+      if (els.unitPrice) {
+        els.unitPrice.textContent = rupees(occurrence.price_paise) + ' per person';
+        els.unitPrice.hidden = occurrence.price_paise <= 0;
+      }
       if (els.payLabel && !submitting) els.payLabel.textContent = defaultPayLabel();
       renderSeats();
     }
