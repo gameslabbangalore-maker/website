@@ -65,11 +65,15 @@ export function parseIcs(text) {
     const dtstart = props.get('DTSTART');
     const start = parseDateTime(dtstart?.value, dtstart?.params);
     if (!start) continue;
+    const dtend = props.get('DTEND');
+    const parsedEnd = parseDateTime(dtend?.value, dtend?.params);
+    const end = parsedEnd && parsedEnd > start ? parsedEnd : start;
 
     out.push({
       uid: props.get('UID')?.value || '',
       summary,
       start,
+      end,
       location: decodeText(props.get('LOCATION')?.value || '').trim(),
       description: decodeText(props.get('DESCRIPTION')?.value || '').trim(),
     });
