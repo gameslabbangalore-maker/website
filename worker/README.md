@@ -551,13 +551,26 @@ If that becomes a real pattern, add a time suffix to the id on both sides.
 |---|---|---|
 | occurrences | `draft` | synced, no price yet — not sellable |
 | | `open` | on sale |
-| | `closed` | sales stopped by hand, event still happening |
+| | `closed` | sales stopped by hand, or the event end time has passed |
 | | `cancelled` | called off |
+| | `hidden` | retained in D1 but omitted from the Ticket Desk |
 | bookings | `pending` | seats held, awaiting payment |
 | | `paid` | webhook verified, tickets minted |
 | | `failed` | payment failed or order creation failed |
 | | `expired` | hold lapsed unpaid, seats released |
 | | `refunded` | refunded at Razorpay |
+
+Google Calendar's `DTEND` is stored as `occurrences.ends_at_utc`. The start time
+is still the public schedule time; the end time is internal and is the hard
+booking cutoff used by both the Worker and the static site.
+
+### Deploy from GitHub
+
+The manual **Deploy ticketing Worker** workflow runs tests, applies pending D1
+migrations, deploys the Worker, and immediately syncs Calendar end times.
+Configure repository secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`,
+`TICKETING_API_BASE`, and `TICKETING_ADMIN_TOKEN`, then run the workflow from
+the Actions tab. Keep it manual so production changes remain deliberate.
 
 ### Known trade-offs
 

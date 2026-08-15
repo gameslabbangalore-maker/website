@@ -237,7 +237,7 @@ async function main() {
   }
 
   const locations = await loadLocations();
-  const todayKey = formatDayKey(new Date());
+  const now = new Date();
   const deduped = new Map();
 
   for (const props of parseIcsEvents(icsText)) {
@@ -249,9 +249,11 @@ async function main() {
 
     const start = parseDateTime(props.get('DTSTART')?.value, props.get('DTSTART')?.params);
     if (!start) continue;
+    const parsedEnd = parseDateTime(props.get('DTEND')?.value, props.get('DTEND')?.params);
+    const end = parsedEnd && parsedEnd > start ? parsedEnd : start;
 
     const dayKey = formatDayKey(start);
-    if (dayKey < todayKey) continue;
+    if (end <= now) continue;
 
     const slug = slugify(summary);
     const rawLocationValue = props.get('LOCATION')?.value || '';
@@ -263,6 +265,7 @@ async function main() {
       title: summary,
       slug,
       start: toIsoString(start),
+      end: toIsoString(end),
       day_key: dayKey,
       timezone: DEFAULT_TIMEZONE,
       location_name: locationMatch ? locationMatch.name : 'To be Announced',
@@ -271,9 +274,10 @@ async function main() {
       raw_location: rawLocation,
     };
 
-    const existing = deduped.get(slug);
+    const occurrenceKey = `${slug}-${dayKey.replace(/-/g, '')}`;
+    const existing = deduped.get(occurrenceKey);
     if (!existing || Date.parse(event.start) < Date.parse(existing.start || '')) {
-      deduped.set(slug, event);
+      deduped.set(occurrenceKey, event);
     }
   }
 

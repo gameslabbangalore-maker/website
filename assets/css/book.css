@@ -124,8 +124,8 @@
 .gl-book { display: grid; gap: 16px; }
 
 .gl-book__title { margin: 0; font-size: 18px; }
-
 .book-field { display: grid; gap: 6px; }
+.book-field[hidden] { display: none; }
 
 .book-field label {
   display: grid;
@@ -135,7 +135,8 @@
   color: var(--muted);
 }
 
-.book-field input {
+.book-field input,
+.book-field select {
   width: 100%;
   box-sizing: border-box;
   background: var(--bg);
@@ -148,7 +149,8 @@
   font-size: 16px;
 }
 
-.book-field input:focus-visible {
+.book-field input:focus-visible,
+.book-field select:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
   border-color: var(--accent);
