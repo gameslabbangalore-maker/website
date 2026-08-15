@@ -122,6 +122,10 @@
   const fabBook   = document.getElementById('fabBook');
   const fabNoDate = document.getElementById('fabNoDate');
   const shareFab  = document.getElementById('shareFab');
+
+  // Older cached event markup included a redundant multi-date note in the
+  // schedule card. The selector now communicates this, so remove that note.
+  document.querySelectorAll('#scheduleBlock .sched-more-dates, #scMoreDates').forEach(el => el.remove());
   const noDateNotice = document.getElementById('noDateNotice');
 
   const M = {
@@ -251,7 +255,7 @@
     if (scBlock) scBlock.hidden = false;
     scWhen && (scWhen.textContent = whenText);
     scWhere && (scWhere.textContent = locationText || '');
-    scTime && (scTime.textContent = timeStr ? ' · ' + timeStr : '');
+    scTime && (scTime.textContent = timeStr ? ' | ' + timeStr : '');
     if (scAdd) scAdd.href = makeICS({ title: titleFallback, start: scheduleDate, endTime:match?.end, durationHours:3, locationText, locationUrl, description:location.href });
     if (scDir){
       if (locationUrl){
@@ -615,7 +619,7 @@
         const venue = item.venue_name || entry.location_name || 'To be Announced';
         if (scWhen) scWhen.textContent = dateOnlyLabel(choice);
         if (scWhere) scWhere.textContent = venue;
-        if (scTime) scTime.textContent = fmtTime(start, timezone) ? ' · ' + fmtTime(start, timezone) : '';
+        if (scTime) scTime.textContent = fmtTime(start, timezone) ? ' | ' + fmtTime(start, timezone) : '';
         if (scAdd) scAdd.href = makeICS({ title:titleFallback, start, endTime:entry.end, durationHours:3, locationText:venue, locationUrl:mapUrl, description:location.href });
         if (scDir){
           if (mapUrl){ scDir.href = mapUrl; scDir.removeAttribute('hidden'); }
