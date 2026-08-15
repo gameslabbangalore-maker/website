@@ -274,9 +274,10 @@ async function main() {
       raw_location: rawLocation,
     };
 
-    const existing = deduped.get(slug);
+    const occurrenceKey = `${slug}-${dayKey.replace(/-/g, '')}`;
+    const existing = deduped.get(occurrenceKey);
     if (!existing || Date.parse(event.start) < Date.parse(existing.start || '')) {
-      deduped.set(slug, event);
+      deduped.set(occurrenceKey, event);
     }
   }
 

@@ -95,6 +95,19 @@
       return da - db;
     });
 
+    const grouped = new Map();
+    list.forEach(entry => {
+      const slug = normalizeSlug(entry?.slug || entry?.title);
+      if (!slug) return;
+      if (!grouped.has(slug)) grouped.set(slug, []);
+      grouped.get(slug).push(entry);
+    });
+    list = Array.from(grouped.values()).map(dates => {
+      const primary = Object.assign({}, dates[0]);
+      primary.additional_dates = Math.max(0, dates.length - 1);
+      return primary;
+    });
+
     if (list.length > 0) setSkeletons(container, list.length);
 
     list.forEach((entry, idx) => {
@@ -134,6 +147,13 @@
       metaLine.className = 'meta';
       metaLine.textContent = [dateLabel, timeLabel].filter(Boolean).join(' | ');
       body.appendChild(metaLine);
+
+      if (entry.additional_dates > 0){
+        const moreDates = document.createElement('p');
+        moreDates.className = 'more-dates';
+        moreDates.textContent = 'Also available on ' + entry.additional_dates + ' more date' + (entry.additional_dates === 1 ? '' : 's');
+        body.appendChild(moreDates);
+      }
 
       if (entry.location_warning && entry.raw_location){
         console.warn('Calendar location mismatch for "%s": "%s"', title, entry.raw_location);

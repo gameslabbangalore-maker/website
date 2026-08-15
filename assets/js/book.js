@@ -60,7 +60,7 @@
     }
     if (els.where) els.where.textContent = occurrence.venue_name || 'To be Announced';
     if (els.price) {
-      els.price.textContent = window.GLBooking.rupees(occurrence.price_paise) + ' per ticket';
+      els.price.textContent = window.GLBooking.rupees(occurrence.price_paise) + ' per person';
     }
     if (els.directions && occurrence.venue_map_url) {
       els.directions.href = occurrence.venue_map_url;

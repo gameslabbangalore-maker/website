@@ -34,12 +34,14 @@
                 <a id="scDir" class="inline-link" href="#" target="_blank" rel="noopener">Get directions</a>
               </div>
               <p class="sched-seats" id="scSeats" hidden></p>
+              <p class="sched-price" id="scPrice" hidden></p>
+              <p class="sched-more-dates" id="scMoreDates" hidden></p>
             </div>
             <a id="scBook" class="btn btn-primary wide-cta" href="#" target="_blank" rel="noopener">Book Now</a>
           </section>
 
           <section class="sched-flip__face sched-flip__back" id="schedBack" aria-hidden="true" inert>
-            {% include booking-form.html compact=true heading="Your details" %}
+            {% include booking-form.html compact=true date_selector=true heading="Your details" %}
           </section>
 
         </div>

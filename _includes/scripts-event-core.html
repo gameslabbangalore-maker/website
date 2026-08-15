@@ -80,6 +80,7 @@
   }
 
   let match = null;
+  let matches = [];
   let timezone = 'Asia/Kolkata';
 
   try {
@@ -91,14 +92,15 @@
 
     const pathSlug = normalizeSlug(pagePath.split('/').filter(Boolean).pop());
 
-    match = events.find(entry => {
+    matches = events.filter(entry => {
       if (!entry) return false;
       const entrySlug = normalizeSlug(entry.slug || entry.title);
       if (PAGE_SLUG && entrySlug === normalizeSlug(PAGE_SLUG)) return true;
       if (pathSlug && entrySlug === pathSlug) return true;
       if (titleFallback && entry.title && entry.title.toLowerCase() === titleFallback.toLowerCase()) return true;
       return false;
-    });
+    }).sort((a, b) => Date.parse(a.start || '') - Date.parse(b.start || ''));
+    match = matches[0] || null;
   } catch (e) {
     console.error('Calendar load error', e);
   }
@@ -110,6 +112,8 @@
   const scAdd     = document.getElementById('scAddCal');
   const scDir     = document.getElementById('scDir');
   const scSeats   = document.getElementById('scSeats');
+  const scPrice   = document.getElementById('scPrice');
+  const scMoreDates = document.getElementById('scMoreDates');
   const scBook    = document.getElementById('scBook');
   const fabBook   = document.getElementById('fabBook');
   const fabNoDate = document.getElementById('fabNoDate');
@@ -216,6 +220,13 @@
   const occurrenceDay = (match?.day_key || eventDayKey || '').replace(/-/g, '');
   const occurrenceId = (occurrenceSlug && occurrenceDay) ? (occurrenceSlug + '-' + occurrenceDay) : '';
 
+  function occurrenceIdFor(entry){
+    const slug = normalizeSlug(entry?.slug || entry?.title || PAGE_SLUG);
+    const date = parseStart(entry);
+    const key = (entry?.day_key || (date ? dayKey(date, timezone) : '')).replace(/-/g, '');
+    return slug && key ? slug + '-' + key : '';
+  }
+
   const useInHouse = Boolean(TICKETING.enabled && TICKETING.apiBase && occurrenceId);
   const ticket = useInHouse
     ? (TICKETING.bookPath + '?o=' + encodeURIComponent(occurrenceId))
@@ -256,6 +267,10 @@
     } else {
       if (fabBook){ fabBook.setAttribute('hidden',''); }
       updateFabSpacing();
+    }
+    if (scMoreDates && matches.length > 1){
+      scMoreDates.textContent = 'Also available on ' + (matches.length - 1) + ' more date' + (matches.length === 2 ? '' : 's');
+      scMoreDates.removeAttribute('hidden');
     }
   } else {
     scHeading && scHeading.setAttribute('hidden','');
@@ -555,31 +570,95 @@
         updateFabSpacing();
       }
 
+      let occurrenceChoices = [];
+
+      function choiceLabel(choice){
+        const item = choice.occurrence;
+        const bits = [window.GLBooking.formatWhen(item.starts_at, timezone)];
+        if (item.venue_name) bits.push(item.venue_name);
+        const left = Math.max(0, Number(item.available) || 0);
+        if (choice.bookable) bits.push(left === 1 ? '1 ticket left' : left + ' tickets left');
+        else if (item.status === 'closed' && left > 0) bits.push('Registrations paused');
+        else bits.push('Sold out');
+        return bits.filter(Boolean).join(' — ');
+      }
+
+      function updateDrawerMeta(){
+        if (!drawerMeta || !occ) return;
+        const bits = [window.GLBooking.formatWhen(occ.starts_at, timezone)];
+        if (occ.venue_name) bits.push(occ.venue_name);
+        drawerMeta.textContent = bits.filter(Boolean).join('  ·  ');
+      }
+
+      function selectOccurrence(id){
+        const choice = occurrenceChoices.find(item => item.occurrence.id === id && item.bookable);
+        if (!choice) return;
+        occ = choice.occurrence;
+        mounted?.setOccurrence(occ);
+        drawerMounted?.setOccurrence(occ);
+        document.querySelectorAll('[data-gl-date]').forEach(select => { select.value = occ.id; });
+        updateDrawerMeta();
+        if (flipped) syncHeight(true);
+      }
+
+      function setupDateSelectors(){
+        [bookForm, drawerForm].forEach(form => {
+          if (!form) return;
+          const field = form.querySelector('[data-gl-date-field]');
+          const select = form.querySelector('[data-gl-date]');
+          if (!field || !select) return;
+          field.hidden = occurrenceChoices.length <= 1;
+          select.innerHTML = '';
+          occurrenceChoices.forEach(choice => {
+            const option = document.createElement('option');
+            option.value = choice.occurrence.id;
+            option.textContent = choiceLabel(choice);
+            option.disabled = !choice.bookable;
+            select.appendChild(option);
+          });
+          select.value = occ.id;
+          select.addEventListener('change', () => selectOccurrence(select.value));
+        });
+      }
+
       try {
-        const res = await fetch(TICKETING.apiBase + '/api/occurrences/' + encodeURIComponent(occurrenceId), { cache:'no-store' });
-        if (!res.ok) return;
-        const data = await res.json();
-        occ = data && data.occurrence;
-        if (!occ) return;
+        occurrenceChoices = (await Promise.all(matches.map(async entry => {
+          const id = occurrenceIdFor(entry);
+          if (!id) return null;
+          const occurrence = await window.GLBooking.fetchOccurrence(TICKETING.apiBase, id).catch(() => null);
+          if (!occurrence) return null;
+          return {
+            entry,
+            occurrence,
+            bookable: Boolean(occurrence.on_sale) && Number(occurrence.available) > 0,
+          };
+        }))).filter(Boolean);
+        if (!occurrenceChoices.length) return;
 
-        const priceText = occ.price_paise > 0
-          ? '₹' + (occ.price_paise / 100).toLocaleString('en-IN')
-          : '';
+        const primaryChoice = occurrenceChoices[0];
+        const defaultChoice = occurrenceChoices.find(choice => choice.bookable) || primaryChoice;
+        const primaryOcc = primaryChoice.occurrence;
+        occ = defaultChoice.occurrence;
+        const soldOut = !occurrenceChoices.some(choice => choice.bookable);
 
-        const soldOut = !occ.on_sale || Number(occ.available) <= 0;
+        if (primaryOcc.price_paise > 0){
+          const unitPrice = '₹' + (primaryOcc.price_paise / 100).toLocaleString('en-IN') + ' per person';
+          if (scPrice){ scPrice.textContent = unitPrice; scPrice.removeAttribute('hidden'); }
+          assignText(M.R0, '₹' + (primaryOcc.price_paise / 100).toLocaleString('en-IN') + ' / person');
+        }
+
         if (soldOut){
           markSoldOut();
-        } else if (priceText){
-          [scBook, fabBook].forEach(el => {
-            if (el) el.textContent = 'Book Now · ' + priceText;
-          });
+        } else {
+          [scBook, fabBook].forEach(el => { if (el) el.textContent = 'Book Now'; });
         }
 
         // Live seat count on the schedule card, so nobody has to guess.
-        const left = Math.max(0, Number(occ.available) || 0);
-        const capacity = Number(occ.capacity) || 0;
+        const primarySoldOut = !primaryChoice.bookable;
+        const left = Math.max(0, Number(primaryOcc.available) || 0);
+        const capacity = Number(primaryOcc.capacity) || 0;
         if (scSeats){
-          if (soldOut){
+          if (primarySoldOut){
             scSeats.textContent = 'Sold out';
             scSeats.setAttribute('data-low','');
             scSeats.removeAttribute('hidden');
@@ -592,6 +671,9 @@
             scSeats.removeAttribute('hidden');
           }
         }
+
+        setupDateSelectors();
+        updateDrawerMeta();
 
         const isPlainClick = (e) =>
           !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && e.button === 0;
@@ -627,14 +709,6 @@
           drawer.querySelectorAll('[data-drawer-close]').forEach((el) => {
             el.addEventListener('click', closeDrawer);
           });
-
-          if (drawerMeta){
-            const bits = [];
-            if (whenText) bits.push(whenText + (timeStr ? ' · ' + timeStr : ''));
-            if (locationText) bits.push(locationText);
-            if (occ.price_paise > 0) bits.push('₹' + (occ.price_paise / 100).toLocaleString('en-IN') + ' per ticket');
-            drawerMeta.textContent = bits.join('  ·  ');
-          }
 
           window.addEventListener('keydown', trapFocus);
         }
