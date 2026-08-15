@@ -83,8 +83,8 @@
     const now = Date.now();
     list = list.filter(entry => {
       if (!entry || !entry.start) return false;
-      const start = Date.parse(entry.start);
-      return !Number.isNaN(start) && start >= now;
+      const end = Date.parse(entry.end || entry.start);
+      return !Number.isNaN(end) && end > now;
     });
 
     list.sort((a, b) => {
@@ -93,6 +93,19 @@
       if (!da) return 1;
       if (!db) return -1;
       return da - db;
+    });
+
+    const grouped = new Map();
+    list.forEach(entry => {
+      const slug = normalizeSlug(entry?.slug || entry?.title);
+      if (!slug) return;
+      if (!grouped.has(slug)) grouped.set(slug, []);
+      grouped.get(slug).push(entry);
+    });
+    list = Array.from(grouped.values()).map(dates => {
+      const primary = Object.assign({}, dates[0]);
+      primary.additional_dates = Math.max(0, dates.length - 1);
+      return primary;
     });
 
     if (list.length > 0) setSkeletons(container, list.length);
@@ -134,6 +147,13 @@
       metaLine.className = 'meta';
       metaLine.textContent = [dateLabel, timeLabel].filter(Boolean).join(' | ');
       body.appendChild(metaLine);
+
+      if (entry.additional_dates > 0){
+        const moreDates = document.createElement('p');
+        moreDates.className = 'more-dates';
+        moreDates.textContent = 'Also available on ' + entry.additional_dates + ' more date' + (entry.additional_dates === 1 ? '' : 's');
+        body.appendChild(moreDates);
+      }
 
       if (entry.location_warning && entry.raw_location){
         console.warn('Calendar location mismatch for "%s": "%s"', title, entry.raw_location);

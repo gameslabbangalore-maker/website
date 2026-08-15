@@ -9,6 +9,15 @@
     <h3 class="gl-book__title">{{ include.heading }}</h3>
   {% endif %}
 
+  {% if include.date_selector %}
+    <div class="book-field" data-gl-date-field hidden>
+      <label>Choose date
+        <select data-gl-date></select>
+      </label>
+    </div>
+    <p class="book-unit-price" data-gl-unit-price hidden></p>
+  {% endif %}
+
   <div class="book-field">
     <label>Full name
       <input data-gl-field="name" type="text" autocomplete="off"
@@ -57,7 +66,7 @@
   </div>
 
   <button class="book-btn book-pay" type="submit" data-gl-pay>
-    <span data-gl-pay-label>Pay securely</span>
+    <span data-gl-pay-label>Proceed to payment</span>
   </button>
 
   <button class="gl-book__cancel" type="button" data-gl-cancel hidden>Back</button>
