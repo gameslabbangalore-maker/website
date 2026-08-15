@@ -128,7 +128,7 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
   .schedule-list{display:grid;gap:10px;margin-bottom:10px}
   .schedule-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
   .when{font-weight:900;font-size:16px;min-width:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .schedule-date-select{width:auto;max-width:175px;padding:0 24px 0 0;border:0;border-radius:0;background-color:var(--card);color:var(--text-main);font:inherit;font-size:14px;font-weight:900;text-align:left;text-align-last:left;cursor:pointer;box-shadow:none}
+  .schedule-date-select{display:inline-block;width:175px;max-width:100%;margin:0;padding:0 24px 0 0;border:0;border-radius:0;-webkit-appearance:none;appearance:none;background-color:var(--card);background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);background-position:calc(100% - 8px) 50%,calc(100% - 3px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;color:var(--text-main);font:inherit;font-size:14px;font-weight:900;text-align:left;text-align-last:left;direction:ltr;cursor:pointer;box-shadow:none}
   .schedule-date-select:hover,.schedule-date-select:focus{background-color:var(--card);box-shadow:none}
   .schedule-date-select:focus-visible{outline:0}
   .schedule-date-select[hidden]{display:none}
