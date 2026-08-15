@@ -285,6 +285,10 @@
       if (fabBook){ fabBook.setAttribute('hidden',''); }
       updateFabSpacing();
     }
+    if (scMoreDates && matches.length > 1){
+      scMoreDates.textContent = 'Happening on ' + (matches.length - 1) + ' more date' + (matches.length === 2 ? '' : 's');
+      scMoreDates.removeAttribute('hidden');
+    }
   } else {
     scHeading && scHeading.setAttribute('hidden','');
     if (scBlock) scBlock.hidden = true;
