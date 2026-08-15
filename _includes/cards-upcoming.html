@@ -135,13 +135,6 @@
       const dateLabel = start ? formatDate(start, timezone) : '';
       const timeLabel = start ? formatTime(start, timezone) : '';
 
-      if (entry.additional_dates > 0){
-        const moreDates = document.createElement('p');
-        moreDates.className = 'more-dates';
-        moreDates.textContent = 'Also available on ' + entry.additional_dates + ' more date' + (entry.additional_dates === 1 ? '' : 's');
-        body.appendChild(moreDates);
-      }
-
       if (entry.location_warning && entry.raw_location){
         console.warn('Calendar location mismatch for "%s": "%s"', title, entry.raw_location);
       }
@@ -164,7 +157,7 @@
       if (entry.additional_dates > 0){
         const moreDates = document.createElement('p');
         moreDates.className = 'more-dates';
-        moreDates.textContent = 'Also available on ' + entry.additional_dates + ' more date' + (entry.additional_dates === 1 ? '' : 's');
+        moreDates.textContent = 'Happening on ' + entry.additional_dates + ' more date' + (entry.additional_dates === 1 ? '' : 's');
         body.appendChild(moreDates);
       }
 
