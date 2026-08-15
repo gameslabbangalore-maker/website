@@ -108,7 +108,9 @@
   const scHeading = document.getElementById('scheduleHeading');
   const scBlock   = document.getElementById('scheduleBlock');
   const scWhen    = document.getElementById('scWhen');
+  const scDateSelect = document.getElementById('scDateSelect');
   const scWhere   = document.getElementById('scWhere');
+  const scTime    = document.getElementById('scTime');
   const scAdd     = document.getElementById('scAddCal');
   const scDir     = document.getElementById('scDir');
   const scSeats   = document.getElementById('scSeats');
@@ -247,6 +249,7 @@
     if (scBlock) scBlock.hidden = false;
     scWhen && (scWhen.textContent = whenText);
     scWhere && (scWhere.textContent = locationText || '');
+    scTime && (scTime.textContent = timeStr ? ' · ' + timeStr : '');
     if (scAdd) scAdd.href = makeICS({ title: titleFallback, start: scheduleDate, durationHours: 3, locationText, locationUrl, description: location.href });
     if (scDir){
       if (locationUrl){
@@ -497,6 +500,11 @@
 
       function openDrawer(){
         if (!canDrawer || drawerOpen) return false;
+        if (defaultBookableChoice){
+          setCurrentOccurrence(defaultBookableChoice.occurrence.id);
+          const dateSelect = drawerForm.querySelector('[data-gl-date]');
+          if (dateSelect) dateSelect.value = defaultBookableChoice.occurrence.id;
+        }
         lastFocus = document.activeElement;
         drawerOpen = true;
 
@@ -571,54 +579,105 @@
       }
 
       let occurrenceChoices = [];
-
-      function choiceLabel(choice){
-        const item = choice.occurrence;
-        const bits = [window.GLBooking.formatWhen(item.starts_at, timezone)];
-        if (item.venue_name) bits.push(item.venue_name);
-        const left = Math.max(0, Number(item.available) || 0);
-        if (choice.bookable) bits.push(left === 1 ? '1 ticket left' : left + ' tickets left');
-        else if (item.status === 'closed' && left > 0) bits.push('Registrations paused');
-        else bits.push('Sold out');
-        return bits.filter(Boolean).join(' — ');
-      }
+      let defaultBookableChoice = null;
 
       function updateDrawerMeta(){
         if (!drawerMeta || !occ) return;
-        const bits = [window.GLBooking.formatWhen(occ.starts_at, timezone)];
-        if (occ.venue_name) bits.push(occ.venue_name);
+        const start = new Date(occ.starts_at);
+        const bits = [occ.venue_name];
+        if (occurrenceChoices.length <= 1) bits.push(fmtDateOnly(start, timezone));
+        bits.push(fmtTime(start, timezone));
         drawerMeta.textContent = bits.filter(Boolean).join('  ·  ');
       }
 
-      function selectOccurrence(id){
-        const choice = occurrenceChoices.find(item => item.occurrence.id === id && item.bookable);
+      function setCurrentOccurrence(id){
+        const choice = occurrenceChoices.find(item => item.occurrence.id === id);
         if (!choice) return;
         occ = choice.occurrence;
         mounted?.setOccurrence(occ);
         drawerMounted?.setOccurrence(occ);
-        document.querySelectorAll('[data-gl-date]').forEach(select => { select.value = occ.id; });
         updateDrawerMeta();
         if (flipped) syncHeight(true);
       }
 
-      function setupDateSelectors(){
-        [bookForm, drawerForm].forEach(form => {
-          if (!form) return;
-          const field = form.querySelector('[data-gl-date-field]');
-          const select = form.querySelector('[data-gl-date]');
+      function dateOnlyLabel(choice){
+        return fmtDateOnly(new Date(choice.occurrence.starts_at), timezone);
+      }
+
+      function renderScheduleChoice(choice){
+        const item = choice.occurrence;
+        const entry = choice.entry;
+        const start = new Date(item.starts_at);
+        const mapUrl = item.venue_map_url || entry.location_map_url || '';
+        const venue = item.venue_name || entry.location_name || 'To be Announced';
+        if (scWhen) scWhen.textContent = dateOnlyLabel(choice);
+        if (scWhere) scWhere.textContent = venue;
+        if (scTime) scTime.textContent = fmtTime(start, timezone) ? ' · ' + fmtTime(start, timezone) : '';
+        if (scAdd) scAdd.href = makeICS({ title:titleFallback, start, durationHours:3, locationText:venue, locationUrl:mapUrl, description:location.href });
+        if (scDir){
+          if (mapUrl){ scDir.href = mapUrl; scDir.removeAttribute('hidden'); }
+          else { scDir.setAttribute('hidden',''); scDir.removeAttribute('href'); }
+        }
+
+        const left = Math.max(0, Number(item.available) || 0);
+        const capacity = Number(item.capacity) || 0;
+        if (scSeats){
+          scSeats.textContent = choice.bookable
+            ? (left === 1 ? 'Only 1 ticket left' : left + (capacity ? ' of ' + capacity : '') + ' tickets left')
+            : (item.status === 'closed' && left > 0 ? 'Registrations paused' : 'Sold out');
+          scSeats.toggleAttribute('data-low', !choice.bookable || left <= 6);
+          scSeats.removeAttribute('hidden');
+        }
+        if (scPrice && item.price_paise > 0){
+          scPrice.textContent = '₹' + (item.price_paise / 100).toLocaleString('en-IN') + ' per person';
+          scPrice.removeAttribute('hidden');
+        }
+        if (scBook){
+          scBook.textContent = choice.bookable ? 'Book Now' : 'Unavailable for this date';
+          scBook.toggleAttribute('aria-disabled', !choice.bookable);
+          scBook.style.pointerEvents = choice.bookable ? '' : 'none';
+          scBook.style.opacity = choice.bookable ? '' : '.6';
+          if (choice.bookable) scBook.href = TICKETING.bookPath + '?o=' + encodeURIComponent(item.id);
+          else scBook.removeAttribute('href');
+        }
+      }
+
+      function setupDateSelectors(primaryChoice, defaultChoice){
+        if (scDateSelect){
+          scDateSelect.innerHTML = '';
+          occurrenceChoices.forEach(choice => {
+            const option = document.createElement('option');
+            option.value = choice.occurrence.id;
+            option.textContent = dateOnlyLabel(choice);
+            scDateSelect.appendChild(option);
+          });
+          scDateSelect.hidden = occurrenceChoices.length <= 1;
+          if (scWhen) scWhen.hidden = occurrenceChoices.length > 1;
+          scDateSelect.value = primaryChoice.occurrence.id;
+          scDateSelect.addEventListener('change', () => {
+            const choice = occurrenceChoices.find(item => item.occurrence.id === scDateSelect.value);
+            if (!choice) return;
+            setCurrentOccurrence(choice.occurrence.id);
+            renderScheduleChoice(choice);
+          });
+        }
+
+        if (drawerForm){
+          const field = drawerForm.querySelector('[data-gl-date-field]');
+          const select = drawerForm.querySelector('[data-gl-date]');
           if (!field || !select) return;
           field.hidden = occurrenceChoices.length <= 1;
           select.innerHTML = '';
           occurrenceChoices.forEach(choice => {
             const option = document.createElement('option');
             option.value = choice.occurrence.id;
-            option.textContent = choiceLabel(choice);
+            option.textContent = dateOnlyLabel(choice);
             option.disabled = !choice.bookable;
             select.appendChild(option);
           });
-          select.value = occ.id;
-          select.addEventListener('change', () => selectOccurrence(select.value));
-        });
+          select.value = defaultChoice.occurrence.id;
+          select.addEventListener('change', () => setCurrentOccurrence(select.value));
+        }
       }
 
       try {
@@ -638,41 +697,22 @@
         const primaryChoice = occurrenceChoices[0];
         const defaultChoice = occurrenceChoices.find(choice => choice.bookable) || primaryChoice;
         const primaryOcc = primaryChoice.occurrence;
-        occ = defaultChoice.occurrence;
+        defaultBookableChoice = defaultChoice.bookable ? defaultChoice : null;
+        occ = primaryOcc;
         const soldOut = !occurrenceChoices.some(choice => choice.bookable);
 
         if (primaryOcc.price_paise > 0){
-          const unitPrice = '₹' + (primaryOcc.price_paise / 100).toLocaleString('en-IN') + ' per person';
-          if (scPrice){ scPrice.textContent = unitPrice; scPrice.removeAttribute('hidden'); }
           assignText(M.R0, '₹' + (primaryOcc.price_paise / 100).toLocaleString('en-IN') + ' / person');
         }
 
         if (soldOut){
           markSoldOut();
         } else {
-          [scBook, fabBook].forEach(el => { if (el) el.textContent = 'Book Now'; });
+          if (fabBook) fabBook.textContent = 'Book Now';
         }
 
-        // Live seat count on the schedule card, so nobody has to guess.
-        const primarySoldOut = !primaryChoice.bookable;
-        const left = Math.max(0, Number(primaryOcc.available) || 0);
-        const capacity = Number(primaryOcc.capacity) || 0;
-        if (scSeats){
-          if (primarySoldOut){
-            scSeats.textContent = 'Sold out';
-            scSeats.setAttribute('data-low','');
-            scSeats.removeAttribute('hidden');
-          } else if (left > 0){
-            scSeats.textContent = left === 1
-              ? 'Only 1 ticket left'
-              : left + (capacity ? ' of ' + capacity : '') + ' tickets left';
-            if (left <= 6) scSeats.setAttribute('data-low','');
-            else scSeats.removeAttribute('data-low');
-            scSeats.removeAttribute('hidden');
-          }
-        }
-
-        setupDateSelectors();
+        renderScheduleChoice(primaryChoice);
+        setupDateSelectors(primaryChoice, defaultChoice);
         updateDrawerMeta();
 
         const isPlainClick = (e) =>

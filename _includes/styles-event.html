@@ -127,15 +127,19 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
   .info-card h3{margin:0 0 14px;font-size:13px;letter-spacing:.45px;text-transform:uppercase;color:var(--muted);text-align:center}
   .schedule-list{display:grid;gap:10px;margin-bottom:10px}
   .schedule-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
-  .when{font-weight:900;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .when{font-weight:900;font-size:16px;min-width:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .schedule-date-select{width:100%;max-width:210px;padding:5px 26px 5px 7px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:var(--bg);color:var(--text-main);font:inherit;font-size:14px;font-weight:900}
+  .schedule-date-select[hidden]{display:none}
   .where{font-weight:900;font-size:16px;color:var(--text-main);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:6px}
+  .where-time{font-size:12.5px;color:var(--muted);font-weight:800}
   .inline-link{font-size:12.5px;font-weight:800;color:var(--muted);text-decoration:none}
-  .sched-seats{margin:8px 0 0;font-size:12.5px;font-weight:800;color:var(--muted);display:flex;align-items:center;gap:7px}
+  .sched-commercial{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px}
+  .sched-seats{margin:0;font-size:12.5px;font-weight:800;color:var(--muted);display:flex;align-items:center;gap:7px;min-width:0}
   .sched-seats::before{content:"";width:7px;height:7px;border-radius:50%;background:#4ec27b;flex:0 0 auto}
   .sched-seats[data-low]{color:var(--accent)}
   .sched-seats[data-low]::before{background:currentColor}
-  .sched-price{margin:6px 0 0;font-size:13px;font-weight:900;color:var(--text-main)}
-  .sched-more-dates{margin:5px 0 0;font-size:12px;font-weight:800;color:var(--muted)}
+  .sched-price{margin:0;font-size:12.5px;font-weight:900;color:var(--text-main);white-space:nowrap}
+  .sched-more-dates{margin:-4px 0 0;font-size:12px;font-weight:800;color:var(--muted);white-space:nowrap}
   .btn-primary{background:var(--accent);color:#000;border:0;font-weight:900}
   .btn-primary:hover{filter:brightness(1.05)}
   .wide-cta{display:block;width:100%;text-align:center;padding:11px 18px;border-radius:999px;margin:6px 0 8px;box-sizing:border-box;text-decoration:none}
@@ -204,7 +208,6 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
   }
 }
 
-.book-unit-price{margin:0;font-size:.9rem;font-weight:900;color:var(--text-main)}
 .book-field[hidden]{display:none}
 .book-field select{width:100%;box-sizing:border-box;padding:11px 12px;border-radius:10px;font:inherit;background:var(--card);color:var(--text-main);border:1px solid rgba(255,255,255,.2)}
 .more-dates{margin:6px 0 0;color:var(--muted);font-size:.82rem;font-weight:800}
@@ -221,6 +224,7 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
 .micro-left{flex:1;min-width:0}
 .micro-right{margin-left:auto;flex-shrink:0;text-align:right}
 .micro-title-row .micro-right{font-size:.88rem;font-weight:900;color:var(--text-main)}
+#microRightTitle{font-size:.84rem;font-weight:800;color:var(--muted);line-height:1.2}
 .micro-action{font-size:.82rem;color:var(--muted);font-weight:800;text-decoration:underline;text-underline-offset:2px;margin-left:auto;white-space:nowrap}
 .micro-action[hidden]{display:none}
 .micro-line:empty{display:none}
@@ -271,6 +275,7 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
   max-height:92vh;
   max-height:92dvh;
   overflow-y:auto;
+  overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
   overscroll-behavior:contain;
   transform:translateY(101%);
@@ -296,8 +301,10 @@ body{background:var(--bg);color:var(--text-main);font-family:'Comfortaa',cursive
 }
 .book-drawer__close:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-.book-drawer__body .gl-book{display:grid;gap:14px}
-.book-drawer__body .book-field label{display:grid;gap:5px;font-size:12.5px;font-weight:800;color:var(--muted)}
+.book-drawer__body,.book-drawer__body .gl-book,.book-drawer__body .book-field{min-width:0;max-width:100%}
+.book-drawer__body .gl-book{display:grid;gap:14px;overflow-x:hidden}
+.book-drawer__body .book-field label{display:grid;gap:5px;font-size:12.5px;font-weight:800;color:var(--muted);min-width:0;max-width:100%}
+.book-drawer__body input,.book-drawer__body select{min-width:0;max-width:100%}
 
 .book-drawer-open .fab-book,
 .book-drawer-open .fab-share{display:none !important}
